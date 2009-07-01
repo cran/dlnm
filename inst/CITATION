@@ -1,0 +1,33 @@
+citHeader("To cite the R package 'dlnm' in publications use:")
+
+desc <- packageDescription("dlnm")
+year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", desc$Date)
+vers <- paste("R package version", desc$Version)
+
+citEntry(entry="Manual",
+         title = paste("dlnm: Distributed Lag Non-linear Models.",vers),
+         author = personList(as.person("Gasparrini, A"),
+                             as.person("Armstrong, B")),
+         year = year,
+         note = vers,
+
+         textVersion =
+         paste("Antonio Gasparrini and Ben Armstrong (",
+               year,
+               "). dlnm: Distributed Lag Non-linear Models. ",
+               vers, ".", sep=""))
+
+citEntry(
+ entry="Article",
+ title= "Models for the relationship between ambient temperature and daily mortality",
+ journal="Epidemiology",
+ volume= "17",
+ number="6",
+ pages="624-631",
+ year="2006",
+ author="Armstrong, B",
+ textVersion="Armstrong, B. (2006) Models for the relationship between ambient temperature and daily
+ mortality. Epidemiology. 17(6):624-631."
+)
+
+citFooter("A BibTeX entry for LaTeX users is returned by: toBibtex(citation('dlnm'))")

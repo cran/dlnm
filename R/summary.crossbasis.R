@@ -1,0 +1,29 @@
+`summary.crossbasis` <-
+function(object, ...) {
+
+	attr <- attributes(object)
+	cat("CROSSBASIS FUNCTIONS\n")
+	cat("Observations:",nrow(object),"\n")
+	cat("Range:",attr$range[1],",",attr$range[2],"\n")
+	cat("Total df:",attr$crossdf,"\n")
+	cat("maxlag:",attr$maxlag,"\n")
+
+	cat("\nBASIS FOR VAR:\n")
+	cat("type:",attr$vartype,"\n")
+	if(!is.null(attr$varknots)) {
+		cat("df:",attr$vardf,", knots at:",attr$varknots,"\n")
+	} else cat("df:",attr$vardf,"\n")
+	if(!is.null(attr$varbound)) cat("boundary knots at",attr$varbound,"\n")
+	if(attr$cen==TRUE) cat("centered on",attr$cenvalue,"\n")
+	if(attr$varint==TRUE) cat("with intercept\n")
+
+	cat("\nBASIS FOR LAG:\n")
+	cat("type:",attr$lagtype,"\n")
+	if(!is.null(attr$lagknots)) {
+		cat("df:",attr$lagdf,", knots at:",attr$lagknots,"\n")
+	} else cat("df:",attr$lagdf,"\n")
+	if(!is.null(attr$lagbound)) cat("boundary knots at",attr$lagbound,"\n")
+	if(attr$lagint==TRUE) cat("with intercept\n")
+
+}
+
