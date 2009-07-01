@@ -1,0 +1,11 @@
+
+export(crossbasis,crosspred,crossplot,mkbasis,mklagbasis)
+
+# documented but not exported
+# export(summary.crossbasis,summary.crosspred)
+
+import(stats,graphics,grDevices)
+importFrom(splines,ns)
+importFrom(tsModel,Lag)
+
+S3method(summary, crossbasis)
