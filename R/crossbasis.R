@@ -1,7 +1,7 @@
 `crossbasis` <-
 function(var,vartype="ns",vardf=1,varknots=NULL,varbound=range(var),
 	varint=FALSE,cen=TRUE,cenvalue=mean(var),maxlag=0,
-	lagtype="ns",lagdf=1,lagknots=NULL,lagbound=c(-1,maxlag),lagint=TRUE) {
+	lagtype="ns",lagdf=1,lagknots=NULL,lagbound=c(0,maxlag),lagint=TRUE) {
 
 ############################################################################
 # CROSSBASIS 

@@ -25,7 +25,7 @@ citEntry(
  number="6",
  pages="624-631",
  year="2006",
- author="Armstrong, B",
+ author = personList(as.person("Armstrong, B")),
  textVersion="Armstrong, B. (2006) Models for the relationship between ambient temperature and daily
  mortality. Epidemiology. 17(6):624-631."
 )

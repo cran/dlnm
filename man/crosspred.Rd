@@ -20,9 +20,11 @@ crosspred(crossbasis, model, at=NULL, from=NULL, to=NULL, by=NULL)
 }
 
 \details{
-The object \code{crossbasis} must be the same containing the cross-basis matrix included in \code{model}, including its attributes and class. The set of values for which the effects must be computed can be specified by \code{at} or alternatively  by \code{from}/\code{to}/\code{by}. By default, \code{from} and \code{to} correspond to the range of the original vector of observation stored in the \code{crossbasis} object (see \code{\link{crossbasis}}). If \code{by} is not provided, 30 equally spaced values are returned.
+The object \code{crossbasis} must be the same containing the cross-basis matrix included in \code{model}, including its attributes and class. The set of values for which the effects must be computed can be specified by \code{at} or alternatively  by \code{from}/\code{to}/\code{by}. If specified by \code{at}, the values are automatically ordered and made unique. By default, \code{from} and \code{to} correspond to the range of the original vector of observation stored in the \code{crossbasis} object (see \code{\link{crossbasis}}). If \code{by} is not provided, 30 equally spaced values are returned.
 
-A vignette with a detailed overview of all the functionalities of the package will be added in the next releases.
+For a detailed overview of the options, see:
+
+\code{vignette("dlnmOverview", package = "dlnm")}
 }
 
 \value{
@@ -66,27 +68,28 @@ data$temp <- (data$tmpd-32)*5/9
 data$o3 <- with(data, o3mean+o3trend)
 
 ### DLM with threshold for the effect of O3 on mortality up to 5 days of lag
-### space of predictor: linear effect above 40 microgr/m3 for O3
+### space of predictor: linear effect above 40.3 microgr/m3 for O3
 ### space of predictor: linear effects below 10C and above 25C for temperature
 ### lag function: integer lag parameterization (unconstrained) for O3
-### lag function: strata at lag 0-1, 2-6 and 7-15 for temperature
+### lag function: strata intervals at lag 0-1, 2-6 and 7-15 for temperature
 
-basis.o3 <- crossbasis(data$o3, vartype="hthr", varknots=40,
+basis.o3 <- crossbasis(data$o3, vartype="hthr", varknots=40.3,
 	lagtype="integer", maxlag=5)
 basis.temp <- crossbasis(data$temp, vartype="thr", varknots=c(10,25),
 	lagtype="strata", lagknots=c(2,7), maxlag=15)
 summary(basis.o3)
 summary(basis.temp)
 model <- glm(death ~  basis.o3 + basis.temp, family=quasipoisson(), data)
-pred.o3 <- crosspred(basis.o3, model, at=0:65)
+pred.o3 <- crosspred(basis.o3, model, at=c(0:65,40.3,50.3))
 
-crossplot(pred.o3, "slices", var=50,
+crossplot(pred.o3, "slices", var=50.3,
 	title="Effect of a 10-unit increase in ozone along lags")
 # overall effect for a 10-unit increase in ozone over 15 days of lag, with CI
-pred.o3$allRRfit["50"]
-cbind(pred.o3$allRRlow, pred.o3$allRRhigh)["50",]
-crossplot(pred.o3, title="3D graph of ozone effect")
+pred.o3$allRRfit["50.3"]
+cbind(pred.o3$allRRlow, pred.o3$allRRhigh)["50.3",]
 crossplot(pred.o3, label="Ozone", title="3D graph of ozone effect")
+
+### See the vignette 'dlnmOverview' for a detailed explanation of this example
 }
 
 \keyword{smooth}

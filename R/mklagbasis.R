@@ -1,6 +1,6 @@
 `mklagbasis` <-
 function(maxlag=0,type="ns",df=1,knots=NULL,
-	bound=c(-1,maxlag),int=TRUE) {
+	bound=c(0,maxlag),int=TRUE) {
 
 # MAXLAG MUST BE >=0
 if(maxlag<0) {

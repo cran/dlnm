@@ -18,6 +18,14 @@ if(!is.null(cenvalue)) {
 if(!type%in%c("ns","strata","poly","integer","thr","lthr","hthr","lin")) {
 	stop("type must be one of ns,strata,poly,integer,thr,lthr,hthr,lin")
 }
+# CHECK ARGUMENT TYPE
+if(!is.numeric(var)) stop("'var' must be a numeric vector")
+if(!is.null(df)&!is.numeric(df)) stop("'df' must be numeric")
+if(!is.null(knots)&!is.numeric(knots)) stop("'knots' must be numeric")
+if(!is.null(bound)&!is.numeric(bound)) stop("'bound' must be numeric")
+if(!is.logical(int)) stop("'int' must be logical")
+if(!is.logical(cen)) stop("'cen' must be logical")
+if(!is.null(cenvalue)&!is.numeric(cenvalue)) stop("'cenvalue' must be numeric")
 # ONE OF DF OR KNOTS MUST BE GIVEN FOR NS, STRATA OR POLY
 if(is.null(df)&is.null(knots) & type%in%c("ns","poly","strata")) {
 	stop("for type 'ns', 'poly' or 'strata' at least df or knots must be specified")
@@ -144,12 +152,12 @@ if(type=="thr")	{
 	}
 	list$basis <- as.matrix(cbind(-pmin(var-knots[1],0),
 		pmax(var-knots[2],0)))
-	df <- 2
+	if(int==TRUE) list$basis <- cbind(1,list$basis)
+	df <- 2+int
 	knots <- knots[1:2]
 	bound <- NULL
 	cen <- FALSE
 	cenvalue <- NULL
-	int <- FALSE
 }
 
 #######
@@ -159,12 +167,12 @@ if(type=="thr")	{
 # ONLY THE FIRST KNOT CONSIDERED
 if(type=="lthr")	{
 	list$basis <- as.matrix(-pmin(var-knots[1],0))
-	df <- 1
+	if(int==TRUE) list$basis <- cbind(1,list$basis)
+	df <- 1+int
 	knots <- knots[1]
 	bound <- NULL
 	cen <- FALSE
 	cenvalue <- NULL
-	int <- FALSE
 }
 
 #######
@@ -174,12 +182,12 @@ if(type=="lthr")	{
 # ONLY THE LAST KNOT CONSIDERED
 if(type=="hthr")	{
 	list$basis <- as.matrix(pmax(var-knots[length(knots)],0))
-	df <- 1
+	if(int==TRUE) list$basis <- cbind(1,list$basis)
+	df <- 1+int
 	knots <- knots[1]
 	bound <- NULL
 	cen <- FALSE
 	cenvalue <- NULL
-	int <- FALSE
 }
 
 #######
@@ -189,10 +197,10 @@ if(type=="hthr")	{
 if(type=="lin")	{
 	if(cen==TRUE) list$basis <- as.matrix(var-cenvalue)
 	if(cen==FALSE) list$basis <- as.matrix(var)
-	df <- 1
+	if(int==TRUE) list$basis <- cbind(1,list$basis)
+	df <- 1+int
 	knots <- NULL
 	bound <- NULL
-	int <- FALSE
 }
 
 ##########################################################################
