@@ -13,7 +13,7 @@ mkbasis(var, type="ns", df=1, knots=NULL, bound = range(var),
 	int=FALSE, cen=TRUE, cenvalue=mean(var))
 
 mklagbasis(maxlag=0, type="ns", df=1, knots=NULL,
-	bound=c(-1, maxlag), int=TRUE)
+	bound=c(0, maxlag), int=TRUE)
 }
 
 \arguments{
@@ -55,6 +55,8 @@ mklagbasis(maxlag=10, type="strata", knots=c(4,7), int=FALSE)
 # centering
 mkbasis(0:10, type="poly", df=3)
 mkbasis(0:10, type="poly", df=3, cen=FALSE)
+
+### See the vignette 'dlnmOverview' for a detailed explanation of this example
 }
 
 \keyword{internal}

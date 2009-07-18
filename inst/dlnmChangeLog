@@ -1,0 +1,64 @@
+=======================
+Changes in dlnm 0.2.1
+=======================
+
+Fixed bugs
+----------
+
+    o	par options in crossplot()
+
+    o	titles for 'slices' in crossplot()
+
+
+=======================
+Changes in dlnm 0.2.0
+=======================
+
+Major changes
+--------------------
+
+    o	The package vignette 'dlnmOverview' has been added.
+
+Documentation
+--------------------
+
+    o	Help pages changed accordingly with the new features.
+
+Examples
+--------------------
+
+    o	The example 2 (in crosspred()) the threshold has been set to
+ 	40.3, in order to show the ordering functionality.
+
+Improvements
+------------
+
+    o	Intercept added to type equal to 'thr', 'hthr', 'lhr', and 'lin'
+
+    o	The vector 'predvar' of predictor values for which the prediction
+ 	must be performed, included in crosspred(), is now automatically
+	ordered and made unique.
+
+Fixed bugs
+----------
+
+    o	Two links to mkbasis() and mklagbasis() added to the help of
+	crossbasis() in order to let the internal functions help page
+	available
+
+    o	par(par.old) included in 'type="slices"' for crossplot() in order
+ 	to redifine a single plot after the command
+
+    o	Error messages added to mkbasis() if argument types are wrong
+
+Minor changes
+-------------
+
+    o	Default value for argument 'lagbound' of crossbasis() changed from
+	c(-1,maxlag) to c(0,maxlag).
+
+
+==================================
+First version in R CRAN dlnm 0.1.0
+==================================
+

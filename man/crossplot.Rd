@@ -31,7 +31,9 @@ Different plots can be obtained choosing the following values for the argument \
 
 \bold{\code{"slices"}}: a multiple plot of effects at specific values of predictor or lags, chosen by \code{var} and \code{lag}, respectively. Up to 4 plots for each dimension are allowed.
 
-A vignette with a detailed overview of all the functionalities of the package will be added in the next releases.
+For a detailed overview of the options, see:
+
+\code{vignette("dlnmOverview", package = "dlnm")}
 }
 
 \references{ 
@@ -79,7 +81,9 @@ crossplot(pred.temp, label="Temperature",
 crossplot(pred.temp, "overall", label="Temperature",
 	title="Overall effect of temperature over 30 days of lag")
 crossplot(pred.temp, "slices", var=c(-20,0,27,33),
-	lag=c(0,5,15,28),	label="Temperature")
+	lag=c(0,5,15,28), label="Temperature")
+
+### See the vignette 'dlnmOverview' for a detailed explanation of this example
 }
 
 \keyword{hplot}

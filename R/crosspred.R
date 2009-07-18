@@ -27,7 +27,7 @@ if(is.null(at)) {
 	if(is.null(by)) {
 		predvar <- seq(from=from,to=to,length.out=30)
 	} else predvar <- seq(from=from,to=to,by=by)
-} else predvar <- at
+} else predvar <- sort(unique(at))
 
 if(!is.null(attr$varknots)) {
 	if(min(predvar)>min(attr$varknots)|max(predvar)<max(attr$varknots)) {

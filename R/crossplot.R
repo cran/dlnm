@@ -55,6 +55,7 @@ if(!is.null(crosspred$matRRfit)) {
 
 if(type=="slices") {
 	mar.old <- par()$mar
+	mfrow.old <- par()$mfrow
 	grey <- grey(0.9)
 	if(length(lag)+length(var)>1) {
 		layout(matrix(1:(length(var)+length(lag)),
@@ -102,12 +103,15 @@ if(type=="slices") {
 				border="white")
 			abline(h=noeff)
 			lines(0:crosspred$maxlag,crosspred$matfit[x[i],],col="red")
-			if(length(lag)>1) mtext(paste(label,"=",var[i]),cex=0.8)
+			if(length(var)>1) mtext(paste(label,"=",var[i]),cex=0.8)
 			title(main=title,ylab=plotlab,xlab="Lag",mgp=c(2,0.7,0),cex=0.7)
 			if(length(lag)==1) title(title,mgp=c(3,0.7,0))
 		}
 	}
-	par(mar=mar.old)
+	if(length(lag)+length(var)>1) {
+		par(mar=mar.old)
+		par(mfrow=mfrow.old)
+	}
 }
 
 ##########

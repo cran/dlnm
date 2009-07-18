@@ -16,9 +16,13 @@ Distributed lag non-linear models (DLNM) represent a modelling framework to desc
 
 Given a series of observations ordered and equally spaced in time, \code{\link{crossbasis}} creates a matrix object of class \code{"crossbasis"} containing the transformed variables to be included in the model formula. The estimation is obtained by default model commands, usually \code{\link[stats::glm]{glm}}. After the model fitting, \code{\link{crosspred}} predicts the results for a set of suitable values of the original predictor and stores them in a \code{"crosspred"} object. Finally, \code{\link{crossplot}} offers a set of choices to plot the results.
 
-For further information on DLNM, see the references below. A vignette with a detailed overview of all the functionalities of the package will be added in the next releases.
-
 Use \code{citation("dlnm")} to cite this package.
+
+A list of changes included in the current and previous versions can be found typing \code{file.show(system.file("dlnmChangeLog", package = "dlnm"))}.
+
+For further information on DLNM, see the references below. For a detailed description of the capabilities of the package, refer to:
+
+\code{vignette("dlnmOverview", package = "dlnm")}
 }
 
 \author{

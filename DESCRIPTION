@@ -1,8 +1,8 @@
 Package: dlnm
 Type: Package
 Title: Distributed Lag Non-linear Models
-Version: 0.1.0
-Date: 2009-07-01
+Version: 0.2.1
+Date: 2009-07-13
 Author: Antonio Gasparrini and Ben Armstrong
 Maintainer: Antonio Gasparrini <antonio.gasparrini@lshtm.ac.uk>
 Imports: stats, graphics, grDevices, splines, tsModel
@@ -13,6 +13,6 @@ Description: The package dlnm contains functions to specify basis and
         results for a fitted model.
 License: GPL (>= 2)
 LazyLoad: yes
-Packaged: Wed Jul 1 11:40:23 2009; ppehagas
+Packaged: Mon Jul 13 17:39:33 2009; ppehagas
 Repository: CRAN
-Date/Publication: 2009-07-01 17:19:48
+Date/Publication: 2009-07-18 15:40:51
