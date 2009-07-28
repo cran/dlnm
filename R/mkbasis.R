@@ -15,8 +15,8 @@ if(!is.null(cenvalue)) {
 ##################
 
 # DEFINE THE POSSIBLE TYPES
-if(!type%in%c("ns","strata","poly","integer","thr","lthr","hthr","lin")) {
-	stop("type must be one of ns,strata,poly,integer,thr,lthr,hthr,lin")
+if(!type%in%c("ns","bs","strata","poly","integer","thr","lthr","hthr","lin")) {
+	stop("type must be one of ns,bs,strata,poly,integer,thr,lthr,hthr,lin")
 }
 # CHECK ARGUMENT TYPE
 if(!is.numeric(var)) stop("'var' must be a numeric vector")
@@ -27,8 +27,8 @@ if(!is.logical(int)) stop("'int' must be logical")
 if(!is.logical(cen)) stop("'cen' must be logical")
 if(!is.null(cenvalue)&!is.numeric(cenvalue)) stop("'cenvalue' must be numeric")
 # ONE OF DF OR KNOTS MUST BE GIVEN FOR NS, STRATA OR POLY
-if(is.null(df)&is.null(knots) & type%in%c("ns","poly","strata")) {
-	stop("for type 'ns', 'poly' or 'strata' at least df or knots must be specified")
+if(is.null(df)&is.null(knots) & type%in%c("ns","bs","poly","strata")) {
+	stop("for type 'ns'-'bs', 'poly' or 'strata' at least df or knots must be specified")
 }
 # KNOTS FORCED WITHIN THE RANGE OF THE VARIABLE
 if(!is.null(knots)) {
@@ -36,9 +36,10 @@ if(!is.null(knots)) {
 	stop("knots must be within the range of var")
 }}
 # KNOTS ORDERED AND MADE UNIQUE, THEY OVERCOMES DF
-if(!is.null(knots)&type%in%c("ns","strata","poly")) {
+if(!is.null(knots)&type%in%c("ns","bs","strata","poly")) {
 	knots <- sort(unique(knots))
 	df <- length(knots)+1+int
+	if(type=="bs") df <- length(knots)+3+int
 	if(type=="strata") df <- length(knots)+int
 }
 # DF MUST BE <= N. OBS
@@ -46,12 +47,18 @@ if(df>length(var)) {
 	stop("df must be <= length(var)")
 }
 # MINIMUM DF = 1
-if((is.null(df)|df<1)&is.null(knots)&type%in%c("ns","strata","poly")) { 
-	df <- 1
-	stop("df must be >1") 
+if(df<1&is.null(knots)&type%in%c("ns","bs","strata","poly")) { 
+	stop("df must be >=1") 
+}
+# MINIMUM DF = 3+INT FOR CUBIC SPLINES
+if((df==1)&is.null(knots)&type%in%c("bs")) { 
+	type <- "ns"
+}
+if((df<3+int)&is.null(knots)&type%in%c("bs")) { 
+	stop("df must be >=3+int for type='bs'") 
 }
 # CENTERING
-if(!type%in%c("ns","poly","lin")) cen <- F
+if(!type%in%c("ns","bs","poly","lin")) cen <- F
 if(cen==FALSE) cenvalue <- NULL
 
 # IF KNOTS NOT PROVIDED FOR THRESHOLD MODELS, FIXED AT MEAN
@@ -80,6 +87,28 @@ if(type=="ns")	{
 		nrow=length(var),ncol=length(knots)+1+int,byrow=TRUE))
 	} else {
 		list$basis <- as.matrix(ns(var,df=df,knots=knots,
+		Bound=bound,int=int)[,])
+	}
+}
+
+#######
+# BS
+#######
+# IF NOT PROVIDED, KNOTS SET TO EQUALLY SPACED QUANTILES
+if(type=="bs")	{
+	if(df==1) {
+		int <- F
+	}
+	if(is.null(knots)&df>(3+int)) {
+		knots <- quantile(var,1/(df-int-2)*1:((df-int)-3),na.rm=TRUE)
+	}
+	if(cen==TRUE) {
+	list$basis <- as.matrix(bs(var,df=df,knots=knots,Bound=bound,
+		int=int)[,] - matrix(bs(cenvalue,df=df,knots=knots,
+		Bound=bound,int=int)[,], 
+		nrow=length(var),ncol=length(knots)+3+int,byrow=TRUE))
+	} else {
+		list$basis <- as.matrix(bs(var,df=df,knots=knots,
 		Bound=bound,int=int)[,])
 	}
 }

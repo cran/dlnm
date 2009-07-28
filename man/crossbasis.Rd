@@ -21,8 +21,8 @@ The arguments below define two set of basis functions calling the internal funct
   \item{var }{ the predictor variable, defined as a numeric vector of ordered observations.}
   \item{vartype, lagtype }{ type of basis. See Details below for the list of possible choices.}
   \item{vardf, lagdf }{ dimension of the basis (number of degrees of freedom spent to specify the relationship in each space). They depend on \code{varknots} and \code{lagknots} if provided.}
-  \item{varknots, lagknots }{ knots location for the basis. They specify the position of the knots for \code{"ns"}, the cut-off points for \code{"strata"} (defining right-open intervals) and the threshold(s) for \code{"lthr"}, \code{"hthr"} and \code{"thr"}. They must be set within the range of \code{var} and \code{0:maxlag}, respectively.}
-  \item{varbound, lagbound }{ boundary knots (sometimes called external knots). Used only if \code{type="ns"}.}
+  \item{varknots, lagknots }{ knots location for the basis. They specify the position of the knots for \code{"ns"} and \code{"bs"}, the cut-off points for \code{"strata"} (defining right-open intervals) and the threshold(s) for \code{"lthr"}, \code{"hthr"} and \code{"thr"}. They must be set within the range of \code{var} and \code{0:maxlag}, respectively.}
+  \item{varbound, lagbound }{ boundary knots (sometimes called external knots). Used only for \code{type} equal to \code{"ns"} and \code{"bs"}.}
   \item{varint, lagint }{ logical. If \code{TRUE}, an 'intercept' is included in the basis. The default values should not be changed: see Warnings below.}
   \item{cen }{ logical. If \code{TRUE}, the basis functions for the space of predictor are centered. See Note below.}
   \item{cenvalue }{ centering value, used as a reference point for the predicted effects.}
@@ -34,7 +34,7 @@ The arguments below define two set of basis functions calling the internal funct
 \details{
 The value in \code{type} defines the basis for each space (predictor and lags). It must  be one of:
 
-\bold{\code{"ns"}}: natural cubic splines, specified by \code{knots} (internal knots) and \code{bound} (boundary or external knots). See the function \code{\link[splines::ns]{ns}} for additional information. An intercept is included if \code{int=T}. The transformed variables can be centered at \code{cenvalue}.
+\bold{\code{"ns"}}, \bold{\code{"bs"}}: cubic splines with and without the natural constraint, respectively. Specified by \code{knots} (internal knots) and \code{bound} (boundary or external knots). See the functions \code{\link[splines::ns]{ns}} and \code{\link[splines::bs]{bs}} for additional information. An intercept is included if \code{int=T}. The transformed variables can be centered at \code{cenvalue}.
 
 \bold{\code{"strata"}}: strata variables (dummy parameterization) determined by internal cut-off values specified in \code{knots}, which represent the lower boundaries for the right-open intervals. A dummy variable for the reference stratum (the first one by default) is included if \code{int=T}, generating a full rank basis. Never centered.
 
@@ -42,13 +42,13 @@ The value in \code{type} defines the basis for each space (predictor and lags). 
 
 \bold{\code{"integer"}}: strata variables (dummy parameterization) for each integer values, expressly created to specify an unconstrained function in the space of lags. \code{df} is set automatically to the number of integer values minus 1 plus \code{int}. A dummy variable for the reference stratum (the first one by default) is included if \code{int=T}, generating a full rank basis. Never centered.
 
-\bold{\code{"hthr","lthr"}}: high and low threshold parameterization (linear relationship above or below the threshold, respectively, flat otherwise). The threshold is chosen by \code{knots} (if more than one are provided, the last and the first one is chosen, respectively). \code{df} is automatically set to 1+\code{int}. An intercept (corresponding to a vector of 1's) is included if \code{int=T}. Never centered.
+\bold{\code{"hthr"}}, \bold{\code{"lthr"}}: high and low threshold parameterization (linear relationship above or below the threshold, respectively, flat otherwise). The threshold is chosen by \code{knots} (if more than one are provided, the last and the first one is chosen, respectively). \code{df} is automatically set to 1+\code{int}. An intercept (corresponding to a vector of 1's) is included if \code{int=T}. Never centered.
 
 \bold{\code{"thr"}}: double threshold parameterization (2 independent linear relationships above the second and below the first threshold, flat between them). The thresholds are chosen by \code{knots}. If only one is provided, the threshold is unique (V-model). If more than 2 are provided, the first 2 are chosen. \code{df} is automatically set to 2+\code{int}. An intercept (corresponding to a vector of 1's) is included if \code{int=T}. Never centered.
 
 \bold{\code{"lin"}}: linear relationship (untransformed apart from optional centering). \code{df} is automatically set to 1+\code{int}. An intercept (corresponding to a vector of 1's) is included if \code{int=T}. It can be centered at \code{cenvalue}. 
 
-The values in \code{knots}, if provided, are automatically ordered and made unique and determine the value of \code{df} (equal to \code{length(knots)+int} for \code{"strata"} and \code{length(knots)+int+1} for \code{"ns"} and \code{"poly"}). The value of \code{df} is fixed for the other types. If not provided, \code{varknots} are placed at equally spaced quantiles, and \code{lagknots} at equally spaced values on the log scale of lags. Some arguments can be automatically changed for not sensible combinations, or set to \code{NULL} if not required.
+The values in \code{knots}, if provided, are automatically ordered and made unique and determine the value of \code{df} (equal to \code{length(knots)+int} for \code{"strata"}, \code{length(knots)+int+3} for \code{"bs"} and \code{length(knots)+int+1} for \code{"ns"} and \code{"poly"}). The value of \code{df} is fixed for the other types. If not provided, \code{varknots} are placed at equally spaced quantiles, and \code{lagknots} at equally spaced values on the log scale of lags. Some arguments can be automatically changed for not sensible combinations, or set to \code{NULL} if not required.
 
 For a detailed overview of the options, see:
 
@@ -70,11 +70,11 @@ The values in \code{var} are expected to be equally spaced (with that space defi
 
 The name of the crossbasis object will be used by \code{\link{crosspred}} in order to extract the related estimated parameters. This name must not match the names of other predictors in the model formula. In addition, if more than one variable is transformed by cross-basis functions in the same model, different names must be specified. 
 
-For continuous functions specified with \code{vartype} equal to \code{"ns"}, \code{"poly"} or \code{"lin"}, the reference for the effects predicted by \code{\link{crosspred}} is set at \code{cenvalue}. For the other choices, the reference is automatic:  for \code{vartype} equal to \code{"strata"} and \code{"integer"}, the reference is the first interval, while for \code{vartype} equal to \code{"hthr"}, \code{"lthr"} and \code{"thr"}, the reference is the region of null effect below, above or between the threshold(s), respectively.
+For continuous functions specified with \code{vartype} equal to \code{"ns"}, \code{"bs"}, \code{"poly"} or \code{"lin"}, the reference for the effects predicted by \code{\link{crosspred}} is set at \code{cenvalue}. For the other choices, the reference is automatic:  for \code{vartype} equal to \code{"strata"} and \code{"integer"}, the reference is the first interval, while for \code{vartype} equal to \code{"hthr"}, \code{"lthr"} and \code{"thr"}, the reference is the region of null effect below, above or between the threshold(s), respectively.
 }
 
 \section{Warnings}{
-It is strongly recommended to avoid the inclusion of an intercept in the basis for \code{var}, otherwise the presence of the additional intercept (when included) in the model used to fit the data will cause some of the cross-basis variables to be excluded. Conversely, an intercept should always be included in the basis for the space of lags when \code{lagtype} is equal to \code{"ns"}, \code{"strata"} or \code{"poly"}.
+It is strongly recommended to avoid the inclusion of an intercept in the basis for \code{var}, otherwise the presence of the additional intercept (when included) in the model used to fit the data will cause some of the cross-basis variables to be excluded. Conversely, an intercept should always be included in the basis for the space of lags when \code{lagtype} is equal to \code{"ns"}, \code{"bs"}, \code{"strata"} or \code{"poly"}.
 }
 
 \seealso{ \code{\link{crosspred}}, \code{\link{crossplot}}}
@@ -86,18 +86,18 @@ It is strongly recommended to avoid the inclusion of an intercept in the basis f
 initDB()
 data <- readCity("chic", collapseAge=TRUE)
 data$temp <- (data$tmpd-32)*5/9
-data$pm10 <- with(data, pm10mean+pm10trend)
+data$pm10 <- with(data, pm10tmean+pm10mtrend)
 
 ### simple DLM for the effect of PM10 on mortality up to 15 days of lag
 ### space of predictor: linear effect for PM10
-### space of predictor: 5df spline for temperature
+### space of predictor: 5df natural cubic spline for temperature
 ### lag function: 4th degree polynomial for PM10
 ### lag function: strata intervals at lag 0 and 1-3 for temperature
 
 basis.pm <- crossbasis(data$pm10, vartype="lin", lagtype="poly",
 	lagdf=5,cen=FALSE,maxlag=15)
 basis.temp <- crossbasis(data$temp, vardf=5, lagtype="strata",
-	lagknots=1,	cenvalue=21, maxlag=3)
+	lagknots=1, cenvalue=21, maxlag=3)
 summary(basis.pm)
 summary(basis.temp)
 model <- glm(death ~  basis.pm + basis.temp, family=quasipoisson(), data)
