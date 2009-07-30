@@ -140,14 +140,17 @@ if(type=="overall") {
 # CONTOURPLOT
 ##############
 
-#if(type=="contour") {
-#	col <- rev(heat.colors(70))[c(1:20*3,61:70)]
-#	filled.contour(crosspred$predvar,0:crosspred$maxlag,
-#		crosspred$matfit,col= col,
-#		plot.title = title(main = title,
-#			xlab = label, ylab = "Lags"),
-#	    	key.title = title(main=plotlab))
-#}
+if(type=="contour") {
+	col1 <- colorRampPalette(c("blue","white"))
+	col2 <- colorRampPalette(c("white","red"))
+	level <- pretty(crosspred$matfit,20)
+	col <- c(col1(sum(level<noeff)),col2(sum(level>noeff)))
+	filled.contour(crosspred$predvar,0:crosspred$maxlag,
+		crosspred$matfit,col= col,
+		plot.title = title(main = title,
+			xlab = label, ylab = "Lags"),
+	    	key.title = title(main=plotlab))
+}
 
 #########
 # 3-D
@@ -156,9 +159,12 @@ if(type=="overall") {
 if(type=="3d") {
 	mar.old <- par()$mar
 	par(mar=c(2.1,1.1,2.1,1.1))
+	if(is.null(ylim)) {
+		ylim <- c(min(crosspred$matfit),max(crosspred$matfit))
+	}
 	persp(crosspred$predvar,0:crosspred$maxlag,crosspred$matfit,
 		ticktype="detailed",theta = 210,phi = 30,xlab=label, ylab="Lag",
-		zlab=plotlab,main=title,col="lightskyblue",
+		zlab=plotlab,main=title,col="lightskyblue",zlim=ylim,
 		ltheta=290,shade=0.75,r=sqrt(3),d=5)
 	par(mar=mar.old)
 }

@@ -1,4 +1,38 @@
 =======================
+Changes in dlnm 0.3.0
+=======================
+
+Major changes
+--------------------
+
+    o	A contour/level plot has been added to crossplot().
+
+    o	The option 'bs' has been added to the argument 'type' of
+	mkbasis()-crossbasis(), to specify a cubic spline without
+	natural constraint.
+
+Improvements
+------------
+
+    o	Argument 'ylim' added for 'type="3d"'.
+
+Minor changes
+-------------
+
+    o	Minor bugs fixed in mkbasis() and mklagbasis().
+
+    o	Typing errors fixed in vignette 'dlnmOverview'.
+
+    o	Help pages, examples and vignette changed accordingly.
+
+Corrections
+-----------
+
+    o	Original series of pollutants in NNMAPS data given by *tmean
+	and *mtrend, not *mean and *trend. Corrected
+
+
+=======================
 Changes in dlnm 0.2.1
 =======================
 

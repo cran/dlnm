@@ -65,7 +65,7 @@ In order to apply the same transformation as that used for the original predicto
 initDB()
 data <- readCity("chic", collapseAge=TRUE)
 data$temp <- (data$tmpd-32)*5/9
-data$o3 <- with(data, o3mean+o3trend)
+data$o3 <- with(data, o3tmean+o3mtrend)
 
 ### DLM with threshold for the effect of O3 on mortality up to 5 days of lag
 ### space of predictor: linear effect above 40.3 microgr/m3 for O3
@@ -88,6 +88,8 @@ crossplot(pred.o3, "slices", var=50.3,
 pred.o3$allRRfit["50.3"]
 cbind(pred.o3$allRRlow, pred.o3$allRRhigh)["50.3",]
 crossplot(pred.o3, label="Ozone", title="3D graph of ozone effect")
+crossplot(pred.o3, "contour", label="Ozone", 
+	title="Contour graph of ozone effect")
 
 ### See the vignette 'dlnmOverview' for a detailed explanation of this example
 }
