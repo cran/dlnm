@@ -1,5 +1,5 @@
 `crosspred` <-
-function(crossbasis,model,at=NULL,from=NULL,to=NULL,by=NULL) {
+function(crossbasis, model, at=NULL, from=NULL, to=NULL, by=NULL) {
 list <- vector("list",0)
 
 attr <- attributes(crossbasis)
@@ -39,12 +39,13 @@ if(!is.null(attr$varknots)) {
 #############
 
 maxlag <- attr$maxlag
-predvarbasis <- mkbasis(predvar,type=attr$vartype,
-	df=attr$vardf,knots=attr$varknots,int=attr$varint,bound=attr$varbound,
-	cen=attr$cen,cenvalue=attr$cenvalue)$basis
+predvarbasis <- mkbasis(predvar,type=attr$vartype,df=attr$vardf,
+	degree=attr$vardegree,knots=attr$varknots,int=attr$varint,
+	bound=attr$varbound,cen=attr$cen,cenvalue=attr$cenvalue)$basis
 rownames(predvarbasis) <- predvar
 lagbasis <- mklagbasis(maxlag=attr$maxlag,type=attr$lagtype,df=attr$lagdf,
-	knots=attr$lagknots,int=attr$lagint,bound=attr$lagbound)$basis
+	degree=attr$lagdegree,knots=attr$lagknots,
+	int=attr$lagint,bound=attr$lagbound)$basis
 predarray <- array(0,dim=c(length(predvar),attr$crossdf,maxlag+1))
 for(i in 1:(maxlag+1)) {
 	predarray[,,i] <- matrix(outer(predvarbasis,lagbasis[i,],"*"),

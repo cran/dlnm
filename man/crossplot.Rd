@@ -64,15 +64,15 @@ data$temp <- (data$tmpd-32)*5/9
 data$pm10 <- with(data, pm10tmean+pm10mtrend)
 
 ### DLNM for the effect of temperature on mortality up to 30 days of lag
-### space of predictor: 5df cubic spline for temperature
+### space of predictor: 5df quadratic spline for temperature
 ### space of predictor: linear effect for PM10
 ### lag function: 5df natural cubic spline for temperature
 ### lag function: single strata at lag 0-1 for PM10
 
 basis.pm <- crossbasis(data$pm10,vartype="lin", lagtype="strata",
 	cen=FALSE, maxlag=1)
-basis.temp <- crossbasis(data$temp, vartype="bs", vardf=5, lagdf=5,
-	cenvalue=21, maxlag=30)
+basis.temp <- crossbasis(data$temp, vartype="bs", vardf=5, vardegree=2,
+	lagdf=5, cenvalue=21, maxlag=30)
 summary(basis.pm)
 summary(basis.temp)
 model <- glm(death ~  basis.pm + basis.temp, family=quasipoisson(), data)

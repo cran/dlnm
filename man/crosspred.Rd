@@ -75,7 +75,7 @@ data$o3 <- with(data, o3tmean+o3mtrend)
 
 basis.o3 <- crossbasis(data$o3, vartype="hthr", varknots=40.3,
 	lagtype="integer", maxlag=5)
-basis.temp <- crossbasis(data$temp, vartype="thr", varknots=c(10,25),
+basis.temp <- crossbasis(data$temp, vartype="dthr", varknots=c(10,25),
 	lagtype="strata", lagknots=c(2,7), maxlag=15)
 summary(basis.o3)
 summary(basis.temp)
@@ -90,6 +90,19 @@ cbind(pred.o3$allRRlow, pred.o3$allRRhigh)["50.3",]
 crossplot(pred.o3, label="Ozone", title="3D graph of ozone effect")
 crossplot(pred.o3, "contour", label="Ozone", 
 	title="Contour graph of ozone effect")
+
+### alternatively, a piecewise linear effect above 35 microgr/m3 for o3,
+### 	with an additional change in slope at 50 microgr/m3
+### same lag function as before
+
+basis.o3 <- crossbasis(data$o3, vartype="hthr", varknots=c(35,50),
+	lagtype="integer", maxlag=5)
+summary(basis.o3)
+model <- update(model)
+pred.o3 <- crosspred(basis.o3, model, at=c(0:65))
+
+crossplot(pred.o3,"overall",label="Ozone",
+	title="Overall effect of ozone over 5 days of lag")
 
 ### See the vignette 'dlnmOverview' for a detailed explanation of this example
 }

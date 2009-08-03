@@ -1,17 +1,18 @@
 `crossbasis` <-
-function(var,vartype="ns",vardf=1,varknots=NULL,varbound=range(var),
-	varint=FALSE,cen=TRUE,cenvalue=mean(var),maxlag=0,
-	lagtype="ns",lagdf=1,lagknots=NULL,lagbound=c(0,maxlag),lagint=TRUE) {
+function(var, vartype="ns", vardf=1, vardegree=1, varknots=NULL,
+	varbound=range(var), varint=FALSE, cen=TRUE, cenvalue=mean(var),
+	maxlag=0, lagtype="ns", lagdf=1, lagdegree=1, lagknots=NULL,
+	lagbound=c(0,maxlag), lagint=TRUE) {
 
 ############################################################################
 # CROSSBASIS 
 #############
 
-basisvar <- mkbasis(var=var,type=vartype,df=vardf,knots=varknots,
-	int=varint,bound=varbound,cen=cen,cenvalue=cenvalue)
+basisvar <- mkbasis(var=var,type=vartype,df=vardf,degree=vardegree,
+	knots=varknots,int=varint,bound=varbound,cen=cen,cenvalue=cenvalue)
 
-basislag <- mklagbasis(maxlag=maxlag,type=lagtype,df=lagdf,knots=lagknots,
-	int=lagint,bound=lagbound)
+basislag <- mklagbasis(maxlag=maxlag,type=lagtype,df=lagdf,degree=lagdegree,
+	knots=lagknots,int=lagint,bound=lagbound)
 
 # CROSSBASIS COMPUTATION
 basis <- matrix(0,nrow=length(var),ncol=basisvar$df*basislag$df)
@@ -34,6 +35,7 @@ attributes(basis) <- c(attributes(basis),list(
 
 	vartype = basisvar$type,
 	vardf = basisvar$df,
+	vardegree=basisvar$degree,
 	varknots = basisvar$knots,
 	varbound = basisvar$bound,
 	varint = basisvar$int,
@@ -43,6 +45,7 @@ attributes(basis) <- c(attributes(basis),list(
 	maxlag = basislag$maxlag,
 	lagtype = basislag$type,
 	lagdf = basislag$df,
+	lagdegree=basislag$degree,
 	lagknots = basislag$knots,
 	lagbound = basislag$bound,
 	lagint = basislag$int
