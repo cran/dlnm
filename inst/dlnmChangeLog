@@ -1,15 +1,63 @@
 =======================
+Changes in dlnm 0.4.0
+=======================
+
+Major changes
+-------------
+
+    o	The argument 'degree' included in mkbasis()-crossbasis(),
+	defining the degree of the unconstrained B-spline ('type' equal 
+	to 'bs') or the maximum power of the polynomial ('type' equal to 
+	'poly').
+
+    o	Linear piecewise function above a threshold included for
+ 	type='hthr'/'lthr'; added an example in help pages and vignette.
+
+Improvements
+------------
+
+    o	Automatic knot selection also for thr-type functions
+
+    o	New example related to the changes above in the help pages and
+ 	in the vignette
+
+    o	Improved error messages in mkbasis() and mklagbasis()
+
+Fixed bugs
+----------
+
+    o	Choices and error messages in mkbasis() and mklagbasis()
+
+Minor changes
+-------------
+
+    o	Double threshold type changed from 'thr' to 'dthr'; added an
+ 	error message in mkbasis() to explain the change.
+
+    o	For type='dthr', knots choice when more than 2 changed from first
+ 	two to first and last ones. 
+
+    o	Basis choices changed in example3 in order to show a quadratic
+ 	spline.
+
+    o	Examples for mkbasis()-mklagbasis() expanded in help pages and
+ 	vignette.
+
+    o	Help pages, examples and vignette changed accordingly.
+
+
+=======================
 Changes in dlnm 0.3.0
 =======================
 
 Major changes
---------------------
+-------------
 
     o	A contour/level plot has been added to crossplot().
 
     o	The option 'bs' has been added to the argument 'type' of
 	mkbasis()-crossbasis(), to specify a cubic spline without
-	natural constraint.
+	natural constraints.
 
 Improvements
 ------------
@@ -49,20 +97,9 @@ Changes in dlnm 0.2.0
 =======================
 
 Major changes
---------------------
+-------------
 
     o	The package vignette 'dlnmOverview' has been added.
-
-Documentation
---------------------
-
-    o	Help pages changed accordingly with the new features.
-
-Examples
---------------------
-
-    o	The example 2 (in crosspred()) the threshold has been set to
- 	40.3, in order to show the ordering functionality.
 
 Improvements
 ------------
@@ -88,8 +125,13 @@ Fixed bugs
 Minor changes
 -------------
 
-    o	Default value for argument 'lagbound' of crossbasis() changed from
-	c(-1,maxlag) to c(0,maxlag).
+    o	Default value for argument 'lagbound' of crossbasis() changed
+ 	from	c(-1,maxlag) to c(0,maxlag).
+
+    o	Help pages changed accordingly with the new features.
+
+    o	The example 2 (in crosspred()) the threshold has been set to
+ 	40.3, in order to show the ordering functionality.
 
 
 ==================================

@@ -9,7 +9,9 @@ function(object, ...) {
 	cat("maxlag:",attr$maxlag,"\n")
 
 	cat("\nBASIS FOR VAR:\n")
-	cat("type:",attr$vartype,"\n")
+	cat("type:",attr$vartype)
+	if(!is.null(attr$vardegree)) cat(" with degree",attr$vardegree)
+	cat("\n")
 	if(!is.null(attr$varknots)) {
 		cat("df:",attr$vardf,", knots at:",attr$varknots,"\n")
 	} else cat("df:",attr$vardf,"\n")
@@ -18,7 +20,9 @@ function(object, ...) {
 	if(attr$varint==TRUE) cat("with intercept\n")
 
 	cat("\nBASIS FOR LAG:\n")
-	cat("type:",attr$lagtype,"\n")
+	cat("type:",attr$lagtype)
+	if(!is.null(attr$lagdegree)) cat(" with degree",attr$lagdegree)
+	cat("\n")
 	if(!is.null(attr$lagknots)) {
 		cat("df:",attr$lagdf,", knots at:",attr$lagknots,"\n")
 	} else cat("df:",attr$lagdf,"\n")

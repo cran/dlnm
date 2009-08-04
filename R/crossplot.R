@@ -1,6 +1,6 @@
 `crossplot` <-
-function(crosspred,type="3d",
-	var=NULL,lag=NULL,ylim=NULL,title=NULL,label="var") {
+function(crosspred, type="3d",
+	var=NULL, lag=NULL, ylim=NULL, title=NULL, label="var") {
 
 if(!type%in%c("slices","3d","contour","overall")) {
 	stop("Type must be one of 'slices','3d','contour','overall'")

@@ -3,7 +3,7 @@
 \setlength{\parindent}{0pt}	% Eliminate the indent at the beginning of a new paragraph
 %\setcounter{secnumdepth}{0}	% Elimate the section numbering starting from a specific depth (see WikiBook)
 
-\usepackage{natbib}	% Bibliography
+\usepackage[numbers]{natbib}	% Bibliography
 \usepackage{fixltx2e}	% Fix some errors
 \usepackage{graphicx}	% To manage external pictures
 \usepackage{float}	% Improves float environment and force the placement figures
@@ -201,14 +201,14 @@ The result of these two functions are two list objects containing the basis matr
 The syntax of the two commands is:
 
 \begin{verbatim}
-mkbasis(var, type="ns", df=1, knots=NULL, bound = range(var),
+mkbasis(var, type="ns", df=1, degree=1, knots=NULL, bound=range(var),
   int=FALSE, cen=TRUE, cenvalue=mean(var))
-
-mklagbasis(maxlag=0, type="ns", df=1, knots=NULL,
+	
+mklagbasis(maxlag=0, type="ns", df=1, degree=1, knots=NULL,
   bound=c(0, maxlag), int=TRUE)
 \end{verbatim}
 
-The first function, \Rfun{mkbasis}, applies a set basis functions on the vector of the predictor specified in \Rarg{var}, i.e. it transforms the vector in a new set of basis variables. The choice of the basis is given by the arguments \Rarg{type}, \Rarg{df}, \Rarg{knots} and \Rarg{bound}. The logical argument \Rcode{int=TRUE} adds an intercept (where allowed) to the basis, while if \Rcode{cen=TRUE} centers the basis variables for \Rarg{var} are centered on \Rarg{cenvalue}. See Section \ref{sec:crossbasis} or type \Rcomm{?crossbasis} in \R{} for additional information.
+The first function, \Rfun{mkbasis}, applies a set basis functions on the vector of the predictor specified in \Rarg{var}, i.e. it transforms the vector in a new set of basis variables. The choice of the basis is given by the arguments \Rarg{type}, \Rarg{df}, \Rarg{degree}, \Rarg{knots} and \Rarg{bound}. The logical argument \Rcode{int=TRUE} adds an intercept (where allowed) to the basis, while if \Rcode{cen=TRUE} centers the basis variables for \Rarg{var} are centered on \Rarg{cenvalue}. See Section \ref{sec:crossbasis} or type \Rcomm{?crossbasis} in \R{} for additional information.
 
 The function \Rfun{mklagbasis} calls \Rfun{mkbasis} to build the basis matrix for the space of lags. Basically, it creates a new vector \Rcode{0:maxlag} (a vector of integers from 0 to the maximum lag allowed) and then apply the related basis functions specified through the same arguments seen above. The basis variables for this dimension are never centered.
 
@@ -225,35 +225,38 @@ The function \Rfun{crossbasis} returns a matrix object of class \Rclass{crossbas
 The syntax of the command is:
 
 \begin{verbatim}
-crossbasis(var, vartype="ns", vardf=1, varknots=NULL, varbound=range(var),
-  varint=FALSE, cen=TRUE, cenvalue=mean(var), maxlag=0, lagtype="ns",
-  lagdf=1, lagknots=NULL, lagbound=c(0,maxlag), lagint=TRUE)
+crossbasis(var, vartype="ns", vardf=1, vardegree=1, varknots=NULL,
+  varbound=range(var), varint=FALSE, cen=TRUE, cenvalue=mean(var),
+  maxlag=0, lagtype="ns", lagdf=1, lagdegree=1, lagknots=NULL,
+  lagbound=c(0,maxlag), lagint=TRUE)
 \end{verbatim}
 
-The argument \Rarg{var} includes the predictor vector, while the other arguments \Rarg{type}, \Rarg{df}, \Rarg{knots}, \Rarg{bound} and \Rarg{int}, with specific stub \Rcode{var-} and \Rcode{lag-}, defines the bases for the two spaces, respectively, creating the related basis variables. The values in \Rarg{cen} and \Rarg{cenvalue} specify if and where the basis variables for the space of the predictor should be centered on the relative transformation of \Rarg{cenvalue} \cite{cao2006}: this value is used as the reference point for the effects predicted by \Rfun{crosspred}. \Rarg{maxlag} set the maximum lag in the related dimension. The two basis matrices are built calling the two internal functions \Rfun{mkbasis} and \Rfun{mklagbasis} and passing the specific arguments.
+The argument \Rarg{var} includes the predictor vector, while the other arguments \Rarg{type}, \Rarg{df}, \Rarg{degree}, \Rarg{knots}, \Rarg{bound} and \Rarg{int}, with specific stub \Rcode{var-} and \Rcode{lag-}, defines the bases for the two spaces, respectively, creating the related basis variables. See below for a detailed explanation of these arguments. The values in \Rarg{cen} and \Rarg{cenvalue} specify if and where the basis variables for the space of the predictor should be centered on the relative transformation of \Rarg{cenvalue} \cite{cao2006}: this value is used as the reference point for the effects predicted by \Rfun{crosspred}. \Rarg{maxlag} sets the maximum lag in the related dimension. The two basis matrices are built calling the two internal functions \Rfun{mkbasis} and \Rfun{mklagbasis} and passing the specific arguments.
 
 Different independent choices regarding the basis for each one of the two dimensions are available through the argument \Rarg{type}, with specific stub \Rcode{var-} or \Rcode{lag-}. The first basis is related to \Rcode{var}, in order to describe the relationship in the space of the predictor. The second one is applied to a new vector \Rcode{0:maxlag}, in order to describe the relationship in the space of lags. The possible options for \Rarg{type} are:
 
 \begin{itemize}
-	\item \Rcode{"ns"}, \Rcode{"bs"}: cubic B-splines with and without the natural constraint, respectively. \Rarg{type="ns"} is the default for both the dimensions. They are specified by \Rarg{knots} (internal knots) and \Rarg{bound} (boundary or internal knots), calling the functions \Rfun{ns} and \Rfun{bs} of the package \Rpkg{splines} (type \Rcomm{?ns} or \Rcomm{?bs} in \R{} for additional information). An intercept is included if \Rcode{int=TRUE}. For the basis in the space of the predictor, the transformed variables can be centered at \Rarg{cenvalue} if \Rcode{cen=TRUE} (the default).
+	\item \Rcode{"ns"}: natural cubic B-splines (constrained to be linear beyond the boundary knots). This is the default \Rarg{type} for both the dimensions. Specified by \Rarg{knots} (internal knots) and \Rarg{bound} (boundary or external knots), calling the functions \Rfun{ns} of the package \Rpkg{splines} (type \Rcomm{?ns} in \R{} for additional information). If \Rarg{knots} is provided, the dimension \Rarg{df} is set to \Rcode{length(knots)+int+1}. An intercept is included if \Rcode{int=TRUE}. For the basis in the space of the predictor, the transformed variables can be centered at \Rarg{cenvalue} if \Rcode{cen=TRUE} (the default).
+
+	\item \Rcode{"bs"}: B-splines characterized by \Rarg{degree} (degree of the piecewise polynomial). Specified by \Rarg{knots} (internal knots) and \Rarg{bound} (boundary or external knots), calling the functions \Rfun{bs} of the package \Rpkg{splines} (type \Rcomm{?bs} in \R{} for additional information). If \Rarg{knots} is provided, the dimension \Rarg{df} is set to \Rcode{length(knots)+degree+int}, with the constraint that \Rarg{df>=degree+int}. An intercept is included if \Rcode{int=TRUE}. For the basis in the space of the predictor, the transformed variables can be centered at \Rarg{cenvalue} if \Rcode{cen=TRUE} (the default).
+
+	\item \Rcode{"strata"}: strata variables (dummy parameterization) determined by internal cut-off values specified in \Rarg{knots}, which represent the lower boundaries for the right-open intervals. Intervals containing no observation are automatically discarded. If \Rarg{knots} is provided, the dimension \Rarg{df} is set to \Rcode{length(knots)+int}. A dummy variable for the reference stratum (the first one by default) is included if \Rcode{int=TRUE}, generating a full rank basis. The related basis functions are never centered.
 	
-	\item \Rcode{"strata"}: strata variables (dummy parameterization) determined by internal cut-off values specified in \Rarg{knots}, which represent the lower boundaries for the right-open intervals. A dummy variable for the reference stratum (the first one by default) is included if \Rcode{int=TRUE}, generating a full rank basis. The related basis functions are never centered.
+	\item \Rcode{"poly"}: polynomial with power specified by \Rarg{degree}. The dimension \Rarg{df} is set to to \Rcode{degree+int}. An intercept, corresponding to a vector of 1's (the power 0 of the polynomial) is included if \Rcode{int=TRUE}. For the basis in the space of the predictor, the transformed variables can be centered at \Rarg{cenvalue} if \Rcode{cen=TRUE} (the default).
 	
-	\item \Rcode{"poly"}: polynomial with degree equal to \Rcode{df-int}. An intercept, corresponding to a vector of 1's (the power 0 of the polynomial) is included if \Rcode{int=TRUE}. Therefore, if an intercept is included, \Rarg{df} (the dimension of the basis) must be set to the chosen degree of the polynomials plus 1. For the basis in the space of the predictor, the transformed variables can be centered at \Rarg{cenvalue} if \Rcode{cen=TRUE} (the default).
+	\item \Rcode{"integer"}: strata variables (dummy parameterization) for each integer values. This choice is explicitly created to specify an unconstrained function in the space of lags, i.e. a function with a parameter for each lag. \Rarg{df} is set automatically to the number of integer values minus 1 plus \Rarg{int}. A dummy variable for the reference stratum (the first one by default) is included if \Rcode{int=TRUE}, generating a full rank basis. The related basis functions are never centered.
 	
-	\item \Rcode{"integer"}: strata variables (dummy parameterization) for each integer values. This choice is explicitly created to specify an unconstrained function in the space of lags, i.e. a function with a parameter for each lag. \Rarg{df} is set automatically to the number of integer values minus1 plus \Rarg{int}. A dummy variable for the reference stratum (the first one by default) is included if \Rcode{int=TRUE}, generating a full rank basis. The related basis functions are never centered.
+	\item \Rcode{"hthr"}, \Rcode{"lthr"}: high and low threshold parameterization, with a linear relationship above or below the threshold, respectively, and flat otherwise. The threshold is chosen by \Rarg{knots}: if more than one is provided, a piecewise linear relationship is applied above the first knot or below the last one, respectively, with the slope changing at each further knot. \Rarg{df} is automatically set to \Rcode{length(knots)+int}. An intercept (corresponding to a vector of 1's) is included if \Rcode{int=T}. The related basis function is never centered.
 	
-	\item \Rcode{"hthr"}, \Rcode{"lthr"}: high and low threshold parameterization, assuming a linear relationship above or below the threshold, respectively, and a null effect otherwise. The threshold is chosen by \Rarg{knots} (if more than one are provided, the last and the first one is chosen, respectively). \Rarg{df} is automatically set to 1. An intercept (corresponding to a vector of 1's) is included if \Rcode{int=T}. The related basis function is never centered.
-	
-	\item \Rcode{"thr"}: double threshold parameterization, assuming two independent linear relationships above the second and below the first threshold, and a null effect between them. The thresholds are chosen by \Rarg{knots}. If only one is provided, the threshold is unique (V-model). If more than 2 are provided, the first 2 are chosen. \Rcode{df} is automatically set to 2. An intercept (corresponding to a vector of 1's) is included if \Rcode{int=T}. The related basis functions are never centered.
+	\item \Rcode{"dthr"}: double threshold parameterization, assuming two independent linear relationships above the second and below the first threshold, and a null effect between them. The thresholds are chosen by \Rarg{knots}. If only one is provided, the threshold is unique (V-model). If more than 2 are provided, the first and the last ones are chosen. \Rarg{df} is automatically set to \Rcode{2+int}. An intercept (corresponding to a vector of 1's) is included if \Rcode{int=T}. The related basis functions are never centered.
 	
 	\item \Rcode{"lin"}: linear relationship (untransformed apart from optional centering). \Rcode{df} is automatically set to 1. An intercept (corresponding to a vector of 1's) is included if \Rcode{int=T}. For the basis in the space of the predictor, the transformed variables can be centered at \Rarg{cenvalue} if \Rcode{cen=TRUE} (the default).
 
 \end{itemize}
 
-The values in \Rarg{knots}, if provided, are automatically ordered and made unique, and determine the value of \Rarg{df} (when not automatically set by default), which is equal to \Rcode{length(knots)+int} for \Rcode{type="strata"}, \Rcode{length(knots)+int+3} for \Rarg{type="bs"} and \Rcode{length(knots)+int+1} for \Rarg{type} equal to \Rcode{"ns"} or \Rcode{"poly"}. The \Rarg{knots} must be set within the range of the variable (\Rarg{var} or \Rcode{0:maxlag}). The value of \Rarg{df} always corresponds to the dimension of the relative basis, and can be interpreted as the number of degrees of freedom spent to define the relationship in that space. If only \Rarg{df} is provided, \Rarg{varknots} are placed at equally spaced quantiles (in the space of predictor), and \Rarg{lagknots} at equally spaced values on the log scale of lags. Some arguments may be automatically changed by the function for combinations not sensible, or set to \Rcode{NULL} if not required: it is a good habit to check the resulting basis specifications with the function \Rfun{suummary.crossbasis}.
+The values in \Rarg{knots}, if provided, are automatically ordered and made unique, and determine the value of \Rarg{df}. The \Rarg{knots} must be set within the range of the variable (\Rarg{var} or \Rcode{0:maxlag}). The value of \Rarg{df} always corresponds to the dimension of the relative basis, and can be interpreted as the number of degrees of freedom spent to define the relationship in that space. If only \Rarg{df} is provided, \Rarg{varknots} are placed at equally spaced quantiles (in the space of predictor), and \Rarg{lagknots} at equally spaced values on the log scale of lags: their number is given reversing the equations above. Some arguments may be automatically changed by the function for combinations not sensible, or set to \Rcode{NULL} if not required: it is recommended to check the resulting basis specifications with the function \Rfun{suummary.crossbasis}.
 
-For continuous functions specified with \Rarg{vartype} equal to \Rcode{"ns"}, \Rcode{"bs"}, \Rcode{"poly"} or \Rcode{"lin"}, the reference for the effects predicted by \Rfun{crosspred} (see Section \ref{sec:crosspred}) is set at \Rarg{cenvalue}. For the other choices, the reference is automatic:  for \Rarg{vartype} equal to \Rcode{"strata"} and \Rcode{"integer"}, the reference is the first interval, while for \Rarg{vartype} equal to \Rcode{"hthr"}, \Rcode{"lthr"} and \Rcode{"thr"}, the reference is the region of null effect below, above or between the threshold(s), respectively.
+For continuous functions specified with \Rarg{vartype} equal to \Rcode{"ns"}, \Rcode{"bs"}, \Rcode{"poly"} or \Rcode{"lin"}, the reference for the effects predicted by \Rfun{crosspred} (see Section \ref{sec:crosspred}) is set at \Rarg{cenvalue}. For the other choices, the reference is automatic:  for \Rarg{vartype} equal to \Rcode{"strata"} and \Rcode{"integer"}, the reference is the first interval, while for \Rarg{vartype} equal to \Rcode{"hthr"}, \Rcode{"lthr"} and \Rcode{"dthr"}, the reference is the region of null effect below, above or between the threshold(s), respectively.
 
 It is strongly recommended to avoid the inclusion of an intercept in the basis for the space of the predictor, otherwise the presence of the additional intercept (when included) in the model used to fit the data will cause some of the cross-basis variables to be excluded. Conversely, an intercept should always be included in the basis for the space of lags when \Rarg{lagtype} is equal to \Rcode{"ns"}, \Rcode{"bs"}, \Rcode{"strata"} or \Rcode{"poly"}.
 
@@ -334,28 +337,42 @@ The models included in the examples do not contain other important confounders w
 \subsection{Examples for \Rfun{mkbasis} and \Rfun{mklagbasis}}
 \label{sec:examplesinternal}
 
-As a first step, we provide an example of the use of the function \Rfun{mkbasis}. We build a basis matrix applying the selected basis functions to the vector of integers going form 1 to 5. We leave many of the arguments at their default values, apart from the selection of the degrees of fredom \Rarg{df}.
+As a first step, we provide an example of the use of the function \Rfun{mkbasis}. We build a basis matrix applying the selected basis functions to the vector of integers going form 1 to 5. We leave many of the arguments at their default values, apart from the selection of the degrees of freedom \Rarg{df}.
 
 <<internal.mkbasis>>=
-basis.var <- mkbasis(1:5, df=3)
+basis.var <- mkbasis(1:5, knots=3)
 basis.var
 @
 
-The chosen basis is a natural cubic splines (default \Rcode{type="ns"}) with the 2 knots (\Rcode{length(knots)} is equal to \Rcode{df-int-1} here) placed at equally spaced quantiles (the default for the basis for the space of the predictor). Apart from the fact that the basis variables are centered at \Rcode{cenvalue=3}, the same results could be obtained by the command \Rcomm{ns(1:5,df=3)}. The basis matrix is stored in the object \Robj{basis.var\$basis}, while the arguments specifying it are included as other objects in the list, and can be called directly (for example, try \Rcomm{basis.var\$knots}).
+The chosen basis is a natural cubic B-splines (default \Rcode{type="ns"}) with the 1 knots and \Rcode{df=2} (\Rarg{df} is equal to \Rcode{length(knots)+1+int} for \Rcode{type="ns"}). Apart from the fact that the basis variables are centered at \Rcode{cenvalue=3} (the mean of the predictor values, the default for this argument), the same results could be obtained by the command \Rcomm{ns(1:5,knots=3)}. The basis matrix is stored in the object \Robj{basis.var\$basis}, while the arguments specifying it are included as other objects in the list, and can be called directly (for example, try \Rcomm{basis.var\$knots}).
 
-An alternative option regarding the type of basis, for example a threshold parameterization, is obtained by the following code (results not shown, the user can try to run the command on his own):
+Alternative choices may be specified through the following code (results not shown, the user can try to run the commands):
 
-<<internal.thr,results=hide>>=
-mkbasis(1:5, type="thr", knots=3)
+<<internal.mkbasis2,results=hide>>=
+mkbasis(1:5, type="bs", df=4, degree=2)
+mkbasis(1:5, type="lin", cenvalue=4)
 @
 
-As explained in Section \ref{sec:internal}, the function \Rfun{mklagbasis} calls \Rfun{mkbasis} to create a basis matrix for the space of the lag. The basis functions are applied to the vector \Rcode{0:maxlag} expressly created by the function. This is an example of application choosing a 2\textsuperscript{nd} degree polynomial:
+In the first case the result is a quadratic spline where the number and location of \Rarg{knots} are chose automatically, and fixed to 2 (\Rarg{df} is \Rcode{length(knots)+degree+int} for this \Rarg{type}) and at equally spaced quantiles, respectively. The second line returns a simple linear function, where the only transformation is the centering at the value of 4.
+
+As explained in Section \ref{sec:internal}, the function \Rfun{mklagbasis} calls \Rfun{mkbasis} to create a basis matrix for the space of the lag. The basis functions are applied to the vector \Rcode{0:maxlag} expressly created by the function. These are two examples of application:
 
 <<internal.mklagbasis>>=
-mklagbasis(maxlag=5, type="poly", df=3)
+mklagbasis(maxlag=5, type="poly", degree=3)
+mklagbasis(maxlag=5, type="integer")
 @
 
-Differently from the bases for the space of the predictor build above, this matrix contains an intercept (\Rcode{int=TRUE} by default), in this case a vector of 1's (see Section \ref{sec:crossbasis}), and it is never centered. As stated above (Section \ref{sec:crossbasis}), \Rarg{df} is equal to the degree of the polynomial plus 1 when an intercept is included. In this case, for a polynomial basis, the argument \Rarg{knots} is not included.
+The first line specifies a 3\textsuperscript{rd} degree polynomial. Differently from the bases for the space of the predictor build above, this matrix contains an intercept (\Rcode{int=TRUE} by default), in this case a vector of 1's (see Section \ref{sec:crossbasis}), and it is never centered. As stated above (Section \ref{sec:crossbasis}), \Rarg{df} is equal to the degree of the polynomial plus 1 when an intercept is included. In this case, for a polynomial basis, the argument \Rarg{knots} is not included. The second example refers to an specific transformation in the space of lags in order to define unconstrained distributed lag effects (see Section \ref{sec:crossbasis}), simply returning an identity matrix. 
+
+Other choices may consider a threshold parameterization, with the following code (results not shown):
+
+<<internal.thr,results=hide>>=
+mkbasis(1:5, type="dthr", knots=c(2,3))
+mkbasis(1:5, type="hthr", knots=3)
+mkbasis(1:5, type="hthr", knots=c(2,3))
+@
+
+In the first example, the result is a double threshold basis which can be applied to describe linear effects below 2 and above 3, with a null effect in between them. In the second case, the choice is for a simple threshold with a linear effect above 3. In the last example, a piecewise linear basis is returned, which can describe a relationship with a first threshold at 2 and then an additional change in slope at 3.
 
 A basis matrix of \Rcode{type="strata"} with and without intercept is created by (results not shown):
 
@@ -368,11 +385,11 @@ In this case, the intercept is represented by the dummy variable for the first s
 The effect of centering is illustrated below (results not shown):
 
 <<internal.cen,results=hide>>=
-mkbasis(0:10, type="poly", df=3)
-mkbasis(0:10, type="poly", df=3, cen=FALSE)
+mkbasis(0:10, type="poly", degree=3)
+mkbasis(0:10, type="poly", degree=3, cen=FALSE)
 @
 
-Each basis function is centered on the relative transformation of \Rarg{cenvalue}, which is placed at the average of the predictor values by default \cite{cao2006}.
+Each basis function is centered on the relative transformation of \Rarg{cenvalue}, which is placed at the mean of the predictor values by default \cite{cao2006}.
 
 %--------------------------------%%--------------------------------%
 \subsection{Example 1: a simple DLM}
@@ -386,7 +403,7 @@ First, we run \Rfun{crossbasis} to build the two cross-basis matrices, saving th
 
 <<example1crossbasis>>=
 basis.pm <- crossbasis(data$pm10, vartype="lin", lagtype="poly",
-  lagdf=5, cen=FALSE, maxlag=15)
+  lagdegree=4,cen=FALSE,maxlag=15)
 basis.temp <- crossbasis(data$temp, vardf=5, lagtype="strata",
   lagknots=1, cenvalue=21, maxlag=3)
 @
@@ -431,7 +448,7 @@ pred.pm$allRRfit["10"]
 cbind(pred.pm$allRRlow, pred.pm$allRRhigh)["10",]
 @
 
-\begin{figure}[H]
+\begin{figure}
 	\centering
 	\caption{}
 		\subfloat[]{\label{fig:example1slices}\includegraphics[width=0.50\textwidth]{fig-example1slices.pdf}}
@@ -453,10 +470,10 @@ The purpose of the second example is to illustrate the use of the threshold para
 
 Again, we first create the cross-basis matrices:
 
-<<example1crossbasis>>=
+<<example2crossbasis>>=
 basis.o3 <- crossbasis(data$o3, vartype="hthr", varknots=40.3,
 	lagtype="integer", maxlag=5)
-basis.temp <- crossbasis(data$temp, vartype="thr", varknots=c(10,25),
+basis.temp <- crossbasis(data$temp, vartype="dthr", varknots=c(10,25),
 	lagtype="strata", lagknots=c(2,7), maxlag=15)
 @
 
@@ -476,17 +493,22 @@ crossplot(pred.o3, "slices", var=50.3,
 	title="Effect of a 10-unit increase in ozone along lags")
 @
 
-\begin{figure}[H]
+\begin{figure}
 	\centering
 	\caption{}
-\label{fig:example2slices}\includegraphics[width=0.50\textwidth]{fig-example2slices.pdf}
+		\subfloat[]{\label{fig:example2slices}\includegraphics[width=0.50\textwidth]{fig-example2slices.pdf}}
+		\subfloat[]{\label{fig:example2overall}\includegraphics[width=0.50\textwidth]{fig-example2overall.pdf}}
 \end{figure}
 
-Similarly to Section \ref{sec:example1}, we can estimate the overall effect of a 10-unit increase in \ozone{} with 95\% confidence intervals. In addition, we plot the three-dimensional effects (simultaneously along the spaces of \ozone{} and lags) using two other options of the function \Rfun{crossplot}. The argument \Rarg{type="3d"} specifies a 3-D plot, while \Rarg{type="contour"} builds a contour/level plot (Figure \ref{fig:example2plot3d} and \ref{fig:example2plotcontour}):
+Similarly to Section \ref{sec:example1}, we can estimate and plot (Figure \ref{fig:example2overall2}) the overall effect of a 10-unit increase in \ozone{} with 95\% confidence intervals. In addition, we plot the three-dimensional effects (simultaneously along the spaces of \ozone{} and lags) using two other options of the function \Rfun{crossplot}. The argument \Rarg{type="3d"} specifies a 3-D plot, while \Rarg{type="contour"} builds a contour/level plot (Figure \ref{fig:example2plot3d} and \ref{fig:example2plotcontour}):
 
 <<example2effect>>=
 pred.o3$allRRfit["50.3"]
 cbind(pred.o3$allRRlow, pred.o3$allRRhigh)["50.3",]
+@
+<<example2overall,fig=T,echo=F>>=
+crossplot(pred.o3,"overall",label="Ozone",
+	title="Overall effect of ozone over 5 days of lag")
 @
 <<example2plot3d,fig=T,echo=F>>=
 crossplot(pred.o3, label="Ozone", title="3D graph of ozone effect")
@@ -495,11 +517,13 @@ crossplot(pred.o3, label="Ozone", title="3D graph of ozone effect")
 crossplot(pred.o3, "contour", label="Ozone", title="Contour graph of ozone effect")
 @
 <<example2noeval1,eval=F>>=
+crossplot(pred.o3,"overall",label="Ozone",
+	title="Overall effect of ozone over 5 days of lag")
 crossplot(pred.o3, label="Ozone", title="3D graph of ozone effect")
 crossplot(pred.o3, "contour", label="Ozone", title="Contour graph of ozone effect")
 @
 
-\begin{figure}[H]
+\begin{figure}
 	\centering
 	\caption{}
 		\subfloat[]{\label{fig:example2plot3d}\includegraphics[width=0.50\textwidth]{fig-example2plot3d.pdf}}
@@ -529,7 +553,7 @@ crossplot(pred.temp, "slices", var=9, ylim=c(0.995,1.017),
 	title="Effect of temperature along lags for a 
 	unit increase below the low threshold")
 @
-\begin{figure}[H]
+\begin{figure}
 	\centering
 	\caption{}
 		\subfloat[]{\label{fig:example2temphigh}\includegraphics[width=0.50\textwidth]{fig-example2temphigh.pdf}}
@@ -537,6 +561,31 @@ crossplot(pred.temp, "slices", var=9, ylim=c(0.995,1.017),
 \end{figure}
 
 The effects along lags for 1\Ctemp{} above the high threshold (25\Ctemp{}) and below the low threshold (10\Ctemp{}) are showed in Figures \ref{fig:example2temphigh} and \ref{fig:example2templow}. The argument \Rarg{ylim} is specified to set the same range in the y-axis, making the two plots comparable.
+
+In order to illustrate a possible extension of the threshold models presented so far, we can assume that the \ozone{} effect is null up to 35 \microg{} and then shows an additional change at 50 \microg{}. We can parameterize this effect with a piecewise linear function above a first threshold, changing slope at a specific cut-off point:
+
+<<example2pred2>>=
+basis.o3 <- crossbasis(data$o3, vartype="hthr", varknots=c(35,50),
+	lagtype="integer", maxlag=5)
+model <- update(model)
+pred.o3 <- crosspred(basis.o3, model, at=c(0:65))
+@
+
+Simply, we changed the cross-basis for \ozone{} including 2 \Rarg{knots} which specify the threshold and the cut-off point for the change in slope, then we updated the model and predicted the results under the new assumptions. The overall effect can be plot by (Figure \ref{fig:example2overall2}):
+
+<<example2overall2,fig=T>>=
+crossplot(pred.o3,"overall",label="Ozone",
+	title="Overall effect of ozone over 5 days of lag")
+@
+
+\begin{figure}
+	\centering
+	\caption{}
+\label{fig:example2overall2}
+\includegraphics[width=0.50\textwidth]{fig-example2overall2.pdf}
+\end{figure}
+
+This result can be compared with the same plot obtained under the simple threshold model in Figure \ref{fig:example2overall}.
 
 %--------------------------------%%--------------------------------%
 \subsection{Example 3: a complex DLNM}
@@ -547,12 +596,13 @@ In this last example we specify a more complex DLNM, where the effects in both d
 These are the cross-basis matrices:
 
 <<example3crossbasis>>=
-basis.pm <- crossbasis(data$pm10, vartype="lin", lagtype="strata",
+basis.pm <- crossbasis(data$pm10,vartype="lin", lagtype="strata",
   cen=FALSE, maxlag=1)
-basis.temp <- crossbasis(data$temp, vartype="bs", vardf=5, lagdf=5, cenvalue=21, maxlag=30)
+basis.temp <- crossbasis(data$temp, vartype="bs", vardf=5, vardegree=2,
+  lagdf=5, cenvalue=21, maxlag=30)
 @
 
-The chosen basis functions for the space of the predictor are a linear function for the effect of \PM{} and a cubic splines (\Rarg{vartype="bs"}) with 5 degrees of freedom for temperature (with \Rarg{varknots} placed by default at equally spaced quantiles in the space of the predictor). The basis for temperature is centered at 21\Ctemp{}, which will represent the reference point for the predicted effects. Regarding the space of lags, we assume a simple lag 0-1 parameterization for \PM{} (i.e. a single strata up to lag 1, keeping the default values of \Rarg{lagdf=1}), while we define another cubic spline, this time with the natural constraint (\Rarg{vartype="ns"} by default) for the lag dimension of temperature. For this space, \Rarg{lagknots} are located by default at equally spaced values in the log scale of lags, while the boundary knots are set to 0 and \Rarg{maxlag}. 
+The chosen basis functions for the space of the predictor are a linear function for the effect of \PM{} and a quadratic B-spline (\Rarg{vartype="bs"}) with 5 degrees of freedom for temperature (with \Rarg{varknots} placed by default at equally spaced quantiles in the space of the predictor). The basis for temperature is centered at 21\Ctemp{}, which will represent the reference point for the predicted effects. Regarding the space of lags, we assume a simple lag 0-1 parameterization for \PM{} (i.e. a single strata up to lag 1, keeping the default values of \Rarg{lagdf=1}), while we define another cubic spline, this time with the natural constraint (\Rarg{vartype="ns"} by default) for the lag dimension of temperature. For this space, \Rarg{lagknots} are located by default at equally spaced values in the log scale of lags, while the boundary knots are set to 0 and \Rarg{maxlag}. 
 
 Now we can fit the model and carry out the prediction:
 
@@ -568,12 +618,10 @@ The 3-D and contour plots equivalent to Figure \ref{fig:example2plot3d}-\ref{fig
 <<example3plot3d,fig=T,echo=F>>=
 crossplot(pred.temp, label="Temperature",
   title="3D graph of temperature effect")
-
 @
 <<example3plotcontour,fig=T,echo=F>>=
 crossplot(pred.temp, "contour", label="Temperature",
   title="Contour graph of temperature effect")
-
 @
 <<example3overall,fig=T,echo=F>>=
 crossplot(pred.temp, "overall", label="Temperature",
@@ -590,13 +638,20 @@ crossplot(pred.temp, "overall", label="Temperature",
 
 These results are showed in Figures \ref{fig:example3overall} and \ref{fig:example3plot3d}-\ref{fig:example3plotcontour}.
 
-\begin{figure}[H]
+\begin{figure}
 	\centering
 	\caption{}
 	\label{fig:example3overall}\includegraphics[width=0.50\textwidth]{fig-example3overall.pdf}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}
+	\centering
+	\caption{}
+		\includegraphics[width=1\textwidth]{fig-example3slices.pdf}
+	\label{fig:example3slices}
+\end{figure}
+
+\begin{figure}
 	\centering
 	\caption{}
 		\subfloat[]{\label{fig:example3plot3d}\includegraphics[width=0.50\textwidth]{fig-example3plot3d.pdf}}
@@ -611,13 +666,6 @@ crossplot(pred.temp, "slices", var=c(-20,0,27,33),
 @
 
 The values in \Rarg{var} and \Rarg{lag} are used to define the specific predictor and lag values for which the effects must be computed. As a result, the plot in Figure \ref{fig:example3slices} shows the effect by temperature at specific lags (left) and the effect by lag at specific temperatures (right). These plots can be imagined as the results of cutting ``slices'' on the effect surface shown in Figure \ref{fig:example3plot3d} at the specific values of temperature and lags.
-
-\begin{figure}[H]
-	\centering
-	\caption{}
-		\includegraphics[width=0.8\textwidth]{fig-example3slices.pdf}
-	\label{fig:example3slices}
-\end{figure}
 
 %--------------------------------%%--------------------------------%%--------------------------------%
 \section{Conclusions}
@@ -639,7 +687,7 @@ Finally, we express our gratitude to all the people working to develop and maint
 
 %--------------------------------%%--------------------------------%%--------------------------------%
 
-\bibliographystyle{plain}
+\bibliographystyle{plainnat}
 \bibliography{biblio}
 
 <<cleaning,echo=F>>=
