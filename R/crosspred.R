@@ -7,6 +7,11 @@ index <- grep(deparse(substitute(crossbasis)),
 	rownames(summary(model)$coeff),fixed=T)
 coef <- summary(model)$coeff[index,1]
 vcov <- vcov(model)[index,index]
+model.class <- class(model)
+if(!is.null(model$family$link)) {
+	model.link <- model$family$link
+} else model.link <- "unknown"
+if(any(model.class=="clogit")) model.link <- "log"
 
 if(length(coef)!=attr$crossdf) {
 	stop("number of estimated parameters does not match number of cross-functions
@@ -14,6 +19,11 @@ Possible reasons:
 1) model dropped some cross-functions because of collinearity
 2) name of crossbasis matrix matches other parameters in the model formula
 In this last case change the name of crossbasis object")
+}
+if(all(model.class!="glm")) {
+	cat("warning: the current implementation of the package assumes that the 
+estimation is carried out through the 'glm()' command.
+The accuracy of the results using alternative commands is not guaranteed\n")
 }
 
 ##########################################################################
@@ -29,10 +39,11 @@ if(is.null(at)) {
 	} else predvar <- seq(from=from,to=to,by=by)
 } else predvar <- sort(unique(at))
 
-if(!is.null(attr$varknots)) {
-	if(min(predvar)>min(attr$varknots)|max(predvar)<max(attr$varknots)) {
-	stop("predicted range should contains original knots")
-}}
+predvar <- c(attr$range[1],predvar,attr$range[2])
+
+if(length(predvar)<attr$vardf+attr$varint+2) {
+	stop("number of predicted values must be > vardf+varint")
+}
 
 ##########################################################################
 # PREDICTION
@@ -71,6 +82,14 @@ names(allfit) <- names(allse) <- predvar
 
 ###########################################################################
 
+matfit <- matfit[-c(1,length(predvar)),]
+matse <- matse[-c(1,length(predvar)),]
+allfit <- allfit[-c(1,length(predvar))]
+allse <- allse[-c(1,length(predvar))]
+predvar <- predvar[-c(1,length(predvar))]
+
+###########################################################################
+
 list$predvar <- predvar
 list$maxlag <- maxlag
 
@@ -82,7 +101,7 @@ list$matse <- matse
 list$allfit <- allfit
 list$allse <- allse
 
-if(model$family$link %in% c("log","logit")) {
+if(model.link %in% c("log","logit")) {
 	list$matRRfit <- exp(matfit)
 	list$matRRhigh <- exp(matfit+1.96*matse)
 	list$matRRlow <- exp(matfit-1.96*matse)
@@ -92,7 +111,8 @@ if(model$family$link %in% c("log","logit")) {
 	list$allRRlow <- exp(allfit-1.96*allse)
 	names(list$allRRlow) <- names(allfit)
 }
-
+list$model.class <- model.class
+list$model.link <- model.link
 class(list) <- "crosspred"
 list
 }

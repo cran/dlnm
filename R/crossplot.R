@@ -28,7 +28,7 @@ if(!is.null(lag)&sum(lag%in%0:crosspred$maxlag)!=length(lag)&
 # GRAPHS
 ###########
 
-if(!is.null(crosspred$matRRfit)) {
+if(crosspred$model.link %in% c("log","logit")) {
 	crosspred$matfit <- crosspred$matRRfit
 	crosspred$mathigh <- crosspred$matRRhigh
 	crosspred$matlow <- crosspred$matRRlow

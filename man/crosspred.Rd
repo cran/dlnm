@@ -24,7 +24,7 @@ The object \code{crossbasis} must be the same containing the cross-basis matrix 
 
 For a detailed overview of the options, see:
 
-\code{vignette("dlnmOverview", package = "dlnm")}
+\code{vignette("dlnmOverview")}
 }
 
 \value{
@@ -37,7 +37,8 @@ A list object of class \code{"crosspred"} with the following components:
   \item{matRRfit }{ exponentiated effects from \code{matfit}.}
   \item{matRRlow, matRRhigh }{ matrices with low and high 95\% confidence intervals for \code{matRRfit}.}
   \item{allRRfit }{ exponentiated total effects from \code{allfit}.}
-  \item{allRRlow, allRRhigh }{ vectors with low and high 95\% confidence intervals for \code{allRRfit}.}
+  \item{model.class }{ class of the model command used for estimation.}
+  \item{model.link }{ a specification for the model link function.}
 }
 
 \references{ 
@@ -47,13 +48,11 @@ Armstrong, B. Models for the relationship between ambient temperature and daily 
 \author{Antonio Gasparrini, \email{antonio.gasparrini@lshtm.ac.uk}}
 
 \note{
-All the effects are reported versus a reference value corresponding to the centering point for continuous functions or to the default values for the other options (see \code{\link{crossbasis}}). Exponentiated effects are included if \code{model} has link equal to \code{log} or \code{logit}.
+All the effects are reported versus a reference value corresponding to the centering point for continuous functions or to the default values for the other options (see \code{\link{crossbasis}}). Exponentiated effects are included if \code{model.link} is equal to \code{log} or \code{logit}.
 }
 
 \section{Warnings}{
 The name of the object \code{crossbasis}  will be used by to extract the related estimated parameters from \code{model}. This name must not match the names of other predictors in the model formula. In addition, if more than one variable is transformed by cross-basis functions in the same model, different names must be specified.
-
-In order to apply the same transformation as that used for the original predictor, the range of \code{predvar} must include the \code{varknots} for \code{varbasis} (see \code{\link{crossbasis}}).
 }
 
 \seealso{ \code{\link{crossbasis}}, \code{\link{crossplot}}}
@@ -61,25 +60,20 @@ In order to apply the same transformation as that used for the original predicto
 \examples{
 # Example 2. See crossbasis and crossplot for other examples
 
-# load and prepare the dataset
-initDB()
-data <- readCity("chic", collapseAge=TRUE)
-data$temp <- (data$tmpd-32)*5/9
-data$o3 <- with(data, o3tmean+o3mtrend)
-
 ### DLM with threshold for the effect of O3 on mortality up to 5 days of lag
 ### space of predictor: linear effect above 40.3 microgr/m3 for O3
 ### space of predictor: linear effects below 10C and above 25C for temperature
 ### lag function: integer lag parameterization (unconstrained) for O3
 ### lag function: strata intervals at lag 0-1, 2-6 and 7-15 for temperature
 
-basis.o3 <- crossbasis(data$o3, vartype="hthr", varknots=40.3,
+data(chicagoNMMAPS)
+basis.o3 <- crossbasis(chicagoNMMAPS$o3, vartype="hthr", varknots=40.3,
 	lagtype="integer", maxlag=5)
-basis.temp <- crossbasis(data$temp, vartype="dthr", varknots=c(10,25),
+basis.temp <- crossbasis(chicagoNMMAPS$temp, vartype="dthr", varknots=c(10,25),
 	lagtype="strata", lagknots=c(2,7), maxlag=15)
 summary(basis.o3)
 summary(basis.temp)
-model <- glm(death ~  basis.o3 + basis.temp, family=quasipoisson(), data)
+model <- glm(death ~  basis.o3 + basis.temp, family=quasipoisson(), chicagoNMMAPS)
 pred.o3 <- crosspred(basis.o3, model, at=c(0:65,40.3,50.3))
 
 crossplot(pred.o3, "slices", var=50.3,
@@ -95,7 +89,7 @@ crossplot(pred.o3, "contour", label="Ozone",
 ### 	with an additional change in slope at 50 microgr/m3
 ### same lag function as before
 
-basis.o3 <- crossbasis(data$o3, vartype="hthr", varknots=c(35,50),
+basis.o3 <- crossbasis(chicagoNMMAPS$o3, vartype="hthr", varknots=c(35,50),
 	lagtype="integer", maxlag=5)
 summary(basis.o3)
 model <- update(model)
