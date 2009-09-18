@@ -56,7 +56,7 @@ Some arguments can be automatically changed for not sensible combinations, or se
 
 For a detailed overview of the options, see:
 
-\code{vignette("dlnmOverview", package = "dlnm")}
+\code{vignette("dlnmOverview")}
 }
 
 \value{
@@ -86,25 +86,20 @@ It is strongly recommended to avoid the inclusion of an intercept in the basis f
 \examples{
 # Example 1. See crosspred and crossplot for other examples
 
-# load and prepare the dataset
-initDB()
-data <- readCity("chic", collapseAge=TRUE)
-data$temp <- (data$tmpd-32)*5/9
-data$pm10 <- with(data, pm10tmean+pm10mtrend)
-
 ### simple DLM for the effect of PM10 on mortality up to 15 days of lag
 ### space of predictor: linear effect for PM10
-### space of predictor: 5df spline for temperature
+### space of predictor: 5df natural cubic spline for temperature
 ### lag function: 4th degree polynomial for PM10
 ### lag function: strata intervals at lag 0 and 1-3 for temperature
 
-basis.pm <- crossbasis(data$pm10, vartype="lin", lagtype="poly",
+data(chicagoNMMAPS)
+basis.pm <- crossbasis(chicagoNMMAPS$pm10, vartype="lin", lagtype="poly",
 	lagdegree=4,cen=FALSE,maxlag=15)
-basis.temp <- crossbasis(data$temp, vardf=5, lagtype="strata",
+basis.temp <- crossbasis(chicagoNMMAPS$temp, vardf=5, lagtype="strata",
 	lagknots=1, cenvalue=21, maxlag=3)
 summary(basis.pm)
 summary(basis.temp)
-model <- glm(death ~  basis.pm + basis.temp, family=quasipoisson(), data)
+model <- glm(death ~  basis.pm + basis.temp, family=quasipoisson(), chicagoNMMAPS)
 pred.pm <- crosspred(basis.pm, model, at=0:20)
 
 crossplot(pred.pm,"slices",var=10,

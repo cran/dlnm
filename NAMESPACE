@@ -6,6 +6,7 @@ export(crossbasis,crosspred,crossplot,mkbasis,mklagbasis)
 
 import(stats,graphics,grDevices)
 importFrom(splines,ns)
+importFrom(splines,bs)
 importFrom(tsModel,Lag)
 
 S3method(summary, crossbasis)
