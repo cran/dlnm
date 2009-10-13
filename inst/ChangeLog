@@ -1,3 +1,12 @@
+Changes in dlnm 1.0.2
+=======================
+
+Minor changes
+-------------
+
+    o	Some html links giving warnings have been fixed.
+
+
 Changes in dlnm 1.0.1
 =======================
 
@@ -11,7 +20,7 @@ Major changes
     o	The function crosspred() has been improved: now there is no constraint 
 	on the range of the predicted values. Moreover, the values 'model.class' 
 	and 'model.link' have been added. The command now works also when the 
-	estimation is carried out by 'clogit()'
+	estimation is carried out by 'clogit()'.
 
 Minor changes
 -------------
