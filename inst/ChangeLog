@@ -1,3 +1,22 @@
+Changes in dlnm 1.1.0
+=======================
+
+Major changes
+-------------
+
+    o	The estimate of the cumulative effects along lags has been included in
+	crosspred() and can be plotted with crossplot() setting 'cumul=T'.
+
+    o	The confidence intervals for 'type' equal to "slices" or "overall" 
+	can be now represented both by "area" (default), "bars" or "lines",
+	by the argument 'ci' in crossplot().
+
+Minor changes
+-------------
+
+    o	Help pages, examples and vignette changed accordingly.
+
+
 Changes in dlnm 1.0.2
 =======================
 

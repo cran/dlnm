@@ -8,15 +8,16 @@ Plot several graphs (3d, slices and overall effects) of predicted effects from d
 }
 
 \usage{
-crossplot(crosspred, type="3d", var=NULL, lag=NULL,
-	ylim=NULL, title=NULL, label="var")
+crossplot(crosspred, type="3d", cumul=FALSE, ci="area", 
+	var=NULL, lag=NULL, ylim=NULL, title=NULL, label="var")
 }
 
 \arguments{
   \item{crosspred }{ an object of class \code{"crosspred"}.}
   \item{type }{ type of plot. See Details below.}
-  \item{var }{ values of predictor for which specific effects must be plotted. Used only if \code{type="slices"}.}
-  \item{lag }{ lag values for which specific effects must be plotted. Used only if \code{type="slices"}.}
+  \item{cumul }{ logical. If \code{TRUE}, cumulative effects along lags are reported. Used only if \code{type="slices"}. See Details}
+  \item{ci }{ type of confidence intervals representation, one of \code{"area"}, \code{"bars"} or \code{"lines"}.}
+  \item{var, lag }{ vectors of predictor values and lags for which specific effects must be plotted. Used only if \code{type="slices"}.}
   \item{ylim }{ numeric vectors of length 2, giving the coordinates ranges for the response axis (y-axis for \code{type} equal to \code{"overall"} or \code{"slices"}, z-axis for \code{"3d"}).}
   \item{title }{ the main title on top of the plot.}
   \item{label }{ label for predictor to be inserted in the plot.}
@@ -31,7 +32,7 @@ Different plots can be obtained choosing the following values for the argument \
 
 \bold{\code{"overall"}}: a plot of the overall effects (summed up all the single lag contributions).
 
-\bold{\code{"slices"}}: a multiple plot of effects at specific values of predictor or lags, chosen by \code{var} and \code{lag}, respectively. Up to 4 plots for each dimension are allowed.
+\bold{\code{"slices"}}: a multiple plot of effects at specific values of predictor or lags, chosen by \code{var} and \code{lag}, respectively. Up to 4 plots for each dimension are allowed. Cumulative effects along lags are reported if \code{cumul=TRUE}: in this case, the same option must have been set to obtain the prediction saved in the \code{crosspred} object (see \code{\link{crosspred}}).
 
 For a detailed overview of the options, see:
 
@@ -47,7 +48,7 @@ Armstrong, B. Models for the relationship between ambient temperature and daily 
 \note{
 All the effects are reported versus a reference value. For continuous functions, this is specified by the centering point defined in the object \code{crossbasis} (see \code{\link{crossbasis}}). Exponentiated effects are automatically returned if \code{model} has link equal to \code{log} or \code{logit}.
 
-The values in \code{var} and \code{lag} must match those specified in the object \code{crosspred} (see \code{\link{crosspred}}).
+The values in \code{var} must match those specified in the object \code{crosspred} (see \code{\link{crosspred}}), while the values in \code{lag} must be included in the lag period specified by \code{\link{crossbasis}}.
 
 This function creates plots with default settings (i.e. perspective in 3-D plot, colours etc.). Refer to the original estimates stored in the \code{crosspred} object in order to personalize the output with generic plot commands.
 }
@@ -71,7 +72,7 @@ basis.temp <- crossbasis(chicagoNMMAPS$temp, vartype="bs", vardf=5, vardegree=2,
 summary(basis.pm)
 summary(basis.temp)
 model <- glm(death ~  basis.pm + basis.temp, family=quasipoisson(), chicagoNMMAPS)
-pred.temp <- crosspred(basis.temp, model, at=-26:33)
+pred.temp <- crosspred(basis.temp, model, at=-26:33, cumul=TRUE)
 
 crossplot(pred.temp, label="Temperature",
 	title="3D graph of temperature effect")
@@ -81,6 +82,8 @@ crossplot(pred.temp, "overall", label="Temperature",
 	title="Overall effect of temperature over 30 days of lag")
 crossplot(pred.temp, "slices", var=c(-20,0,27,33),
 	lag=c(0,5,15,28), label="Temperature")
+crossplot(pred.temp, "slices", cum=TRUE, ci="bars", var=-20,
+	label="Temperature", title="Cumulative effect for -20C along lags")
 
 ### See the vignette 'dlnmOverview' for a detailed explanation of this example
 }

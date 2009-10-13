@@ -1,11 +1,13 @@
 `crossplot` <-
-function(crosspred, type="3d",
+function(crosspred, type="3d", cumul=FALSE, ci="area",
 	var=NULL, lag=NULL, ylim=NULL, title=NULL, label="var") {
 
 if(!type%in%c("slices","3d","contour","overall")) {
-	stop("Type must be one of 'slices','3d','contour','overall'")
+	stop("type must be one of 'slices','3d','contour','overall'")
 }
-
+if(!ci%in%c("area","bars","lines")) {
+	stop("'ci' must be one of 'area', 'bars' or 'lines'")
+}
 if(is.null(var)&is.null(lag)&(type=="slices")) {
 	stop("at least 'var' or 'lag' must be provided when type='slices'")
 }
@@ -16,18 +18,29 @@ if((length(var)!=length(lag))&(!is.null(var)&!is.null(lag))&type=="slices") {
 	stop("if both are provided, length of 'var' and 'lag' must be the same")
 }
 if(!is.null(var)&sum(var%in%crosspred$predvar)!=length(var)&
-	(type=="slices"|type=="slice")) {
+	(type=="slices")) {
 	stop("'var' must match values used for prediction")
 }
 if(!is.null(lag)&sum(lag%in%0:crosspred$maxlag)!=length(lag)&
-	(type=="slices"|type=="slice")) {
+	(type=="slices")) {
 	stop("'lag' must match values in 0:maxlag")
+}
+if(cumul==TRUE&is.null(crosspred$cumfit)) {
+	stop("Cumulative effects can be plotted if predicted in the 'crosspred'
+	object. Set the argument 'cumul=TRUE' in the function crosspred()")
 }
 
 ##########################################################################
 # GRAPHS
 ###########
 
+if(cumul==T) {
+	crosspred$matfit <- crosspred$cumfit
+	crosspred$matse <- crosspred$cumse
+	crosspred$matRRfit <- crosspred$cumRRfit
+	crosspred$matRRhigh <- crosspred$cumRRhigh
+	crosspred$matRRlow <- crosspred$cumRRlow
+}
 if(crosspred$model.link %in% c("log","logit")) {
 	crosspred$matfit <- crosspred$matRRfit
 	crosspred$mathigh <- crosspred$matRRhigh
@@ -52,8 +65,8 @@ if(crosspred$model.link %in% c("log","logit")) {
 # SLICES
 ##########
 
-
 if(type=="slices") {
+	if(cumul==TRUE) plotlab <- paste("Cumulative",plotlab)
 	mar.old <- par()$mar
 	mfrow.old <- par()$mfrow
 	grey <- grey(0.9)
@@ -72,14 +85,35 @@ if(type=="slices") {
 				max(crosspred$mathigh[,x]))
 		} else ylimlag <- ylim
 		for(i in 1:length(lag)) {
-			plot(predvar,crosspred$matfit[,x[i]],type="l",
+			plot(predvar,crosspred$matfit[,x[i]],type="n",
 				frame.plot=FALSE,xlab="",ylab="",ylim=ylimlag,axes=FALSE)
 			axis(1,cex.axis=0.7,mgp=c(3,0.7,0))
 			axis(2,cex.axis=0.7,mgp=c(3,0.7,0))
-			polygon(c(predvar,rev(predvar)),c(crosspred$mathigh[,x[i]],
-				rev(crosspred$matlow[,x[i]])),col=grey,
-				border="white")
-			abline(h=noeff)
+			if(ci=="area") {
+				polygon(c(predvar,rev(predvar)),
+					c(crosspred$mathigh[,x[i]],
+					rev(crosspred$matlow[,x[i]])),
+					col=grey,border="white")
+				abline(h=noeff)
+				lines(predvar,crosspred$matfit[,x[i]],
+					col="red")
+			} else if(ci=="bars") {
+				segments(predvar,crosspred$mathigh[,x[i]],
+					predvar,crosspred$matlow[,x[i]])
+				segments(predvar-0.1,crosspred$mathigh[,x[i]],
+					predvar+0.1,crosspred$mathigh[,x[i]])
+				segments(predvar-0.1,crosspred$matlow[,x[i]],
+					predvar+0.1,crosspred$matlow[,x[i]])
+				abline(h=noeff)
+				points(predvar,crosspred$matfit[,x[i]],
+					col="red",pch=19)				
+			} else if(ci=="lines") {
+				lines(predvar,crosspred$mathigh[,x[i]],lty=2)
+				lines(predvar,crosspred$matlow[,x[i]],lty=2)
+				abline(h=noeff)
+				lines(predvar,crosspred$matfit[,x[i]],
+					col="red")
+			}
 			lines(predvar,crosspred$matfit[,x[i]],col="red")
 			if(length(lag)>1) mtext(paste("Lag =",lag[i]),cex=0.8)
 			title(main=title,ylab=plotlab,xlab=label,mgp=c(2,0.7,0),cex=0.7)
@@ -98,14 +132,34 @@ if(type=="slices") {
 				xlab="",ylab="",ylim=ylimvar,axes=FALSE)
 			axis(1,cex.axis=0.7,mgp=c(3,0.7,0))
 			axis(2,cex.axis=0.7,mgp=c(3,0.7,0))
-			polygon(c(predlag,rev(predlag)),c(crosspred$mathigh[x[i],],
-				rev(crosspred$matlow[x[i],])),col=grey,
-				border="white")
-			abline(h=noeff)
-			lines(0:crosspred$maxlag,crosspred$matfit[x[i],],col="red")
+			if(ci=="area") {
+				polygon(c(predlag,rev(predlag)),
+					c(crosspred$mathigh[x[i],],
+					rev(crosspred$matlow[x[i],])),
+					col=grey,border="white")
+				abline(h=noeff)
+				lines(predlag,crosspred$matfit[x[i],],col="red")
+			} else if(ci=="bars") {
+				segments(predlag,crosspred$mathigh[x[i],],
+					predlag,crosspred$matlow[x[i],])
+				segments(predlag-0.1,crosspred$mathigh[x[i],],
+					predlag+0.1,crosspred$mathigh[x[i],])
+				segments(predlag-0.1,crosspred$matlow[x[i],],
+					predlag+0.1,crosspred$matlow[x[i],])
+				abline(h=noeff)
+				points(0:crosspred$maxlag,crosspred$matfit[x[i],],
+					col="red",pch=19)			
+			} else if(ci=="lines") {
+				lines(predlag,crosspred$mathigh[x[i],],lty=2)
+				lines(predlag,crosspred$matlow[x[i],],lty=2)
+				abline(h=noeff)
+				lines(0:crosspred$maxlag,crosspred$matfit[x[i],],
+					col="red")
+			}
 			if(length(var)>1) mtext(paste(label,"=",var[i]),cex=0.8)
 			title(main=title,ylab=plotlab,xlab="Lag",mgp=c(2,0.7,0),cex=0.7)
 			if(length(lag)==1) title(title,mgp=c(3,0.7,0))
+
 		}
 	}
 	if(length(lag)+length(var)>1) {
@@ -127,13 +181,28 @@ if(type=="overall") {
 		ylab=plotlab,ylim=ylim,axes=FALSE)
 	axis(1,xlab=predvar)
 	axis(2,xlab=crosspred$allfit)
-	polygon(c(predvar,rev(predvar)),
+	if(ci=="area") {
+		polygon(c(predvar,rev(predvar)),
 		c(crosspred$allhigh,rev(crosspred$alllow)),
 			col=grey(0.9), border="white")
+		abline(h=noeff)
+		lines(predvar,crosspred$allfit,col="red")
+	} else if(ci=="bars") {
+		segments(predvar,crosspred$allhigh,predvar,crosspred$alllow)
+		segments(predvar-0.1,crosspred$allhigh,
+			predvar+0.1,crosspred$allhigh)
+		segments(predvar-0.1,crosspred$alllow,
+			predvar+0.1,crosspred$alllow)
+		abline(h=noeff)
+		points(predvar,crosspred$allfit,col="red",pch=19)			
+	} else if(ci=="lines") {
+		lines(predvar,crosspred$allhigh,lty=2)
+		lines(predvar,crosspred$alllow,lty=2)
+		abline(h=noeff)
+		lines(predvar,crosspred$allfit,col="red")
+	}
 	abline(h=noeff)
-	lines(predvar,crosspred$allfit,col="red")
 	title(main=title,xlab=label)
-
 }
 
 ##############
