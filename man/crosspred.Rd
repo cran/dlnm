@@ -4,11 +4,12 @@
 \title{ Generate predicted effects for a DLNM }
 
 \description{
-Generate predicted effects from a distributed lag non-linear model (DLNM) for a set of values of the original predictor. It reports specific effects for each combination of values and lags, and overall effects (summed up along lags).
+Generate predicted effects from a distributed lag non-linear model (DLNM) for a set of values of the original predictor. It returns specific  effects for each combination of values and lags, plus overall and (optionally) cumulative effects (summed up along lags).
 }
 
 \usage{
-crosspred(crossbasis, model, at=NULL, from=NULL, to=NULL, by=NULL)
+crosspred(crossbasis, model, at=NULL, 
+	from=NULL, to=NULL, by=NULL, cumul=FALSE)
 }
 
 \arguments{
@@ -17,10 +18,13 @@ crosspred(crossbasis, model, at=NULL, from=NULL, to=NULL, by=NULL)
   \item{at }{ vector of values used for prediction.}
   \item{from, to }{ range of values used for prediction.}
   \item{by }{ increment of the sequence.}
+  \item{cumul }{ logical. If \code{TRUE}, cumulative effects are predicted. See details.}
 }
 
 \details{
 The object \code{crossbasis} must be the same containing the cross-basis matrix included in \code{model}, including its attributes and class. The set of values for which the effects must be computed can be specified by \code{at} or alternatively  by \code{from}/\code{to}/\code{by}. If specified by \code{at}, the values are automatically ordered and made unique. By default, \code{from} and \code{to} correspond to the range of the original vector of observation stored in the \code{crossbasis} object (see \code{\link{crossbasis}}). If \code{by} is not provided, 30 equally spaced values are returned.
+
+Matrices with cumulative effects summed upon lags for each values used for prediction are included if \code{cumul=TRUE}. For a long lag series (i.e. 1000 lags) the routine can be slow. These matrices are required by \code{\link{crossplot}} to graph the cumulative effects along lags.
 
 For a detailed overview of the options, see:
 
@@ -34,9 +38,12 @@ A list object of class \code{"crosspred"} with the following components:
   \item{coef, vcov }{ related coefficients and variance-covariance matrix from \code{model}.}
   \item{matfit, matse }{ matrices of effects and related standard errors for each value of \code{predvar} and lag.}
   \item{allfit, allse }{ vectors of total effects and related standard errors for each value of \code{predvar}.}
+  \item{cumfit, cumse }{ matrices of cumulative effects (along lags) and related standard errors for each value of \code{predvar} and lag. Computed if \code{cumul=TRUE}.}
   \item{matRRfit }{ exponentiated effects from \code{matfit}.}
   \item{matRRlow, matRRhigh }{ matrices with low and high 95\% confidence intervals for \code{matRRfit}.}
   \item{allRRfit }{ exponentiated total effects from \code{allfit}.}
+  \item{cumRRfit }{ exponentiated effects from \code{cumfit}. Computed if \code{cumul=TRUE}.}
+  \item{cumRRlow, cumRRhigh }{ matrices with low and high 95\% confidence intervals for \code{cumRRfit}. Computed if \code{cumul=TRUE}.}
   \item{model.class }{ class of the model command used for estimation.}
   \item{model.link }{ a specification for the model link function.}
 }

@@ -1,5 +1,6 @@
 `crosspred` <-
-function(crossbasis, model, at=NULL, from=NULL, to=NULL, by=NULL) {
+function(crossbasis, model, at=NULL,
+	from=NULL, to=NULL, by=NULL, cumul=FALSE) {
 list <- vector("list",0)
 
 attr <- attributes(crossbasis)
@@ -18,7 +19,7 @@ if(length(coef)!=attr$crossdf) {
 Possible reasons:
 1) model dropped some cross-functions because of collinearity
 2) name of crossbasis matrix matches other parameters in the model formula
-In this last case change the name of crossbasis object")
+In this last case change the name of the crossbasis object")
 }
 if(all(model.class!="glm")) {
 	cat("warning: the current implementation of the package assumes that the 
@@ -66,8 +67,7 @@ dimnames(predarray) <- with(attr, list(predvar,colnames(crossbasis),
 	rownames(lagbasis)))
 predcrossbasis <- apply(predarray,c(1,2),sum)
 
-matfit <- matrix(0,dim(predarray)[1],dim(predarray)[3])
-matse <- matrix(0,dim(predarray)[1],dim(predarray)[3])
+matfit <- matse <- matrix(0,dim(predarray)[1],dim(predarray)[3])
 for (i in 1:(maxlag + 1)) {
 	matfit[, i] <- as.matrix(predarray[, , i]) %*% coef
 	matse[, i] <- sqrt(diag(as.matrix(predarray[, , i]) %*% vcov %*% 
@@ -80,12 +80,27 @@ allfit <- predcrossbasis%*%coef
 allse <- sqrt(diag(predcrossbasis%*%vcov%*%t(predcrossbasis)))
 names(allfit) <- names(allse) <- predvar
 
+if(cumul==TRUE) {
+	cumfit <- cumse <- matrix(0,dim(predarray)[1],dim(predarray)[3])
+	for (i in 1:(maxlag + 1)) {
+		predcumbasis <- apply(predarray[,,1:i],c(1,2),sum)
+		cumfit[,i] <- predcumbasis%*%coef
+		cumse[,i] <- sqrt(diag(predcumbasis%*%vcov%*%t(predcumbasis)))
+	}
+	rownames(cumfit) <- rownames(cumse) <- predvar
+	colnames(cumfit) <- colnames(cumse) <- dimnames(predarray)[[3]] 
+}
+
 ###########################################################################
 
 matfit <- matfit[-c(1,length(predvar)),]
 matse <- matse[-c(1,length(predvar)),]
 allfit <- allfit[-c(1,length(predvar))]
 allse <- allse[-c(1,length(predvar))]
+if(cumul==TRUE) {
+	cumfit <- cumfit[-c(1,length(predvar)),]
+	cumse <- cumse[-c(1,length(predvar)),]
+}
 predvar <- predvar[-c(1,length(predvar))]
 
 ###########################################################################
@@ -100,6 +115,10 @@ list$matfit <- matfit
 list$matse <- matse
 list$allfit <- allfit
 list$allse <- allse
+if(cumul==TRUE) {
+	list$cumfit <- cumfit
+	list$cumse <- cumse
+}
 
 if(model.link %in% c("log","logit")) {
 	list$matRRfit <- exp(matfit)
@@ -110,7 +129,14 @@ if(model.link %in% c("log","logit")) {
 	names(list$allRRhigh) <- names(allfit)
 	list$allRRlow <- exp(allfit-1.96*allse)
 	names(list$allRRlow) <- names(allfit)
+	if(cumul==TRUE) {
+		list$cumRRfit <- exp(cumfit)
+		list$cumRRhigh <- exp(cumfit+1.96*cumse)
+		list$cumRRlow <- exp(cumfit-1.96*cumse)
+	}
 }
+list$vartype <- attr$vartype
+list$lagtype <- attr$lagtype
 list$model.class <- model.class
 list$model.link <- model.link
 class(list) <- "crosspred"

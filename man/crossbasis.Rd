@@ -42,7 +42,7 @@ The value in \code{type} defines the basis for each space (predictor and lags). 
 
 \bold{\code{"strata"}}: strata variables (dummy parameterization) determined by internal cut-off values specified in \code{knots}, which represent the lower boundaries for the right-open intervals. Intervals containing no observation are automatically discarded. If \code{knots} is provided, the dimension \code{df} is set to \code{length(knots)+int}. A dummy variable for the reference stratum (the first one by default) is included if \code{int=T}, generating a full rank basis. Never centered.
 
-\bold{\code{"poly"}}: polynomial. polynomial with power specified by \code{degree}. The dimension \code{df} is set to to \code{degree+int}. An intercept, corresponding to a vector of 1's (the power 0 of the polynomial) is included if \code{int=T}. The transformed variables can be centered at \code{cenvalue}.
+\bold{\code{"poly"}}: polynomial with power specified by \code{degree}. The dimension \code{df} is set to to \code{degree+int}. An intercept, corresponding to a vector of 1's (the power 0 of the polynomial) is included if \code{int=T}. The transformed variables can be centered at \code{cenvalue}.
 
 \bold{\code{"integer"}}: strata variables (dummy parameterization) for each integer values, expressly created to specify an unconstrained function in the space of lags. \code{df} is set automatically to the number of integer values minus 1 plus \code{int}. A dummy variable for the reference stratum (the first one by default) is included if \code{int=T}, generating a full rank basis. Never centered.
 
@@ -107,7 +107,7 @@ crossplot(pred.pm,"slices",var=10,
 # overall effect for a 10-unit increase in PM over 15 days of lag, with CI
 pred.pm$allRRfit["10"]
 cbind(pred.pm$allRRlow, pred.pm$allRRhigh)["10",]
-crossplot(pred.pm, "overall", ylim=c(0.99,1.04), label="PM10",
+crossplot(pred.pm, "overall", ylim=c(0.99,1.04), label="PM10", ci="lines",
 	title="Overall effect of PM10 over 15 days of lag")
 
 ### See the vignette 'dlnmOverview' for a detailed explanation of this example
