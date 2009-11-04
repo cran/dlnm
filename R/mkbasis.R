@@ -132,8 +132,8 @@ if(type=="strata")	{
 	}
 	x <- cut(var,c(range[1],knots,range[2]+0.1),right=FALSE)
 	temp <- as.matrix(outer(x,levels(x),"==")+0)
-	list$basis <- as.matrix(temp[,apply(temp,2,sum)!=0])
-	knots <- knots[(apply(temp,2,sum)!=0)[1:length(knots)]]
+	list$basis <- as.matrix(temp[,apply(temp,2,sum,na.rm=T)!=0])
+	knots <- knots[(apply(temp,2,sum,na.rm=T)!=0)[1:length(knots)]]
 	if(int==FALSE & !is.null(knots)) {
 		list$basis <- as.matrix(list$basis[,-1])
 	}

@@ -135,8 +135,6 @@ if(model.link %in% c("log","logit")) {
 		list$cumRRlow <- exp(cumfit-1.96*cumse)
 	}
 }
-list$vartype <- attr$vartype
-list$lagtype <- attr$lagtype
 list$model.class <- model.class
 list$model.link <- model.link
 class(list) <- "crosspred"
