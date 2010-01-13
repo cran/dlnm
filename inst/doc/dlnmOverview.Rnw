@@ -70,13 +70,13 @@ options(continue="  ")
 \section{Preamble}
 \label{sec:preamble}
 
-The \R{} package \Rpkg{dlnm} provides some facilities to run \emph{distributed lag non-linear models} (DLNM's), a modelling framework to describe simultaneously non-linear and delayed effects between predictors and an outcome in time-series data. 
+The \R{} package \Rpkg{dlnm} offers some facilities to run \emph{distributed lag non-linear models} (DLNM's), a modelling framework to describe simultaneously non-linear and delayed effects between predictors and an outcome in time-series data. 
 
 The aim of this document is to provide an overview of the capabilities of the package, together with extensive examples of application with real data. Some information on installation procedures and on the data included in the package are given in Section~\ref{sec:installdata}. The theory underlying the DLNM methodology is briefly illustrated in Section~\ref{sec:dlnm}, while the functions included in the package are described in Section~\ref{sec:functions}. Some examples of applications are provided in Section~\ref{sec:examples}: users mainly interested in the application can skip the previous Sections and and start with these examples. Finally, Section~\ref{sec:conclusions} offers some conclusions.
 
-The DLNM's methodology, together with a thorough algebraical development, has been previously described in \citet{gasparrini2010statmed}. This framework was originally conceived and proposed to investigate the health effect of temperature in \citet{armstrong2006}.
+The DLNM's methodology has been previously described in \citet{gasparrini2010statmed}, together with a detailed algebraical development. This framework was originally conceived and proposed to investigate the health effect of temperature by \citet{armstrong2006}.
 
-Type \Rcomm{citation("dlnm")} in \R{} to cite the \Rpkg{dlnm} package. A list of changes included in the current and previous versions can be found typing \Rcomm{file.show(system.file("ChangeLog", package = "dlnm"))}.
+Type \Rcomm{citation("dlnm")} in \R{} to cite the \Rpkg{dlnm} package after installation (see Section~\ref{sec:installdata}). A list of changes included in the current and previous versions can be found typing \Rcomm{file.show(system.file("ChangeLog", package = "dlnm"))}.
 
 Please send comments or suggestions and report bugs to \texttt{antonio.gasparrini@lshtm.ac.uk}.
 
@@ -88,7 +88,7 @@ Please send comments or suggestions and report bugs to \texttt{antonio.gasparrin
 \subsection{Installing the package \Rpkg{dlnm}}
 \label{sec:installing}
 
-The \Rpkg{dlnm} package is installed in the standard way for CRAN packages, for example using the \Rfun{install.packages} function or directly through the menu in \R{} (from version 2.9.0 onwards), clicking on \emph{Packages} and then on \emph{Install package(s)...}. The package can be alternatively installed using the .zip file containing the binaries, via \emph{Packages} and then \emph{Install package(s) from local zip files...}. 
+The \Rpkg{dlnm} package is installed in the standard way for CRAN packages from version 2.9.0 onwards, for example typing \Rcomm{install.packages("dlnm")} or directly through the menu in \R{}, clicking on \emph{Packages} and then on \emph{Install package(s)...}. The package can be alternatively installed using the .zip file containing the binaries, via \emph{Packages} and then \emph{Install package(s) from local zip files...}. 
 
 The functionalities of \Rpkg{dlnm} depend on other packages whose commands are called to specify the \Rpkg{dlnm} functions. This hierarchy is ruled by the field \emph{Imports} of the file \texttt{description} included in the package. The functions are imported from the packages \Rpkg{splines} (functions \Rfun{ns} and \Rfun{bs}) and \Rpkg{tsModel} (function \Rfun{Lag}). While \Rpkg{splines} is present in the basic installation of \R{}, the package \Rpkg{tsModel} is automatically downloaded if \Rpkg{dlnm} is installed through \R{} using the CRAN, but must be independently installed if a .zip file is used.
 
@@ -159,19 +159,61 @@ The choice of the two set of basis functions for each space is perfectly indepen
 \section{The functions in the package \Rpkg{dlnm}}
 \label{sec:functions}
 
-The functions included in the package can be used to complete all the steps required to specify and interpret a DLNM. The data are assumed to represent an equally-spaced, complete and ordered series of observations.
+This section describes the main functions included in the package \Rpkg{dlnm}. Here we provide a description of all the stages involved in the definition, estimation and interpretation of DLNMs, summarizing the conceptual and analytical steps. In addition, we illustrate the structure of the functions and discuss specific issues about their usage. Examples of applications to real time series data are described in Section~\ref{sec:examples}.
 
-The internal functions \Rfun{mkbasis} and \Rfun{mklagbasis} are called in order to build the basis matrices for the dimension of the predictor and lags, respectively. In concrete terms, they apply a transformation to the vector of predictor and to the vector of lags, and stored the transformed variables in two matrix objects. Several different choices are available, for example splines, polynomials, stratification and threshold parameterization. Details on the basis specification are given in Section~\ref{sec:examplesinternal}. These two internal commands are called by other functions, and they are not meant to be run by the users. However, they are included in the namespace of the package and therefore made accessible, with the intention to keep the process more transparent and give the opportunity to change or improve them.
+%--------------------------------%%--------------------------------%
+\subsection{Internal functions: \Rfun{mkbasis} and \Rfun{mklagbasis}}
+\label{sec:internal}
 
-The main function in the package \Rpkg{dlnm} is \Rfun{crossbasis}. It calls the internal functions \Rfun{mkbasis} and \Rfun{mklagbasis} and combines the two basis matrices in order to create the cross-basis matrix which specifies the dependency simultaneously in the two dimensions. The arguments are set to some default values, and can be automatically changed for nonsensical combinations, or set to null if not required. Anyway, meaningless combinations of arguments (for example strata where no observation lies) could lead to collinear variables, with identifiability problems in the model. The user is advised to test the result with the function \Rfun{summary.crossbasis}, which provides a summary of the choices made for the two bases and the final cross-basis.
+These functions build the basis matrices for the dimension of the predictor and lags, respectively. In concrete terms, they apply a transformation to the vector of predictor and to the vector of lags, and store the transformed variables and information about the chosen basis in list objects. These functions are called by \Rfun{crossbasis} (see Section~\ref{sec:crossbasis}) and are not expected to be directly run by the user in order to specify DLNMs. Their first arguments are \Rarg{x} and \Rarg{maxlag}, respectively, representing the original predictor and the maximum lag. The latter is used by \Rfun{mklagbasis} to generate the lag vector \Rcode{0:maxlag}.
 
-The cross-basis matrix should be included in the model formula of default regression functions. More than one cross-basis matrix can be included in the same formula. The name of the object containing the cross-basis matrix will be used to extract the estimated parameters, and must not match the names of other predictors in the model formula. Several different regression commands can be used: \Rfun{lm}, \Rfun{glm}, \Rfun{gam} (package \Rpkg{mgcv}), \Rfun{glm.nb} (package \Rpkg{MASS}), \Rfun{gee} (package \Rpkg{geepack}), \Rfun{clogit} and \Rfun{coxph} (package \Rpkg{survival}). Other commands may be included in the future.
+Different types of basis may be chosen through the argument \Rarg{type}: the possible options are natural cubic or simple B-splines (\Rcode{type="ns"} or \Rcode{"bs"}), strata through dummy variables (\Rcode{"strata"}), polynomials (\Rcode{"poly"}), threshold-type functions such as low, high or double threshold or piecewise parameterization (\Rcode{"lthr"}-\Rcode{"hthr"}-\Rcode{"dthr"}), strata variables for each integer values (\Rcode{"integer"}, used in unconstrained DLMs) and simply linear (\Rcode{"lin"}).
 
-The function \Rfun{crosspred} generates the predicted effects for a set of values of the original predictor, given the applied cross-basis functions and the parameters estimated by the model. It stores them in matrices with specific effects for each combination of predictor values and lags, and in vectors of overall effects (summed up along lags). Cumulative effects may be included, and exponentiated values are returned for model with log or logit link.
+The argument \Rarg{"df"} defines the dimension of the basis (the number of its columns, basically the number of transformed variables), which, in completely parametric models, corresponds to the number of degrees of freedom spent to define the relationship in the regression model including the basis. This value may depend on the argument \Rarg{knots} (which overcomes \Rarg{df}), specifying the position of the internal knots for \Rcode{"ns"} and \Rcode{"bs"} (with boundary knots specified in \Rarg{bound}), the cut-off points for \Rcode{"strata"} (defining right-open intervals) and the thresholds/cut-off points for \Rcode{"lthr"}, \Rcode{"hthr"} and \Rcode{"dthr"}. The argument \Rarg{degree} select the degree of polynomial for \Rcode{"bs"} and \Rcode{"poly"}.
 
-Finally, the function \Rfun{crossplot} provides some options to visualize the predicted effects.
+The arguments \Rarg{cen} and \Rarg{cenvalue} state if the basis must be centered and the centering value to be used. The presence of an intercept in the basis matrix is determined by the argument \Rarg{int}. Actually, the concept of intercept is different between bases: types \Rcode{"ns"} and \Rcode{"bs"} apply a complex parameterization where the intercept is implicitly built within the basis variables (see the related help pages typing \Rcomm{?ns} and \Rcomm{?bs}); in type \Rcode{"strata"} the intercept corresponds to the dummy variable for the baseline stratum (the first one by default), which is excluded if \Rcode{int=F}; the intercept is the usual vector of 1's in the other types. See Section~\ref{sec:crossbasis} for additional information.
 
-See the related help pages (for example \Rcomm{help(crossbasis)} or \Rcomm{?crossbasis}) for the details on the usage and the arguments of these functions.
+The value returned by \Rfun{mkbasis} and \Rfun{mklagbasis} is a list object, whose first component \Robj{basis} is the matrix created by the application of the chosen basis functions to \Rcode{x} or \Rcode{0:maxlag}, respectively. Additional values corresponding to the arguments above are returned in the other components of the list object.
+
+%--------------------------------%%--------------------------------%
+\subsection{The function \Rfun{crossbasis}}
+\label{sec:crossbasis}
+
+This is the main function in the package \Rpkg{dlnm}. It calls the internal functions \Rfun{mkbasis} and \Rfun{mklagbasis} and combines the two basis matrices through a tensor product in order to create the cross-basis, which specifies the dependency simultaneously in the two dimensions. See \citet[Section 4.1~-~4.2]{gasparrini2010statmed} for details. Its first argument is \Rarg{x}, assumed to represent an equally-spaced, complete and ordered series of observations, in order for the function to be coherently applied.
+
+The function uses arguments \Rarg{df}-\Rarg{knots}-\Rarg{bound}-\Rarg{degree}-\Rarg{int}-\Rarg{cen}-\Rarg{cenvalue}-\Rarg{maxlag}, with specific (optional) prefix \Rcode{var}- or \Rcode{lag}- to pass them to \Rfun{mkbasis} or \Rfun{mklagbasis}, respectively (see Section~\ref{sec:internal}, and type \Rcomm{?crossbasis} for a complete list of the arguments). The additional argument \Rarg{group} defines groups of observations to be considered as individual unrelated series, and may be useful for example in seasonal analyses (see Section~\ref{sec:example2}).
+
+The function returns an object of class \Rclass{crossbasis}, together with attributes defining the choices for the two basis functions. The arguments are set to some default values, and can be automatically changed for nonsensical combinations, or set to null if not required. Meaningless combinations of arguments (for example knots defined outside the predictor range) could lead to collinear variables, with identifiability problems in the model. The function applies some coherence checks and fix some specific problem (for example discarding strata intervals where no observation lies), but other problem may arise. The user is advised to test the result with the function \Rfun{summary.crossbasis}, which provides a summary of the choices made for the two bases and the final cross-basis.
+
+The values in \Rcode{x} are expected to be equally-spaced (with the interval defining the lag unit) and ordered in time. The series must be complete. Each value in the series of transformed variables is computed also using previous observations included in the lag period considered: therefore, the first \Rcode{maxlag} observations in the transformed variables are set to \Rcode{NA}. Missing values in \Rcode{x} are allowed, but, for the same reason, the same and the next \Rcode{maxlag} transformed values will be set to \Rcode{NA}. Although correct, this could generate computational problems for DLNMs with long lag periods in the presence of scattered missing observations.
+
+The basis variables for the space of the predictor are centered by default for continuous functions (types \Rcode{"ns"}, \Rcode{"bs"}, \Rcode{"poly"} and \Rcode{"lin"}). The default centering point is the predictor mean, if not set with \Rarg{cenvalue}. This value will represent the reference for predicted effects from a DLNM (see Section~\ref{sec:crosspred}). The choice of the reference value does not affect the fit of the model, and should be based on interpretational issues. The reference in non-continuous functions is automatically set to the first interval in \Rcode{strata} and \Rcode{integer}, or to the flat region in \Rcode{lthr}-\Rcode{hthr}-\Rcode{dthr}.
+
+An intercept is included by default only in the basis defining the lag dimension. It is strongly recommended to avoid the inclusion of an intercept in the basis for \Rarg{x}, otherwise a rank-deficient cross-basis matrix will be specified, causing some of the cross-variables to be excluded in the regression model. 
+
+%--------------------------------%%--------------------------------%
+\subsection{The function \Rfun{crosspred}}
+\label{sec:crosspred}
+
+The cross-basis matrix produced by \Rfun{crossbasis} need to be included in a regression model formula in order to run a DLNM. The interpretation of the estimated related parameters, specifying a bi-dimensional relationship, is virtually impossible in complex DLNMs. The association is summarized through the function \Rfun{crosspred}, which predicts the effects for a set of values of the original predictor, and return the results for each combination of predictor values and lags. The function creates the same cross-basis functions for the chosen predictor values, based on the attributes of the original cross-basis matrix, and generates estimated effects and standard errors by extracting the related parameters estimated in the model (see \citet[Section 4.3]{gasparrini2010statmed} for details).
+
+The first two arguments of the function are \Rarg{basis} (the matrix object of class \Rclass{crossbasis}) and \Rarg{model} (the regression model object which includes \Rarg{basis}). The function extracts the information about the cross-basis from the attributes of the former, and links each cross-basis variables with the estimated parameters in the latter through their names. Multiple cross-basis matrices associated with different predictors may be included in \Rarg{model}: in this case, the user must specify different names for the cross-basis objects.
+
+One of the main advantages of the \Rpkg{dlnm} package is that the user can perform DLNMs with standard regression functions, simply including the cross-basis matrix in the model formula. The current implementation only works with time series data, basically involving an equally-spaced and ordered predictor series, and its use is straightforward with the functions \Rfun{lm}, \Rfun{glm} or \Rfun{gam} (package \Rpkg{mgcv}). However, the user can apply different regression functions, compatibly with the time series structure of the data. Alternative use beyond time series analysis, such as in case-control or cohort designs, is in development. The function \Rfun{crosspred} exploits \Rfun{coef} and \Rfun{vcov} methods to extract the coefficients and related (co)variance matrix from \Rarg{model}, respectively: for classes of regression functions without these methods, the user needs to manually extract the parameters and include them in the arguments \Rarg{coef} and \Rarg{vcov}. In this case, their dimensions and order must match the variables included in \Rarg{basis}.
+
+The predictor values used for prediction are selected with the argument \Rarg{at}, or alternatively with \Rarg{from}-\Rarg{to}-\Rarg{by}. If specified by \Rarg{at}, the values are automatically ordered and made unique. If \Rarg{at} and \Rarg{by} are not provided, approximately 50 equally-spaced rounded values are returned using \Rfun{pretty}.
+
+The function returns an object of class \Rclass{crosspred}, simply a list of components including the vector of prediction values, matrices of lag-specific effects and standard errors for combinations of each prediction value and lag, plus vectors of overall effects (summed up along lags) and standard errors. Matrices of cumulative effects and standard errors are included for \Rcode{cumul=T} (default to \Rcode{FALSE}), which represent the sum of the lag-specific effects at each lag. Exponentiated effects are added if the link of the regression model is equal to log or logit, together with confidence intervals computed using a normal approximation and a confidence level selected by \Rarg{ci.level}. The model link is automatically selected from model for classes \Rcode{"lm"}, \Rcode{"glm"}, \Rcode{"gam"} (package \Rpkg{mgcv}) and \Rcode{"clogit"} and \Rcode{"coxph"} (package \Rpkg{survival}), but needs to be provided for different classes or if arguments \Rarg{coef}-\Rarg{vcov} are used to input the parameters.
+
+%--------------------------------%%--------------------------------%
+\subsection{Plotting functions}
+\label{sec:plotting}
+
+Interpretation of the bi-dimensional predicted effects are aided by graphical representation. High and low-level plotting functions are provided through the methods \Rfun{plot}, \Rfun{lines} and \Rfun{points}. The method \Rfun{plot} calls high-level functions \Rfun{plot.default}, \Rfun{persp} and \Rfun{filled.contour} to produce scatter plots, 3-D and contour plots of overall and lag-specific effects. These methods have replaced the old function \Rfun{crossplot} since version 1.3.0, providing the user to specify the whole range or arguments of the plotting functions above, allowing complete flexibility in the choices of colours, axes, labels and other graphical parameters. See the help of the original high-level functions for additional details and a complete list of the arguments. Methods \Rfun{lines} and \Rfun{points} may be used as low-level plotting functions to add lines or points to an existing plot.
+
+The first argument of the functions is \Rarg{x}, a list object of class \Rclass{crosspred}. The argument \Rarg{ptype} specifies the type of plot, choosing among \Rcode{"3d"}, \Rcode{"contour"}, \Rcode{"overall"} and \Rcode{"slices"}, the latter selecting effects along lags at specific predictor values and effects along the predictor at specific lags. These are chosen through the additional arguments \Rarg{var}-\Rarg{lag}, respectively. Cumulative effects along lags are reported if \Rcode{cumul=TRUE}: in this case, the same option must have been set to obtain the prediction saved in \Rarg{x} (see Section~\ref{sec:crosspred}).
+
+All the effects are reported versus a reference value. For continuous functions, this is specified by the centering point defined in the \Robj{crossbasis} object (see Section~\ref{sec:crossbasis}). Exponentiated effects are automatically returned if the component \Rarg{model.link} of \Rarg{x} is equal to log or logit, or forced with the argument \Rcode{exp=TRUE}.
 
 %--------------------------------%%--------------------------------%%--------------------------------%
 \section{Some examples}
@@ -179,29 +221,26 @@ See the related help pages (for example \Rcomm{help(crossbasis)} or \Rcomm{?cros
 
 This Section provides some examples of the use of the functions included in the \Rpkg{dlnm} package, described in Section~\ref{sec:functions}. In spite of the specific application on the health effects of air pollution and temperature, these examples are easily generalized to different topics. The results included in this Section are not meant to represent scientific findings, but are reported with the only purpose to illustrate the capabilities of the \Rpkg{dlnm} package.
 
-First, some simple examples of the internal functions  are showed in Section~\ref{sec:examplesinternal}. Although these commands are not expected to be performed directly by the user, but are commonly called through \Rfun{crossbasis}, these codes can shine a light on the process to build the basis functions for the two dimensions (predictor and lags), and clarify the meaning of the arguments of the function \Rfun{crossbasis}.
+First, some simple examples of the internal functions are showed in Section~\ref{sec:examplesinternal}. Then, 3 different examples of the application of DLNM's are illustrated in the Sections~\ref{sec:example1}~-~\ref{sec:example3}, using the NMMAPS dataset for the city of Chicago in the period 1987-2000 included in the package, which has been described in Section~\ref{sec:data}. These different cases cover most of the functionalities of the package, providing a detailed overview of its capabilities and a basis to perform analyses on this dataset or on other data sources.
 
-Then, 3 different examples of the application of DLNM's are illustrated in the Sections~\ref{sec:example1}-\ref{sec:example3}, using the NMMAPS dataset for the city of Chicago in the period 1987-2000 included in the package, which has been described in Section~\ref{sec:data}. These different cases cover most of the functionalities of the package, providing a detailed overview of its capabilities and a basis to perform analyses on this dataset or on other data sources.
-
-The package is assumed to be present in the \R{} library (see Section~\ref{sec:installing}) and loaded in the session, together with the data, typing:
+The package is assumed to be present in the \R{} library (see Section~\ref{sec:installing}) and loaded in the session, typing:
 
 <<load>>=
 library(dlnm)
-data(chicagoNMMAPS)
 @
 
 %--------------------------------%%--------------------------------%
-\subsection{Examples for \Rfun{mkbasis} and \Rfun{mklagbasis}}
+\subsection{Examples for internal functions}
 \label{sec:examplesinternal}
 
-As a first step, we provide an example of the use of the function \Rfun{mkbasis}. We build a basis matrix applying the selected basis functions to the vector of integers going form 1 to 5. We leave many of the arguments at their default values, apart from the selection of the degrees of freedom \Rarg{df}.
+As a first step, we provide an example of the use of the function \Rfun{mkbasis}. We build different basis matrices applying the selected basis functions to the vector of integers going form 1 to 5. In the first example we leave many of the arguments at their default values, apart from the selection of the degrees of freedom \Rarg{df}:
 
 <<internal.mkbasis>>=
 basis.var <- mkbasis(1:5, knots=3)
 basis.var
 @
 
-The result is a simple \Rclass{list} object. The chosen basis is a natural cubic B-splines (default \Rcode{type="ns"}) with 1 knot and \Rcode{df=2} (\Rarg{df} is equal to \Rcode{length(knots)+1+int} for \Rcode{type="ns"}). Apart from the fact that the basis variables are centered at \Rcode{cenvalue=3} (the mean of the predictor values, the default for this argument), the same results could be obtained by the command \Rcomm{ns(1:5, knots=3)}. The basis matrix is stored in the object \Robj{basis.var\$basis}, while the arguments specifying it are included as other objects in the list, and can be called directly (for example, try \Rcomm{basis.var\$knots}).
+The result is list object with the basis matrix and other components returning the chosen arguments. Here the basis is a natural cubic B-splines (default \Rcode{type="ns"}) with 1 knot and \Rcode{df=2} (\Rarg{df} is equal to \Rcode{length(knots)+1+int} for \Rcode{type="ns"}). Apart from the fact that the basis variables are centered at \Rcode{cenvalue=3} (the mean of the predictor values, the default for this argument), the same results could be obtained by the command \Rcomm{ns(1:5, knots=3)}.
 
 Alternative choices may be specified through the following code (results not shown, the user can try to run the commands):
 
@@ -218,7 +257,7 @@ The function \Rfun{mklagbasis} calls \Rfun{mkbasis} to create a basis matrix for
 mklagbasis(maxlag=5, type="poly", degree=3)
 @
 
-The command specifies a 3\textsuperscript{rd} degree polynomial. Differently from the bases for the space of the predictor build above, this matrix contains an intercept (\Rcode{int=TRUE} by default), in this case a vector of 1's (see \Rcomm{?crossbasis}), and is never centered. \Rarg{df} is equal to the degree of the polynomial plus 1 when an intercept is included. In this case, for a polynomial basis, the argument \Rarg{knots} is not included. 
+The statement specifies a 3\textsuperscript{rd} degree polynomial. Differently from the bases for the space of the predictor build above, this matrix contains an intercept (\Rcode{int=TRUE} by default), in this case a vector of 1's (see Section~\ref{sec:crossbasis}), and is never centered. \Rarg{df} is equal to \Rcode{degree+1} when an intercept is included. In this case, for a polynomial basis, the argument \Rarg{knots} is not included. 
 
 Other examples (results not shown):
 
@@ -227,7 +266,7 @@ mklagbasis(maxlag=5, type="integer")
 mkbasis(1:5, type="dthr", knots=c(2,3))
 @
 
-In the first line, the command applies a specific transformation in the space of lags in order to define unconstrained distributed lag effects (see \Rcomm{?crossbasis}), simply returning an identity matrix. The second choice returns a double threshold basis which can be applied to describe linear effects below 2 and above 3, with a null effect in between them.
+In the first line, the function applies a specific transformation in the space of lags in order to define unconstrained distributed lag effects (see Section~\ref{sec:delayed}), simply returning an identity matrix. The second choice returns a double threshold basis which can be applied to describe linear effects below 2 and above 3, with a null effect in between them.
 
 A basis matrix of \Rcode{type="strata"} with and without intercept is created by (results not shown):
 
@@ -236,7 +275,7 @@ mklagbasis(maxlag=10, type="strata", knots=c(4,7))
 mklagbasis(maxlag=10, type="strata", knots=c(4,7), int=F)
 @
 
-In this case, the intercept is represented by the dummy variable for the first stratum (see \Rcomm{?crossbasis}). The values in \Rarg{knots} specify the cut-off point for the strata, and represent the lower boundaries for the right-open intervals.
+In this case, the intercept is represented by the dummy variable for the first stratum (see Section~\ref{sec:crossbasis}). The values in \Rarg{knots} specify the cut-off point for the strata, and represent the lower boundaries for the right-open intervals.
 
 The effect of centering is illustrated below (results not shown):
 
@@ -251,9 +290,9 @@ Each basis function is centered on the relative transformation of \Rarg{cenvalue
 \subsection{Example 1: a simple DLM}
 \label{sec:example1}
 
-In this first example, we specify a simple DLM, assessing the effect of \PM{} on overall mortality, while adjusting for the effect of temperature. In order to do so, we first build two cross-basis matrices for the two predictors, and then include them in a model formula of a regression function. The effect of \PM{} is assumed linear in the dimension of the predictor, so, from this point of view, we can define this as a simple DLM even if it estimates also the distributed lag function for temperature, which is included as a non-linear term.
+In this first example, we specify a simple DLM, assessing the effect of \PM{} on overall mortality, while adjusting for the effect of temperature. In order to do so, we first build two cross-basis matrices for the two predictors, and then include them in a model formula of a regression function. The effect of \PM{} is assumed linear in the dimension of the predictor, so, from this point of view, we can define this as a simple DLM even if it estimates also the distributed lag function for temperature, which is included as a non-linear term. As highlighted above, the data are assumed to be composed by equally-spaced, complete and ordered series.
 
-First, we run \Rfun{crossbasis} to build the two cross-basis matrices, saving them in two objects. The names of the two objects must be different in order to predict the effects separately for each of them (see \Rcomm{?crosspred}). This is the code:
+First, we run \Rfun{crossbasis} to build the two cross-basis matrices, saving them in two objects. The names of the two objects must be different in order to predict the effects separately for each of them (see Section~\ref{sec:crosspred}). This is the code:
 
 <<example1crossbasis>>=
 basis.pm <- crossbasis(chicagoNMMAPS$pm10, vartype="lin", lagtype="poly",
@@ -262,11 +301,9 @@ basis.temp <- crossbasis(chicagoNMMAPS$temp, vardf=5, lagtype="strata",
 	lagknots=1, cenvalue=21, maxlag=3)
 @
 
-The function \Rfun{crossbasis} calls the two internal functions \Rfun{mkbasis} and \Rfun{mklagbasis} to build the basis matrices. It passes the arguments with stub \Rcode{var-} to the former, in order to specify the basis functions for the predictor (in this case \Robj{chicagoNMMAPS\$pm10} and \Robj{chicagoNMMAPS\$temp}), and the arguments with stub \Rcode{lag-} to the latter, specifying the basis functions for the expressly created vector \Rcode{0:maxlag}. Then it combines the two basis matrices to create the final cross-basis variables included in the objects of class \Rclass{crossbasis} (\Robj{basis.pm} and \Robj{basis.temp}). As highlighted above, the data are assumed to be composed by equally-spaced, complete and ordered series.
-
 In this case, we assume that the effect of \PM{} is linear (\Rarg{vartype="lin"}), while we model the relationship with temperature through a natural cubic spline with 5 degrees of freedom (\Rarg{vartype="ns"}, chosen by default). In this space, the internal knots (if not provided) are placed by default at equally spaced quantiles, while the boundary knots are located at the range of the observed values, so we need to specify only \Rarg{vardf}. We did not center \PM{}, in order to compute the predicted effects versus a reference value of 0 \microg{} (the same results could be obtained setting \Rarg{cen=TRUE} and \Rarg{cenvalue=0}). The reference value for temperature is set to 21\Ctemp{}.
 
-The basis for the space of the lags is chosen through the same arguments but with stub \texttt{lag-}. We specify the lagged effect of PM\textsubscript{10} up to 15 days of lag with a 4\textsuperscript{th} degree polynomial function (setting \texttt{lagdegree=4}). The delayed effect of temperature are defined by two lag strata (0 and 1-3), assuming the effects as constant within each stratum. The argument \Rarg{varknots=1} defines the lower boundary of the second interval.
+The basis for the space of the lags is chosen through the same arguments but with prefix \Rcode{lag-}. We specify the lagged effect of PM\textsubscript{10} up to 15 days of lag with a 4\textsuperscript{th} degree polynomial function (setting \texttt{lagdegree=4}). The delayed effect of temperature are defined by two lag strata (0 and 1-3), assuming the effects as constant within each stratum. The argument \Rarg{varknots=1} defines the lower boundary of the second interval.
 
 An overview of the specifications for the cross-basis (and the related bases in the two dimensions) is provided by the function \texttt{summary.crossbasis}, which calls the attributes of the \texttt{crossbasis} object:
 
@@ -287,23 +324,23 @@ The effects of specific levels of \PM{} on overall mortality, predicted by the m
 pred.pm <- crosspred(basis.pm, model, at=0:20, cumul=T)
 @
 
-The function includes the \Robj{basis.pm} and \Robj{model} objects used to estimate the parameters as the first two arguments, while \Rarg{at=0:20} states that the prediction must be computed for each integer value from 0 to 20 \microg{}. The argument \Rarg{cumul} (default to \Robj{FALSE}) indicates that also cumulative effects along lags must be included. Now that the predicted effects have been stored in \Robj{pred.pm}, they can be plot by the function \Rfun{crossplot}:
+The functions include the \Robj{basis.pm} and \Robj{model} objects used to estimate the parameters as the first two arguments, while \Rarg{at=0:20} states that the prediction must be computed for each integer value from 0 to 20 \microg{}. The argument \Rarg{cumul} (default to \Robj{FALSE}) indicates that also cumulative effects along lags must be included. Now that the predicted effects have been stored in \Robj{pred.pm}, they can be plot by the methods functions described in Section~\ref{sec:plotting}. For example:
 
 <<example1slices,fig=T,echo=F>>=
-crossplot(pred.pm, "slices", var=10,
-	title="Effects of a 10-unit increase in PM10 along lags")
+plot(pred.pm, "slices", var=10, col=3, ylab="RR",
+	main="Effects of a 10-unit increase in PM10 along lags")
 @
 
 <<example1slicescumul,fig=T,echo=F>>=
-crossplot(pred.pm, "slices", var=10, cumul=T,
-	title="Cumulative effects of a 10-unit increase in PM10 along lags")
+plot(pred.pm, "slices", var=10, cumul=TRUE, ylab="Cumulative RR",
+	main="Cumulative effects of a 10-unit increase in PM10 along lags")
 @
 
 <<example1slicesnoeval,eval=F>>=
-crossplot(pred.pm, "slices", var=10,
-	title="Effects of a 10-unit increase in PM10 along lags")
-crossplot(pred.pm, "slices", var=10, cumul=T,
-	title="Cumulative effects of a 10-unit increase in PM10 along lags")
+plot(pred.pm, "slices", var=10, col=3, ylab="RR",
+	main="Effects of a 10-unit increase in PM10 along lags")
+plot(pred.pm, "slices", var=10, cumul=TRUE, ylab="Cumulative RR",
+	main="Cumulative effects of a 10-unit increase in PM10 along lags")
 @
 
 \begin{figure}
@@ -313,7 +350,7 @@ crossplot(pred.pm, "slices", var=10, cumul=T,
 		\subfloat[]{\label{fig:example1slicescumul}\includegraphics[width=0.50\textwidth]{fig-example1slicescumul.pdf}}
 \end{figure}
 
-The function includes the \Robj{pred.pm} object with the stored results, and the argument \Rarg{"slices"} defines that we want to graph the relationship at specific values of the two dimensions (predictor and lag). With \Rcode{var=10} we specify this relationship along lags for a specific value of \PM{}, i.e. 10 \microg{}. This effect is compared to the reference value of 0 \microg{}, giving the lag-specific effects for a 10-unit increase. The argument \Rarg{cumul} indicates if cumulative effect, previously saved in \Robj{pred.pm}, must be plotted. The results are shown in Figures~\ref{fig:example1slices}-\ref{fig:example1slicescumul}. The interpretation is twofold: the curve represents the increase in risk in each future day following an increase of 10 \microg{} in \PM{} in a specific day (\emph{forward interpretation}), or otherwise the contributions of each past day with the same \PM{} increase to the risk in a specific day (\emph{backward interpretation}). The plots in Figures~\ref{fig:example1slices}-\ref{fig:example1slicescumul} suggest that the initial increase in risk of \PM{} is reversed at longer lags. The overall effect for a 10-unit increase in  \PM{} over 15 days of lag (i.e. summing all the effects up to the maximum lag), together with its 95\% confidence intervals can be extracted by the objects \Robj{allRRfit}, \Robj{allRRhigh} and \Robj{allRRlow} included in \Robj{pred.pm}, typing:
+The function includes the \Robj{pred.pm} object with the stored results, and the argument \Rarg{"slices"} defines that we want to graph the relationship at specific values of the two dimensions (predictor and lag). With \Rcode{var=10} we specify this relationship along lags for a specific value of \PM{}, i.e. 10 \microg{}. This effect is compared to the reference value of 0 \microg{}, giving the lag-specific effects for a 10-unit increase. We also chose a different colour for the first plot. The argument \Rarg{cumul} indicates if cumulative effect, previously saved in \Robj{pred.pm}, must be plotted. The results are shown in Figures~\ref{fig:example1slices}-\ref{fig:example1slicescumul}. The interpretation is twofold: the curve represents the increase in risk in each future day following an increase of 10 \microg{} in \PM{} in a specific day (\emph{forward interpretation}), or otherwise the contributions of each past day with the same \PM{} increase to the risk in a specific day (\emph{backward interpretation}). The plots in Figures~\ref{fig:example1slices}-\ref{fig:example1slicescumul} suggest that the initial increase in risk of \PM{} is reversed at longer lags. The overall effect for a 10-unit increase in  \PM{} over 15 days of lag (i.e. summing all the effects up to the maximum lag), together with its 95\% confidence intervals can be extracted by the objects \Robj{allRRfit}, \Robj{allRRhigh} and \Robj{allRRlow} included in \Robj{pred.pm}, typing:
 
 <<example1effect>>=
 pred.pm$allRRfit["10"]
@@ -352,22 +389,22 @@ model <- glm(death ~  basis.o3 + basis.temp + ns(doy, 4) + dow,
 pred.o3 <- crosspred(basis.o3, model, at=c(0:65,40.3,50.3))
 @
 
-The values for which the prediction must be computed are specified in \Rarg{at}: here we define the integers from 0 to 65 \microg{} (approximately the range of ozone distribution), plus the threshold and the value 50.3 \microg{} corresponding to a 10-unit increase above the threshold, which is automatically set as the reference point for \Rarg{type="hthr"} (see \Rcomm{?crossbasis}). The vector is automatically ordered. We can plot the lag-specific effects, similarly to Section~\ref{sec:example1}, and also the overall effect of a 10-unit increase in \ozone{} with 95\% confidence intervals. The commands are (results in Figures~\ref{fig:example2slices}-\ref{fig:example2overall}):
+The values for which the prediction must be computed are specified in \Rarg{at}: here we define the integers from 0 to 65 \microg{} (approximately the range of ozone distribution), plus the threshold and the value 50.3 \microg{} corresponding to a 10-unit increase above the threshold, which is automatically set as the reference point for \Rarg{type="hthr"} (see Section~\ref{sec:crossbasis}). The vector is automatically ordered. We can plot the lag-specific effects, similarly to Section~\ref{sec:example1}, and also the overall effect of a 10-unit increase in \ozone{} with 95\% confidence intervals. The related code is (results in Figures~\ref{fig:example2slices}-\ref{fig:example2overall}):
 
 <<example2slices,fig=T,echo=F>>=
-crossplot(pred.o3, "slices", var=50.3, ci="bars",
-	title="Effects of a 10-unit increase in ozone along lags")
+plot(pred.o3, "slices", var=50.3, ci="bars", type="p", pch=19, ci.level=0.80,
+	main="Effects of 10-unit increase above the threshold (80%CI)")
 @
 <<example2overall,fig=T,echo=F>>=
-crossplot(pred.o3,"overall",label="Ozone", ylim=c(0.9,1.3),
-	title="Overall effects of ozone over 5 days of lag")
+plot(pred.o3,"overall",xlab="Ozone", ci="lines", ylim=c(0.9,1.3), lwd=2,
+	ci.level=0.80, main="Overall effect over 5 days of lag (80%CI)")
 @
 
 <<example2noeval1,eval=F>>=
-crossplot(pred.o3, "slices", var=50.3, ci="bars",
-	title="Effects of a 10-unit increase in ozone along lags")
-crossplot(pred.o3,"overall",label="Ozone", ylim=c(0.9,1.3),
-	title="Overall effects of ozone over 5 days of lag")	
+plot(pred.o3, "slices", var=50.3, ci="bars", type="p", pch=19, ci.level=0.80,
+	main="Effects of 10-unit increase above the threshold (80%CI)")
+plot(pred.o3,"overall",xlab="Ozone", ci="lines", ylim=c(0.9,1.3), lwd=2,
+	ci.level=0.80, main="Overall effect over 5 days of lag (80%CI)")
 @
 
 \begin{figure}
@@ -377,9 +414,9 @@ crossplot(pred.o3,"overall",label="Ozone", ylim=c(0.9,1.3),
 		\subfloat[]{\label{fig:example2overall}\includegraphics[width=0.50\textwidth]{fig-example2overall.pdf}}
 \end{figure}
 
-In the first command, the argument \Rarg{ci="bars"} states that, differently from the default \Rcode{"area"} seen in Figures~\ref{fig:example1slices}-\ref{fig:example1slicescumul}, the confidence intervals are represented by bars. In the second command, the argument \Rarg{type="overall"} indicates that the overall effects (summed upon lags) must be plotted, with \Rarg{ylim} defining the range of the y-axis.
+In the first statement, the argument \Rarg{ci="bars"} states that, differently from the default \Rcode{"area"} seen in Figures~\ref{fig:example1slices}-\ref{fig:example1slicescumul}, the confidence intervals are represented by bars. In addition, the argument \Rcode{ci.level=0.80} states that 80\% confidence intervals must be plotted. Finally, we chose points, instead of the default line, with specific symbol, by the arguments \Rarg{type} and \Rarg{pch}. In the second statement, the argument \Rarg{type="overall"} indicates that the overall effects (summed upon lags) must be plotted, with confidence intervals as dashed lines, \Rarg{ylim} defining the range of the y-axis, \Rarg{lwd} the thickness of the line.
 
-Similarly to the previous example, we can extract from \Robj{pred.o3} the estimated overall effect for a 10-unit increase in ozone above the threshold, together with its 95\% confidence intervals:
+Similarly to the previous example, we can extract from \Robj{pred.o3} the estimated overall effect for a 10-unit increase in ozone above the threshold ($50.3-40.3$ \microg{}), together with its 95\% confidence intervals:
 
 <<example2effect>>=
 pred.o3$allRRfit["50.3"]
@@ -394,7 +431,7 @@ The same plots and computation can be applied to the cold and heat effects of te
 
 In the previous examples, the effects of air pollution (\PM{} and \ozone{}, respectively) were assumed completely linear or linear above a threshold. This assumption facilitates both the interpretation and the representation of the association: the dimension of the predictor is never considered, and the lag-specific or overall effects for a 10-unit increase are easily plotted. In contrast, when considering the non-linear effects of temperature, we need to adopt a bi-dimensional perspective in order to represent effects which vary non-linearly along the space of the predictor and lags.
 
-In this last example we specify a more complex DLNM, where the effects are estimated using smooth non-linear functions for both dimensions . Despite the higher complexity of the relationship, we will see how the steps required to specify and fit the model and predict the results are exactly the same as for the simpler models see before in Sections \ref{sec:example1}-\ref{sec:example2}, only requiring different plotting choices. The user can apply the same steps to investigate the effects of temperature in previous examples, and extend the plots for \PM{} and \ozone{}. In this case we run a DLNM to investigate the effects of temperature and \PM{} on overall mortality up to lag 30 and 1, respectively.
+In this last example we specify a more complex DLNM, where the effects are estimated using smooth non-linear functions for both dimensions. Despite the higher complexity of the relationship, we will see how the steps required to specify and fit the model and predict the results are exactly the same as for the simpler models see before in Sections \ref{sec:example1}-\ref{sec:example2}, only requiring different plotting choices. The user can apply the same steps to investigate the effects of temperature in previous examples, and extend the plots for \PM{} and \ozone{}. In this case we run a DLNM to investigate the effects of temperature and \PM{} on overall mortality up to lag 30 and 1, respectively.
 
 These are the cross-basis matrices:
 
@@ -410,30 +447,31 @@ The chosen basis functions for the space of the predictor are a linear function 
 <<example3noeval,eval=F>>=
 model <- glm(death ~  basis.pm + basis.temp + ns(time, 7*14) + dow,
 	family=quasipoisson(), chicagoNMMAPS)
-pred.temp <- crosspred(basis.temp, model, at=-26:33)
-crossplot(pred.temp, label="Temperature",
-	title="3D graph of temperature effects")
-crossplot(pred.temp, "contour", label="Temperature",
-	title="Contour graph of temperature effects")
+pred.temp <- crosspred(basis.temp, model, by=1)
+plot(pred.temp, xlab="Temperature",zlab="RR", theta=200, phi=40, lphi=30,
+	main="3D graph of temperature effect")
+plot(pred.temp, "contour", xlab="Temperature", key.title=title("RR"),
+	plot.title=title("Contour plot",xlab="Temperature",ylab="Lag"))
 @
 
 <<example3plot3d,fig=T,echo=F>>=
 model <- glm(death ~  basis.pm + basis.temp + ns(time, 7*14) + dow,
 	family=quasipoisson(), chicagoNMMAPS)
 pred.temp <- crosspred(basis.temp, model, at=-26:33)
-crossplot(pred.temp, label="Temperature",
-	title="3D graph of temperature effects")
-@
-<<example3plotcontour,fig=T,echo=F>>=
-crossplot(pred.temp, "contour", label="Temperature",
-	title="Contour graph of temperature effects")
+plot(pred.temp, xlab="Temperature",zlab="RR", theta=200, phi=40, lphi=30,
+	main="3D graph of temperature effect")
 @
 
-The 3-D and contour plots obtained by the commands above are represented in Figures~\ref{fig:example3plot3d}-\ref{fig:example3plotcontour}. The plot of the overall effects can be obtained by (result not shown):
+<<example3plotcontour,fig=T,echo=F>>=
+plot(pred.temp, "contour", xlab="Temperature", key.title=title("RR"),
+	plot.title=title("Contour plot",xlab="Temperature",ylab="Lag"))
+@
+
+Note that prediction values are chosen only with the argument \Rcode{by=1} in \Rfun{crosspred}, defining all the integer values within the predictor range. The first plotting expression produces a 3-D plot illustrated in Figure~\ref{fig:example3plot3d}, with non-default choices for perspective and lightning obtained through the arguments \Rarg{theta}-\Rarg{phi}-\Rarg{lphi}. The second plotting expression specifies the contour plot in Figure~\ref{fig:example3plotcontour} with titles and axis labels chosen by arguments \Rarg{plot.title} and \Rarg{key.title}. The user can find additional information and a complete list of arguments in the help pages of the original high-level plotting functions (typing \Rcomm{?persp} and \Rcomm{?filled.contour}). The plot of the overall effects can be obtained by (result not shown):
 
 <<example3overall,fig=F>>=
-crossplot(pred.temp, "overall", label="Temperature",
-	title="Overall effects of temperature over 30 days of lag")
+plot(pred.temp, "overall", xlab="Temperature", ylim=c(0.8,1.7),
+	main="Overall effect of temperature over 30 days of lag")
 @
 
 \begin{figure}
@@ -446,16 +484,33 @@ crossplot(pred.temp, "overall", label="Temperature",
 \begin{figure}
 	\centering
 	\caption{}
-		\includegraphics[width=0.6\textwidth]{fig-example3slices.pdf}
-	\label{fig:example3slices}
+		\subfloat[]{\label{fig:example3slices}\includegraphics[width=0.50\textwidth]{fig-example3slices.pdf}}
+		\subfloat[]{\label{fig:example3slices2}\includegraphics[width=0.50\textwidth]{fig-example3slices2.pdf}}
 \end{figure}
 
-More comprehensively, Figure \ref{fig:example3slices} shows the effects by temperature at multiple specific lags (left) and the effect by lag at multiple specific temperatures (right). The arguments \Rarg{var} and \Rarg{lag} are used to define the specific predictor and lag values for which the effects must be computed. These plots can be imagined as the results of cutting \emph{slices} on the effect surface shown in Figures~\ref{fig:example3plot3d}-\ref{fig:example3plotcontour} at the specific values of temperature and lags, and provide a detailed overview of the effects surface together with the related confidence intervals. This plot is carried out by:
+Plots in Figures~\ref{fig:example3plot3d}~-~\ref{fig:example3plotcontour} offer a comprehensive summary of the bi-dimensional relationship, but are limited in their ability to inform on effects at specific values of predictor or lags. In addition, they are also limited for inferential purposes, as the uncertainty of the estimated effects is not reported in 3-D and contour plots. A more detailed analysis is provided by plotting "slices" of the effect surface for specific predictor and lag values. The code is:
 
-<<example3slices,fig=T>>=
-crossplot(pred.temp, "slices", var=c(-20,0,27,33),
-	lag=c(0,5,15,28), label="Temperature")
+<<example3noeval2,eval=F>>=
+plot(pred.temp, "slices", var=-20, ci="n", col=1, ylim=c(0.95,1.15), lwd=1.5,
+	main="Lag-specific effects at different temperature, ref. 21C")
+for(i in 1:3) lines(pred.temp, "slices", var=c(0,27,33)[i], col=i+1, lwd=1.5)
+legend("topright",paste("Temperature =",c(-20,0,27,33)), col=1:4, lwd=1.5)
+plot(pred.temp, "slices", var=c(-20,33), lag=c(0,5), col=4)
 @
+
+<<example3slices,fig=T,echo=F>>=
+plot(pred.temp, "slices", var=-20, ci="n", col=1, ylim=c(0.95,1.15), lwd=1.5,
+	main="Lag-specific effects at different temperature, ref. 21C")
+for(i in 1:3) lines(pred.temp, "slices", var=c(0,27,33)[i], col=i+1, lwd=1.5)
+legend("topright",paste("Temperature =",c(-20,0,27,33)), col=1:4, lwd=1.5)
+@
+
+<<example3slices2,fig=T,echo=F>>=
+plot(pred.temp, "slices", var=c(-20,33), lag=c(0,5), col=4)
+@
+
+The results are reported in Figures~\ref{fig:example3slices}~-~\ref{fig:example3slices2}. Figure~\ref{fig:example3slices} illustrates lag-specific effects for mild and extreme cold and hot temperatures of -20\Ctemp{}, 0\Ctemp{}, 27\Ctemp{}, and 33\Ctemp{} (with reference at 21\Ctemp{}). Figures~\ref{fig:example3slices2} depicts both effects along the predictor range at lag 0 and 5 (left column), and effects along lags at temperatures -20\Ctemp{} and 33\Ctemp{} (right column). The arguments \Rarg{var} and \Rarg{lag} define the "slices" to be cut in the effect surface in Figure~\ref{fig:example3plot3d}~-~\ref{fig:example3plotcontour}. The argument \Rcode{ci="n"} in the first expression states that confidence intervals must not be plotted. The preliminary interpretation suggests that cold temperatures are associated with longer mortality risk than heat, but not immediate, showing a "protective" effect at lag 0. This analytical proficiency would be hardly achieved with simpler models, probably losing important details of the association.
+
 
 %--------------------------------%%--------------------------------%%--------------------------------%
 \section{Conclusions}
@@ -474,9 +529,9 @@ The DLNM's framework introduced here is developed for time series design. The ge
 \section{Acknowledgements}
 \label{sec:acknowledgements}
 
-This work was supported by the Medical Research Council (UK) through the Research Grant RES-G0707030.
+This work was supported by the Medical Research Council (UK), Research Grant RES-G0707030.
 
-We gratefully acknowledge the valuable suggestions of Fabio Frascati regarding the procedures to build and document this package. Other package vignettes were used as examples (in particular \Rpkg{gnm} by Heather Turner and David Firth). We are thankful to the colleagues who tested the beta-version of this package and suggested some important improvements included in the current version (in particular Marie-France Valois).
+We gratefully acknowledge the valuable suggestions of Fabio Frascati regarding the procedures to build and document this package. Other package vignettes were used as examples (in particular \Rpkg{gnm} by Heather Turner and David Firth). We are thankful to the colleagues who tested the beta-version of this package and suggested some important improvements included in the current version (in particular Marie-France Valois and Adrian Barnett).
 
 Finally, we express our gratitude to all the people working to develop and maintain the \R{} Project.
 

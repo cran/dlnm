@@ -1,8 +1,11 @@
 
-export(crossbasis,crosspred,crossplot,mkbasis,mklagbasis)
+export(crossbasis,crosspred,mkbasis,mklagbasis)
+export(plot.crosspred,lines.crosspred,points.crosspred)
+export(summary.crossbasis,summary.crosspred)
+export(crossplot)
 
 # documented but not exported
-# export(summary.crossbasis,summary.crosspred)
+#
 
 import(stats,graphics,grDevices)
 importFrom(splines,ns)
@@ -10,3 +13,7 @@ importFrom(splines,bs)
 importFrom(tsModel,Lag)
 
 S3method(summary, crossbasis)
+S3method(summary, crosspred)
+S3method(plot, crosspred)
+S3method(lines, crosspred)
+S3method(points, crosspred)

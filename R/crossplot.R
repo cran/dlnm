@@ -27,7 +27,7 @@ if(!is.null(lag)&sum(lag%in%0:crosspred$maxlag)!=length(lag)&
 }
 if(cumul==TRUE&is.null(crosspred$cumfit)) {
 	stop("Cumulative effects can be plotted if predicted in the 'crosspred'
-	object. Set the argument 'cumul=TRUE' in the function crosspred()")
+object. Set the argument 'cumul=TRUE' in the function crosspred()")
 }
 
 ##########################################################################
@@ -237,5 +237,10 @@ if(type=="3d") {
 		ltheta=290,shade=0.75,r=sqrt(3),d=5)
 	par(mar=mar.old)
 }
+
+cat("The function 'crossplot' has been replaced by method functions for class
+'crosspred' since version 1.3.0, and kept only for compatibility issues.
+The users are strongly suggested to run 'plot.crosspred' instead\n")
+
 }
 

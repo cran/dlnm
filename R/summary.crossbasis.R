@@ -4,7 +4,7 @@ function(object, ...) {
 	attr <- attributes(object)
 	cat("CROSSBASIS FUNCTIONS\n")
 	cat("observations:",nrow(object),"\n")
-	if(attr$group>1) cat("groups:",attr$group,"\n")
+	if(!is.null(attr$group)) cat("groups:",attr$group,"\n")
 	cat("range:",attr$range[1],",",attr$range[2],"\n")
 	cat("total df:",attr$crossdf,"\n")
 	cat("maxlag:",attr$maxlag,"\n")

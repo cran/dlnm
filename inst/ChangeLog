@@ -1,3 +1,43 @@
+Changes in dlnm 1.3.1
+=======================
+
+Major changes
+-------------
+
+    o	Function crossplot() replaced by method functions plot(), lines()
+	and points() for class ‘crosspred’. The user can now flexibly 
+	choose all the arguments through '...' to modify axes, colours,
+	labels etc.
+
+    o	Arguments 'coef', 'vcov' and 'model.link' added to crosspred(), to
+	provide the user a way to manually include the parameters for 
+	models without methods for coef() and vcov().
+
+    o	Improved routine for automatic selection of rounded values used for
+	prediction in crosspred() with 'at'-'from'-'to'-'by'.
+	
+Minor changes
+-------------
+
+    o	Included 'ci.level' in crosspred() and plot() method and 'ci="n"'
+	in plot() method for no confidence intervals.
+
+    o	Improved model parameters extraction method in crosspred() through
+	regular expressions.
+
+    o	Added class "matrix" to crossbasis objects.
+
+    o	Included summary.crosspred().
+
+    o	Added lazyData to description file.
+
+    o	Improved coherence checks in functions and centering in mkbasis().
+
+    o	A detailed description of the functions added in the vignette.
+
+    o	Help pages, vignette and citation changes accordingly.
+
+
 Changes in dlnm 1.2.4
 =======================
 
@@ -6,6 +46,7 @@ Major changes
 
     o	mkbasis substantially revised: now 'int' unrelated to df,
 	then relation 'type'-'df'-'int' more logical.
+
 
 Changes in dlnm 1.2.3
 =======================
