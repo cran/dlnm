@@ -42,11 +42,6 @@ if(type=="poly") {
 	df <- degree+int
 	knots <- NULL
 }
-# KNOTS FORCED WITHIN THE RANGE OF THE VARIABLE
-if(!is.null(knots)) {
-	if(min(knots)<=min(var,na.rm=TRUE)|max(knots)>=max(var,na.rm=TRUE)) {
-	stop("knots must be within the range of var")
-}}
 # DF FIXED FOR TYPES INTEGER (SOLVED LATER), DTHR AND LIN
 if(type=="integer") df <- 1
 if(type=="dthr") df <- 2+int
@@ -131,9 +126,7 @@ if(type=="strata")	{
 		knots <- quantile(var,1/(df+1-int)*1:(df-int),na.rm=TRUE)
 	}
 	x <- cut(var,c(range[1],knots,range[2]+0.1),right=FALSE)
-	temp <- as.matrix(outer(x,levels(x),"==")+0)
-	list$basis <- as.matrix(temp[,apply(temp,2,sum,na.rm=T)!=0])
-	knots <- knots[(apply(temp,2,sum,na.rm=T)!=0)[1:length(knots)]]
+	list$basis <- as.matrix(outer(x,levels(x),"==")+0)
 	if(int==FALSE & !is.null(knots)) {
 		list$basis <- as.matrix(list$basis[,-1])
 	}

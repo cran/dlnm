@@ -3,28 +3,32 @@ function(crossbasis, model, at=NULL,
 	from=NULL, to=NULL, by=NULL, cumul=FALSE) {
 list <- vector("list",0)
 
+if(class(crossbasis)!="crossbasis") {
+	stop("the first argument must be an object of class 'crossbasis'")
+}
 attr <- attributes(crossbasis)
-index <- grep(deparse(substitute(crossbasis)),
-	rownames(summary(model)$coeff),fixed=T)
-coef <- summary(model)$coeff[index,1]
-vcov <- vcov(model)[index,index]
 model.class <- class(model)
-if(!is.null(model$family$link)) {
-	model.link <- model$family$link
-} else model.link <- "unknown"
-if(any(model.class=="clogit")) model.link <- "log"
+if(!any(model.class %in% c("glm","lm","clogit","coxph","gam"))) {
+	stop("model class must be one of 'glm','lm','clogit','coxph','gam'
+crosspred() needs to be modified in order to include other model functions")
+}
+index <- grep(deparse(substitute(crossbasis)),names(coef(model)),fixed=T)
+coef <- coef(model)[index]
+vcov <- vcov(model)[index,index]
 
-if(length(coef)!=attr$crossdf) {
+if(any(model.class %in% c("glm","gam"))) {
+	model.link <- model$family$link
+} else if(all(model.class %in% "lm")) {
+	model.link <- "identity"
+} else model.link <- "log"
+
+if(length(coef)!=attr$crossdf | any(is.na(coef))) {
 	stop("number of estimated parameters does not match number of cross-functions
 Possible reasons:
 1) model dropped some cross-functions because of collinearity
+It may happens when knots specify all-0 variables for var/lag
 2) name of crossbasis matrix matches other parameters in the model formula
-In this last case change the name of the crossbasis object")
-}
-if(all(model.class!="glm")) {
-	cat("warning: the current implementation of the package assumes that the 
-estimation is carried out through the 'glm()' command.
-The accuracy of the results using alternative commands is not guaranteed\n")
+In this case change the name of the crossbasis object")
 }
 
 ##########################################################################

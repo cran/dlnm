@@ -1,5 +1,5 @@
 `crossbasis` <-
-function(var, vartype="ns", vardf=1, vardegree=1, varknots=NULL,
+function(var, group=NULL, vartype="ns", vardf=1, vardegree=1, varknots=NULL,
 	varbound=range(var), varint=FALSE, cen=TRUE, cenvalue=mean(var),
 	maxlag=0, lagtype="ns", lagdf=1, lagdegree=1, lagknots=NULL,
 	lagbound=c(0,maxlag), lagint=TRUE) {
@@ -25,11 +25,30 @@ for(v in 1:basisvar$df) {
 colnames(basis) <- outer(paste("v",1:basisvar$df,sep=""),
 	paste("l",1:basislag$df,sep=""),	function(x,y) paste(x,y,sep="."))
 
+# GROUP 
+if(!is.null(group)) {
+	# FIRST COHERENCE CHECKS
+	if(any(is.na(group))) stop("missing values in 'group' are not allowed")
+	if(length(group)!=length(var)) {
+		stop("length(group) must be equal to length(var)")
+	}
+	if(min(tapply(var,group,length))<=basisvar$df) {
+		stop("each group must have length > vardf")
+	}
+	if(min(tapply(var,group,length))<=maxlag) {
+		stop("each group must have length > maxlag")
+	}
+# SET TO NA ALL THE FIRST MAXLAG OBS FOR EACH GROUP
+	basis[sequence(tapply(seq(nrow(basis)),
+		group,length))%in%1:maxlag,] <- NA
+}
+
 ############################################################################
 # ATTRIBUTES
 ############
 
 attributes(basis) <- c(attributes(basis),list(
+	group = length(unique(group)),
 	range = range(var,na.rm=TRUE),
 	crossdf = basisvar$df*basislag$df,
 
