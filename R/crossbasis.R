@@ -31,10 +31,15 @@ colnames(basis) <- outer(paste("v",seq(length=basisvar$df),sep=""),
 
 # IF GROUP, JUST SET TO NA ALL THE FIRST  
 if(!is.null(group)) {
+	# FORCE GROUP TO FACTOR, ELIMINATE UNUSED LEVELS
+	group <- factor(group)
 	# FIRST COHERENCE CHECKS
 	if(any(is.na(group))) stop("missing values in 'group' are not allowed")
 	if(length(group)!=length(x)) {
 		stop("length(group) must be equal to length(x)")
+	}
+	if(sum(diff(as.numeric(group))!=0)!=length(levels(group))-1) {
+		stop("series defined by 'group' must be consecutive")
 	}
 	if(min(tapply(x,group,length))<=basisvar$df) {
 		stop("each group must have length > vardf")

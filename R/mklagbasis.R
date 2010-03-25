@@ -12,7 +12,7 @@ if(maxlag==0) {
 	type <- "strata"
 	df=1
 	knots=NULL
-	int=F
+	int=FALSE
 }
 
 lag <- 0:maxlag

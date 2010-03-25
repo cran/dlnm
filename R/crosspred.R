@@ -56,7 +56,7 @@ the argumetns 'coef' and 'vcov'")
 	indcoef <- grep(cond,names(modelcoef))
 	coef <- modelcoef[indcoef]
 	indvcov <- grep(cond,dimnames(modelvcov)[[1]])
-	vcov <- modelvcov[indvcov,indvcov,drop=F]
+	vcov <- modelvcov[indvcov,indvcov,drop=FALSE]
 }
 if(length(coef)!=attr$crossdf || length(coef)!=dim(vcov)[1] ||
 	any(is.na(coef))|| any(is.na(vcov))) {

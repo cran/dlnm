@@ -43,7 +43,7 @@ if(!is.null(exp)&&!is.logical(exp)) stop("'exp' must be logical")
 # COMPUTE EFFECTS
 
 # CUMULATIVE IF CUMUL==T
-if(cumul==T) {
+if(cumul==TRUE) {
 	x$matfit <- x$cumfit
 	x$matse <- x$cumse
 }
