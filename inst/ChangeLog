@@ -1,3 +1,29 @@
+Changes in dlnm 1.2.0
+=======================
+
+Major changes
+-------------
+
+    o	New argument 'group' in crossbasis() to generate functions for
+	each sub-group defined by the factor.
+
+    o	crosspred() now works also with lm, gam (mgcv), gee (geepack),
+	clogit and coxph (survival).
+
+    o	change in mkbasis: now knots also outside range, but for types
+	"strata" and "-thr" there's the chance to generate collinear
+	variables: included a warning in help for crossbasis().
+
+    o	Vignette 'dlnmOverview" rearranged with new examples, one of 
+	them on seasonal analysis. Reference to new paper Gasparrini
+	2010 Stat Med.
+
+Minor changes
+-------------
+
+    o	Help pages and citation changed accordingly.
+
+
 Changes in dlnm 1.1.1
 =======================
 
@@ -13,12 +39,13 @@ Changes in dlnm 1.1.0
 Major changes
 -------------
 
-    o	The estimate of the cumulative effects along lags has been included in
-	crosspred() and can be plotted with crossplot() setting 'cumul=T'.
+    o	The estimate of the cumulative effects along lags has been
+	included in crosspred() and can be plotted with crossplot()
+	setting 'cumul=T'.
 
-    o	The confidence intervals for 'type' equal to "slices" or "overall" 
-	can be now represented both by "area" (default), "bars" or "lines",
-	by the argument 'ci' in crossplot().
+    o	The confidence intervals for 'type' equal to "slices" or
+	"overall" can be now represented both by "area" (default),
+	"bars" or "lines", by the argument 'ci' in crossplot().
 
 Minor changes
 -------------
@@ -41,20 +68,21 @@ Changes in dlnm 1.0.1
 Major changes
 -------------
 
-    o	The dataset chicagoNMMAPS has been added, relaxing the dependence on 
-	the package NMMAPSlite. Now the examples can be run using these data 
-	and without an internet connection.
+    o	The dataset chicagoNMMAPS has been added, relaxing the dependence
+	on the package NMMAPSlite. Now the examples can be run using
+	these data and without an internet connection.
 
-    o	The function crosspred() has been improved: now there is no constraint 
-	on the range of the predicted values. Moreover, the values 'model.class' 
-	and 'model.link' have been added. The command now works also when the 
-	estimation is carried out by 'clogit()'.
+    o	The function crosspred() has been improved: now there is no
+	constraint on the range of the predicted values. Moreover, the
+	values 'model.class' and 'model.link' have been added. The
+	command now works also when the estimation is carried out by
+	'clogit()'.
 
 Minor changes
 -------------
 
-    o	The section 'Functions' in the vignette 'dlnmOverview' has been reduced: 
-	A reference to the functions help pages has been added.
+    o	The section 'Functions' in the vignette 'dlnmOverview' has been
+	reduced: a reference to the functions help pages has been added.
 
     o	Help pages, examples and vignette changed accordingly.
 

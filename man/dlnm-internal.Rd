@@ -33,6 +33,10 @@ mklagbasis(maxlag=0, type="ns", df=1, degree=1, knots=NULL,
 These two internal functions are called by \code{\link{crossbasis}} to build the basis matrices for the two dimensions of predictor and lags. Even if they are not expected to be directly run by the users, they are included in the namespace of the package and therefore made accessible, with the intention to keep the process more transparent and give the opportunity to change or improve them.
 
 \code{mkbasis} applies a set basis functions on the vector of the predictor specified in \code{var}. \code{mklagbasis} calls \code{mkbasis} to build the basis matrix for the space of lags. Basically, it creates a new vector \code{0:maxlag} (a vector of integers from 0 to the maximum lag allowed) and then apply the related basis functions. The functions for the 2 spaces are defined by the arguments above. See \code{\link{crossbasis}} for additional information.
+
+For a detailed illustration of the use of the functions, see:
+
+\code{vignette("dlnmOverview")}
 }
 
 \value{

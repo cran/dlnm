@@ -34,7 +34,7 @@ Different plots can be obtained choosing the following values for the argument \
 
 \bold{\code{"slices"}}: a multiple plot of effects at specific values of predictor or lags, chosen by \code{var} and \code{lag}, respectively. Up to 4 plots for each dimension are allowed. Cumulative effects along lags are reported if \code{cumul=TRUE}: in this case, the same option must have been set to obtain the prediction saved in the \code{crosspred} object (see \code{\link{crosspred}}).
 
-For a detailed overview of the options, see:
+For a detailed illustration of the use of the functions, see:
 
 \code{vignette("dlnmOverview")}
 }
@@ -58,10 +58,10 @@ This function creates plots with default settings (i.e. perspective in 3-D plot,
 \examples{
 # Example 3. See crossbasis and crosspred for other examples
 
-### DLNM for the effect of temperature on mortality up to 30 days of lag
+### complex DLNM
 ### space of predictor: 5df quadratic spline for temperature
 ### space of predictor: linear effect for PM10
-### lag function: 5df natural cubic spline for temperature
+### lag function: 5df natural cubic spline for temperature up to lag30
 ### lag function: single strata at lag 0-1 for PM10
 
 data(chicagoNMMAPS)
@@ -71,8 +71,9 @@ basis.temp <- crossbasis(chicagoNMMAPS$temp, vartype="bs", vardf=5, vardegree=2,
 	lagdf=5, cenvalue=21, maxlag=30)
 summary(basis.pm)
 summary(basis.temp)
-model <- glm(death ~  basis.pm + basis.temp, family=quasipoisson(), chicagoNMMAPS)
-pred.temp <- crosspred(basis.temp, model, at=-26:33, cumul=TRUE)
+model <- glm(death ~  basis.pm + basis.temp + ns(time, 7*14) + dow,
+	family=quasipoisson(), chicagoNMMAPS)
+pred.temp <- crosspred(basis.temp, model, at=-26:33)
 
 crossplot(pred.temp, label="Temperature",
 	title="3D graph of temperature effect")
@@ -82,8 +83,6 @@ crossplot(pred.temp, "overall", label="Temperature",
 	title="Overall effect of temperature over 30 days of lag")
 crossplot(pred.temp, "slices", var=c(-20,0,27,33),
 	lag=c(0,5,15,28), label="Temperature")
-crossplot(pred.temp, "slices", cum=TRUE, ci="bars", var=-20,
-	label="Temperature", title="Cumulative effect for -20C along lags")
 
 ### See the vignette 'dlnmOverview' for a detailed explanation of this example
 }

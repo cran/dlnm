@@ -14,7 +14,7 @@ crosspred(crossbasis, model, at=NULL,
 
 \arguments{
   \item{crossbasis }{ an object of class \code{"crossbasis"}.}
-  \item{model }{ a model object for which the prediction is desired.}
+  \item{model }{ a model object for which the prediction is desired. See Details below.}
   \item{at }{ vector of values used for prediction.}
   \item{from, to }{ range of values used for prediction.}
   \item{by }{ increment of the sequence.}
@@ -22,11 +22,13 @@ crosspred(crossbasis, model, at=NULL,
 }
 
 \details{
+\code{model} can be an object created by the following regression functions: \code{\link[stats]{lm}}, \code{\link[stats]{glm}}, \code{gam} (package \pkg{mgcv}), \code{gee} (package \pkg{geepack}), \code{clogit} and \code{coxph} (package \pkg{survival}). It can contain more than one \code{crossbasis} objects.
+
 The object \code{crossbasis} must be the same containing the cross-basis matrix included in \code{model}, including its attributes and class. The set of values for which the effects must be computed can be specified by \code{at} or alternatively  by \code{from}/\code{to}/\code{by}. If specified by \code{at}, the values are automatically ordered and made unique. By default, \code{from} and \code{to} correspond to the range of the original vector of observation stored in the \code{crossbasis} object (see \code{\link{crossbasis}}). If \code{by} is not provided, 30 equally spaced values are returned.
 
 Matrices with cumulative effects summed upon lags for each values used for prediction are included if \code{cumul=TRUE}. For a long lag series (i.e. 1000 lags) the routine can be slow. These matrices are required by \code{\link{crossplot}} to graph the cumulative effects along lags.
 
-For a detailed overview of the options, see:
+For a detailed illustration of the use of the functions, see:
 
 \code{vignette("dlnmOverview")}
 }
@@ -59,6 +61,8 @@ All the effects are reported versus a reference value corresponding to the cente
 }
 
 \section{Warnings}{
+In case of collinear variables in the \code{crossbasis} object, some of them are discarded and the related parameters not included in \code{model}. \code{crosspred} will return an error. Check that the specification of the variables in \code{\link{crossbasis}} is meaningful.
+
 The name of the object \code{crossbasis}  will be used by to extract the related estimated parameters from \code{model}. This name must not match the names of other predictors in the model formula. In addition, if more than one variable is transformed by cross-basis functions in the same model, different names must be specified.
 }
 
@@ -67,43 +71,31 @@ The name of the object \code{crossbasis}  will be used by to extract the related
 \examples{
 # Example 2. See crossbasis and crossplot for other examples
 
-### DLM with threshold for the effect of O3 on mortality up to 5 days of lag
+### seasonal analysis
 ### space of predictor: linear effect above 40.3 microgr/m3 for O3
-### space of predictor: linear effects below 10C and above 25C for temperature
-### lag function: integer lag parameterization (unconstrained) for O3
-### lag function: strata intervals at lag 0-1, 2-6 and 7-15 for temperature
+### space of predictor: linear effects below 15C and above 25C for temperature
+### lag function: integer lag parameterization (unconstrained) for O3 up to lag5
+### lag function: strata intervals at lag 0-1, 2-5 and 6-10 for temperature
 
 data(chicagoNMMAPS)
-basis.o3 <- crossbasis(chicagoNMMAPS$o3, vartype="hthr", varknots=40.3,
-	lagtype="integer", maxlag=5)
-basis.temp <- crossbasis(chicagoNMMAPS$temp, vartype="dthr", varknots=c(10,25),
-	lagtype="strata", lagknots=c(2,7), maxlag=15)
+chicagoNMMAPSseas <- subset(chicagoNMMAPS, month>5 & month<10)
+basis.o3 <- crossbasis(chicagoNMMAPSseas$o3, group=chicagoNMMAPSseas$year,
+	vartype="hthr", varknots=40.3, lagtype="integer", maxlag=5)
+basis.temp <- crossbasis(chicagoNMMAPSseas$temp, group=chicagoNMMAPSseas$year,
+	vartype="dthr", varknots=c(15,25), lagtype="strata",
+	lagknots=c(2,6), maxlag=10)
 summary(basis.o3)
 summary(basis.temp)
-model <- glm(death ~  basis.o3 + basis.temp, family=quasipoisson(), chicagoNMMAPS)
+model <- glm(death ~  basis.o3 + basis.temp + ns(doy, 4) + dow,
+	family=quasipoisson(), chicagoNMMAPSseas)
 pred.o3 <- crosspred(basis.o3, model, at=c(0:65,40.3,50.3))
 
-crossplot(pred.o3, "slices", var=50.3,
+crossplot(pred.o3, "slices", var=50.3, ci="bars",
 	title="Effect of a 10-unit increase in ozone along lags")
 # overall effect for a 10-unit increase in ozone over 15 days of lag, with CI
 pred.o3$allRRfit["50.3"]
 cbind(pred.o3$allRRlow, pred.o3$allRRhigh)["50.3",]
 crossplot(pred.o3, label="Ozone", title="3D graph of ozone effect")
-crossplot(pred.o3, "contour", label="Ozone", 
-	title="Contour graph of ozone effect")
-
-### alternatively, a piecewise linear effect above 35 microgr/m3 for o3,
-### 	with an additional change in slope at 50 microgr/m3
-### same lag function as before
-
-basis.o3 <- crossbasis(chicagoNMMAPS$o3, vartype="hthr", varknots=c(35,50),
-	lagtype="integer", maxlag=5)
-summary(basis.o3)
-model <- update(model)
-pred.o3 <- crosspred(basis.o3, model, at=c(0:65))
-
-crossplot(pred.o3,"overall",label="Ozone",
-	title="Overall effect of ozone over 5 days of lag")
 
 ### See the vignette 'dlnmOverview' for a detailed explanation of this example
 }
