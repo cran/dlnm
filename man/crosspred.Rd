@@ -22,7 +22,7 @@ crosspred(crossbasis, model, at=NULL,
 }
 
 \details{
-\code{model} can be an object created by the following regression functions: \code{\link[stats]{lm}}, \code{\link[stats]{glm}}, \code{gam} (package \pkg{mgcv}), \code{gee} (package \pkg{geepack}), \code{clogit} and \code{coxph} (package \pkg{survival}). It can contain more than one \code{crossbasis} objects.
+\code{model} can be an object created by the following regression functions: \code{lm}, \code{glm}, \code{gam} (package \pkg{mgcv}), \code{glm.nb} (package \pkg{MASS}) or \code{gee} (package \pkg{geepack}), \code{clogit} and \code{coxph} (package \pkg{survival}). The model formula can contain more than one \code{crossbasis} objects.
 
 The object \code{crossbasis} must be the same containing the cross-basis matrix included in \code{model}, including its attributes and class. The set of values for which the effects must be computed can be specified by \code{at} or alternatively  by \code{from}/\code{to}/\code{by}. If specified by \code{at}, the values are automatically ordered and made unique. By default, \code{from} and \code{to} correspond to the range of the original vector of observation stored in the \code{crossbasis} object (see \code{\link{crossbasis}}). If \code{by} is not provided, 30 equally spaced values are returned.
 
@@ -91,7 +91,9 @@ model <- glm(death ~  basis.o3 + basis.temp + ns(doy, 4) + dow,
 pred.o3 <- crosspred(basis.o3, model, at=c(0:65,40.3,50.3))
 
 crossplot(pred.o3, "slices", var=50.3, ci="bars",
-	title="Effect of a 10-unit increase in ozone along lags")
+	title="Effects of a 10-unit increase in ozone along lags")
+crossplot(pred.o3,"overall",label="Ozone", ylim=c(0.9,1.3),
+	title="Overall effects of ozone over 5 days of lag")
 # overall effect for a 10-unit increase in ozone over 15 days of lag, with CI
 pred.o3$allRRfit["50.3"]
 cbind(pred.o3$allRRlow, pred.o3$allRRhigh)["50.3",]

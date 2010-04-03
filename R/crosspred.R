@@ -7,20 +7,30 @@ if(class(crossbasis)!="crossbasis") {
 	stop("the first argument must be an object of class 'crossbasis'")
 }
 attr <- attributes(crossbasis)
+# CUMULATIVE EFFECTS ONLY WITH LAGGED EFFECTS
+if(attr$maxlag==0) cumul <- FALSE
+
+# SET COEF, VCOV AND LINK FOR EVERY TYPE OF MODELS
 model.class <- class(model)
-if(!any(model.class %in% c("glm","lm","clogit","coxph","gam"))) {
-	stop("model class must be one of 'glm','lm','clogit','coxph','gam'
+if(!any(model.class %in% c("lm","glm","gam","negbin","geeglm",
+	"clogit","coxph"))) {
+	stop("model class must be one of 'lm','glm','gam','negbin','geeglm','clogit','coxph'
 crosspred() needs to be modified in order to include other model functions")
 }
 index <- grep(deparse(substitute(crossbasis)),names(coef(model)),fixed=T)
 coef <- coef(model)[index]
-vcov <- vcov(model)[index,index]
 
-if(any(model.class %in% c("glm","gam"))) {
-	model.link <- model$family$link
-} else if(all(model.class %in% "lm")) {
+if(any(model.class %in% c("geeglm"))) {
+	vcov <- summary(model)$cov.scaled[index,index]
+} else vcov <- vcov(model)[index,index]
+
+if(all(model.class %in% c("lm"))) {
 	model.link <- "identity"
-} else model.link <- "log"
+} else if(any(model.class %in% c("clogit"))) {
+	model.link <- "logit"
+} else if(all(model.class %in% c("coxph"))) {
+	model.link <- "logit"
+} else model.link <- model$family$link
 
 if(length(coef)!=attr$crossdf | any(is.na(coef))) {
 	stop("number of estimated parameters does not match number of cross-functions
@@ -35,6 +45,7 @@ In this case change the name of the crossbasis object")
 # PREDVAR
 #############
 
+# SET PREDVAR FROM AT, FROM/TO/BY
 if(is.null(from)) from <- attributes(crossbasis)$range[1]
 if(is.null(to)) to <- attributes(crossbasis)$range[2]
 
@@ -44,10 +55,8 @@ if(is.null(at)) {
 	} else predvar <- seq(from=from,to=to,by=by)
 } else predvar <- sort(unique(at))
 
-predvar <- c(attr$range[1],predvar,attr$range[2])
-
-if(length(predvar)<attr$vardf+attr$varint+2) {
-	stop("number of predicted values must be > vardf+varint")
+if(length(predvar)<attr$vardf+attr$varint) {
+	stop("number of predicted values must be >= vardf+varint")
 }
 
 ##########################################################################
@@ -55,6 +64,7 @@ if(length(predvar)<attr$vardf+attr$varint+2) {
 #############
 
 maxlag <- attr$maxlag
+# CREATE VARBASIS AND LAGBASIS
 predvarbasis <- mkbasis(predvar,type=attr$vartype,df=attr$vardf,
 	degree=attr$vardegree,knots=attr$varknots,int=attr$varint,
 	bound=attr$varbound,cen=attr$cen,cenvalue=attr$cenvalue)$basis
@@ -62,6 +72,7 @@ rownames(predvarbasis) <- predvar
 lagbasis <- mklagbasis(maxlag=attr$maxlag,type=attr$lagtype,df=attr$lagdf,
 	degree=attr$lagdegree,knots=attr$lagknots,
 	int=attr$lagint,bound=attr$lagbound)$basis
+# CREATE PREDARRAY: DIFFERENTLY FROM CROSSBASIS, VARBASIS ALWAYS THE SAME
 predarray <- array(0,dim=c(length(predvar),attr$crossdf,maxlag+1))
 for(i in 1:(maxlag+1)) {
 	predarray[,,i] <- matrix(outer(predvarbasis,lagbasis[i,],"*"),
@@ -80,32 +91,22 @@ for (i in 1:(maxlag + 1)) {
 rownames(matfit) <- rownames(matse) <- predvar
 colnames(matfit) <- colnames(matse) <- dimnames(predarray)[[3]]
 
-allfit <- predcrossbasis%*%coef
+allfit <- as.vector(predcrossbasis%*%coef)
 allse <- sqrt(diag(predcrossbasis%*%vcov%*%t(predcrossbasis)))
 names(allfit) <- names(allse) <- predvar
 
 if(cumul==TRUE) {
 	cumfit <- cumse <- matrix(0,dim(predarray)[1],dim(predarray)[3])
 	for (i in 1:(maxlag + 1)) {
-		predcumbasis <- apply(predarray[,,1:i],c(1,2),sum)
+		# THIS WAY, OTHERWISE ARRAY LOSES DIM IF 1 COL
+		predcumarray <- array(predarray[,,1:i],c(dim(predarray)[1:2],i))
+		predcumbasis <- apply(predcumarray,c(1,2),sum)
 		cumfit[,i] <- predcumbasis%*%coef
 		cumse[,i] <- sqrt(diag(predcumbasis%*%vcov%*%t(predcumbasis)))
 	}
 	rownames(cumfit) <- rownames(cumse) <- predvar
 	colnames(cumfit) <- colnames(cumse) <- dimnames(predarray)[[3]] 
 }
-
-###########################################################################
-
-matfit <- matfit[-c(1,length(predvar)),]
-matse <- matse[-c(1,length(predvar)),]
-allfit <- allfit[-c(1,length(predvar))]
-allse <- allse[-c(1,length(predvar))]
-if(cumul==TRUE) {
-	cumfit <- cumfit[-c(1,length(predvar)),]
-	cumse <- cumse[-c(1,length(predvar)),]
-}
-predvar <- predvar[-c(1,length(predvar))]
 
 ###########################################################################
 
