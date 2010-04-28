@@ -17,13 +17,21 @@ if(!any(model.class %in% c("lm","glm","gam","negbin","geeglm",
 	stop("model class must be one of 'lm','glm','gam','negbin','geeglm','clogit','coxph'
 crosspred() needs to be modified in order to include other model functions")
 }
-index <- grep(deparse(substitute(crossbasis)),names(coef(model)),fixed=T)
-coef <- coef(model)[index]
+indcoef <- grep(deparse(substitute(crossbasis)),names(coef(model)),fixed=T)
+coef <- coef(model)[indcoef]
 
 if(any(model.class %in% c("geeglm"))) {
-	vcov <- summary(model)$cov.scaled[index,index]
-} else vcov <- vcov(model)[index,index]
-
+	indvcov <- grep(deparse(substitute(crossbasis)),
+		colnames(summary(model)$cov.scaled),fixed=T)
+	vcov <- summary(model)$cov.scaled[indvcov, indvcov]
+ } else {
+	indvcov <- grep(deparse(substitute(crossbasis)),
+		colnames(vcov(model)),fixed=T)
+	vcov <- vcov(model)[indvcov, indvcov]
+}
+if(length(indcoef)!=length(indvcov)) {
+	stop("Crossbasis parameters do not match entries in vcov")
+}
 if(all(model.class %in% c("lm"))) {
 	model.link <- "identity"
 } else if(any(model.class %in% c("clogit"))) {

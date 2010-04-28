@@ -1,3 +1,12 @@
+Changes in dlnm 1.2.2
+=======================
+
+Minor changes
+-------------
+
+    o	Bug in crosspred() for vcov-coef: fixed.
+
+
 Changes in dlnm 1.2.1
 =======================
 
