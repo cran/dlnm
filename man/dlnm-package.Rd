@@ -38,7 +38,7 @@ Maintainer: Antonio Gasparrini, \email{antonio.gasparrini@lshtm.ac.uk}
 }
 
 \references{
-Gasparrini A., Armstrong, B., Kenward MG. Distributed lag non-linear models. Statistics in Medicine. 2010, In Press.
+Gasparrini A., Armstrong, B., Kenward MG. Distributed lag non-linear models. Statistics in Medicine. 2010, Epub ahead of print May 7. DOI: 10.1002/sim.3940.
 
 Armstrong, B. Models for the relationship between ambient temperature and daily mortality. \emph{Epidemiology}. 2006, \bold{17}(6):624-31.
 }
