@@ -17,11 +17,11 @@ citEntry(
  	author = personList(as.person("Gasparrini, A"),as.person("Armstrong, B"),as.person("Kenward, MG")),
 	 title= "Distributed lag non-linear models",
  	journal="Statistics in Medicine",
-	volume= "In Press",
+	volume= "",
 	number="",
-	pages="",
+	pages="Epub ahead of print May 7. DOI: 10.1002/sim.3940",
 	year="2010",
-	textVersion="Gasparrini A., Armstrong, B.,Kenward MG. Distributed lag non-linear models. Statistics in Medicine. 2010, In Press."
+	textVersion="Gasparrini A., Armstrong, B.,Kenward MG. Distributed lag non-linear models. Statistics in Medicine. 2010, Epub ahead of print May 7. DOI: 10.1002/sim.3940."
 )
 
 citEntry(
@@ -33,8 +33,7 @@ citEntry(
 	number="6",
 	pages="624-631",
 	year="2006",
-	textVersion="Armstrong, B. Models for the relationship between ambient temperature and daily
-	mortality. Epidemiology. 2010, 17(6):624-631."
+	textVersion="Armstrong, B. Models for the relationship between ambient temperature and daily mortality. Epidemiology. 2010, 17(6):624-631."
 )
 
 citFooter("A BibTeX entry for LaTeX users is returned by: toBibtex(citation('dlnm'))")
