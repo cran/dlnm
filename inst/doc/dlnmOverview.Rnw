@@ -211,7 +211,7 @@ The function returns an object of class \Rclass{crosspred}, simply a list of com
 
 Interpretation of the bi-dimensional predicted effects are aided by graphical representation. High and low-level plotting functions are provided through the methods \Rfun{plot}, \Rfun{lines} and \Rfun{points}. The method \Rfun{plot} calls high-level functions \Rfun{plot.default}, \Rfun{persp} and \Rfun{filled.contour} to produce scatter plots, 3-D and contour plots of overall and lag-specific effects. These methods have replaced the old function \Rfun{crossplot} since version 1.3.0, providing the user to specify the whole range or arguments of the plotting functions above, allowing complete flexibility in the choices of colours, axes, labels and other graphical parameters. See the help of the original high-level functions for additional details and a complete list of the arguments. Methods \Rfun{lines} and \Rfun{points} may be used as low-level plotting functions to add lines or points to an existing plot.
 
-The first argument of the functions is \Rarg{x}, a list object of class \Rclass{crosspred}. The argument \Rarg{ptype} specifies the type of plot, choosing among \Rcode{"3d"}, \Rcode{"contour"}, \Rcode{"overall"} and \Rcode{"slices"}, the latter selecting effects along lags at specific predictor values and effects along the predictor at specific lags. These are chosen through the additional arguments \Rarg{var}-\Rarg{lag}, respectively. Cumulative effects along lags are reported if \Rcode{cumul=TRUE}: in this case, the same option must have been set to obtain the prediction saved in \Rarg{x} (see Section~\ref{sec:crosspred}).
+The first argument of the functions is \Rarg{x}, a list object of class \Rclass{crosspred}. The argument \Rarg{ptype} specifies the type of plot, choosing among \Rcode{"3d"}, \Rcode{"contour"}, \Rcode{"overall"} and \Rcode{"slices"}, the latter selecting effects along lags at specific predictor values and effects along the predictor at specific lags. These are chosen through the additional arguments \Rarg{var}-\Rarg{lag}, respectively. Cumulative effects along lags are reported if \Rcode{cumul=TRUE}: in this case, the same option must have been set to obtain the prediction saved in \Rarg{x} (see Section~\ref{sec:crosspred}). Confidence intervals are optionally plotted for \Rcode{"overall"} and \Rcode{"slices"}. The type is chosen by the argument \Rarg{ci} among \Rcode{"area"}, \Rcode{"bars"} and \Rcode{"lines"}. Low-level plotting functions \Rfun{polygon}, \Rfun{segments} and \Rfun{lines} are called, respectively, whose arguments are passed by a list specified with the argument \Rarg{ci.arg}. See the help of these low-level functions for additional details and a complete list of the arguments.
 
 All the effects are reported versus a reference value. For continuous functions, this is specified by the centering point defined in the \Robj{crossbasis} object (see Section~\ref{sec:crossbasis}). Exponentiated effects are automatically returned if the component \Rarg{model.link} of \Rarg{x} is equal to log or logit, or forced with the argument \Rcode{exp=TRUE}.
 
@@ -311,9 +311,10 @@ An overview of the specifications for the cross-basis (and the related bases in 
 summary(basis.pm)
 @
 
-Now the two \Robj{crossbasis} objects can be included in a model formula in order to fit the DLM. In this case we model the effect assuming an overdispersed Poisson distribution, including a smooth function of time with 7 df/year (in order to correct for seasonality and long time trend) and day of the week as factor:
+Now the two \Robj{crossbasis} objects can be included in a model formula in order to fit the DLM. The packages \Rpkg{splines} is loaded, as it is needed in the examples. In this case we model the effect assuming an overdispersed Poisson distribution, including a smooth function of time with 7 df/year (in order to correct for seasonality and long time trend) and day of the week as factor:
 
 <<example1model>>=
+library(splines)
 model <- glm(death ~  basis.pm + basis.temp + ns(time, 7*14) + dow,
 	family=quasipoisson(), chicagoNMMAPS)
 @
@@ -327,8 +328,8 @@ pred.pm <- crosspred(basis.pm, model, at=0:20, cumul=T)
 The functions include the \Robj{basis.pm} and \Robj{model} objects used to estimate the parameters as the first two arguments, while \Rarg{at=0:20} states that the prediction must be computed for each integer value from 0 to 20 \microg{}. The argument \Rarg{cumul} (default to \Robj{FALSE}) indicates that also cumulative effects along lags must be included. Now that the predicted effects have been stored in \Robj{pred.pm}, they can be plot by the methods functions described in Section~\ref{sec:plotting}. For example:
 
 <<example1slices,fig=T,echo=F>>=
-plot(pred.pm, "slices", var=10, col=3, ylab="RR",
-	main="Effects of a 10-unit increase in PM10 along lags")
+plot(pred.pm, "slices", var=10, col=3, ylab="RR", ci.arg=list(density=15,lwd=2),
+  main="Effect of a 10-unit increase in PM10 along lags")
 @
 
 <<example1slicescumul,fig=T,echo=F>>=
@@ -337,10 +338,10 @@ plot(pred.pm, "slices", var=10, cumul=TRUE, ylab="Cumulative RR",
 @
 
 <<example1slicesnoeval,eval=F>>=
-plot(pred.pm, "slices", var=10, col=3, ylab="RR",
-	main="Effects of a 10-unit increase in PM10 along lags")
+plot(pred.pm, "slices", var=10, col=3, ylab="RR", ci.arg=list(density=15,lwd=2),
+  main="Effect of a 10-unit increase in PM10 along lags")
 plot(pred.pm, "slices", var=10, cumul=TRUE, ylab="Cumulative RR",
-	main="Cumulative effects of a 10-unit increase in PM10 along lags")
+	main="Cumulative effect of a 10-unit increase in PM10 along lags")
 @
 
 \begin{figure}
@@ -350,7 +351,9 @@ plot(pred.pm, "slices", var=10, cumul=TRUE, ylab="Cumulative RR",
 		\subfloat[]{\label{fig:example1slicescumul}\includegraphics[width=0.50\textwidth]{fig-example1slicescumul.pdf}}
 \end{figure}
 
-The function includes the \Robj{pred.pm} object with the stored results, and the argument \Rarg{"slices"} defines that we want to graph the relationship at specific values of the two dimensions (predictor and lag). With \Rcode{var=10} we specify this relationship along lags for a specific value of \PM{}, i.e. 10 \microg{}. This effect is compared to the reference value of 0 \microg{}, giving the lag-specific effects for a 10-unit increase. We also chose a different colour for the first plot. The argument \Rarg{cumul} indicates if cumulative effect, previously saved in \Robj{pred.pm}, must be plotted. The results are shown in Figures~\ref{fig:example1slices}-\ref{fig:example1slicescumul}. The interpretation is twofold: the curve represents the increase in risk in each future day following an increase of 10 \microg{} in \PM{} in a specific day (\emph{forward interpretation}), or otherwise the contributions of each past day with the same \PM{} increase to the risk in a specific day (\emph{backward interpretation}). The plots in Figures~\ref{fig:example1slices}-\ref{fig:example1slicescumul} suggest that the initial increase in risk of \PM{} is reversed at longer lags. The overall effect for a 10-unit increase in  \PM{} over 15 days of lag (i.e. summing all the effects up to the maximum lag), together with its 95\% confidence intervals can be extracted by the objects \Robj{allRRfit}, \Robj{allRRhigh} and \Robj{allRRlow} included in \Robj{pred.pm}, typing:
+The function includes the \Robj{pred.pm} object with the stored results, and the argument \Rarg{"slices"} defines that we want to graph the relationship at specific values of the two dimensions (predictor and lag). With \Rcode{var=10} we specify this relationship along lags for a specific value of \PM{}, i.e. 10 \microg{}. This effect is compared to the reference value of 0 \microg{}, giving the lag-specific effects for a 10-unit increase. We also chose a different colour for the first plot. The argument \Rarg{cumul} indicates if cumulative effect, previously saved in \Robj{pred.pm}, must be plotted. The results are shown in Figures~\ref{fig:example1slices}-\ref{fig:example1slicescumul}. Confidence intervals are set to the default value \Rcode{"area"} for the argument \Rarg{ci}. In the left panel, additional arguments are passed to the low-level plotting function \Rfun{polygon} through \Rarg{ci.arg}, to draw instead shading lines as confidence intervals. 
+
+The interpretation is twofold: the curve represents the increase in risk in each future day following an increase of 10 \microg{} in \PM{} in a specific day (\emph{forward interpretation}), or otherwise the contributions of each past day with the same \PM{} increase to the risk in a specific day (\emph{backward interpretation}). The plots in Figures~\ref{fig:example1slices}-\ref{fig:example1slicescumul} suggest that the initial increase in risk of \PM{} is reversed at longer lags. The overall effect for a 10-unit increase in  \PM{} over 15 days of lag (i.e. summing all the effects up to the maximum lag), together with its 95\% confidence intervals can be extracted by the objects \Robj{allRRfit}, \Robj{allRRhigh} and \Robj{allRRlow} included in \Robj{pred.pm}, typing:
 
 <<example1effect>>=
 pred.pm$allRRfit["10"]
@@ -397,14 +400,14 @@ plot(pred.o3, "slices", var=50.3, ci="bars", type="p", pch=19, ci.level=0.80,
 @
 <<example2overall,fig=T,echo=F>>=
 plot(pred.o3,"overall",xlab="Ozone", ci="lines", ylim=c(0.9,1.3), lwd=2,
-	ci.level=0.80, main="Overall effect over 5 days of lag (80%CI)")
+  ci.arg=list(col=1,lty=3), main="Overall effect over 5 days of lag")
 @
 
 <<example2noeval1,eval=F>>=
 plot(pred.o3, "slices", var=50.3, ci="bars", type="p", pch=19, ci.level=0.80,
 	main="Effects of 10-unit increase above the threshold (80%CI)")
 plot(pred.o3,"overall",xlab="Ozone", ci="lines", ylim=c(0.9,1.3), lwd=2,
-	ci.level=0.80, main="Overall effect over 5 days of lag (80%CI)")
+  ci.arg=list(col=1,lty=3), main="Overall effect over 5 days of lag")
 @
 
 \begin{figure}
@@ -414,7 +417,7 @@ plot(pred.o3,"overall",xlab="Ozone", ci="lines", ylim=c(0.9,1.3), lwd=2,
 		\subfloat[]{\label{fig:example2overall}\includegraphics[width=0.50\textwidth]{fig-example2overall.pdf}}
 \end{figure}
 
-In the first statement, the argument \Rarg{ci="bars"} states that, differently from the default \Rcode{"area"} seen in Figures~\ref{fig:example1slices}-\ref{fig:example1slicescumul}, the confidence intervals are represented by bars. In addition, the argument \Rcode{ci.level=0.80} states that 80\% confidence intervals must be plotted. Finally, we chose points, instead of the default line, with specific symbol, by the arguments \Rarg{type} and \Rarg{pch}. In the second statement, the argument \Rarg{type="overall"} indicates that the overall effects (summed upon lags) must be plotted, with confidence intervals as dashed lines, \Rarg{ylim} defining the range of the y-axis, \Rarg{lwd} the thickness of the line.
+In the first statement, the argument \Rarg{ci="bars"} dictates that, differently from the default \Rcode{"area"} seen in Figures~\ref{fig:example1slices}-\ref{fig:example1slicescumul}, the confidence intervals are represented by bars. In addition, the argument \Rcode{ci.level=0.80} states that 80\% confidence intervals must be plotted. Finally, we chose points, instead of the default line, with specific symbol, by the arguments \Rarg{type} and \Rarg{pch}. In the second statement, the argument \Rarg{type="overall"} indicates that the overall effects (summed upon lags) must be plotted, with confidence intervals as lines, \Rarg{ylim} defining the range of the y-axis, \Rarg{lwd} the thickness of the line. Similarly to the previous example, the display of confidence intervals are refined through the list of arguments specified by \Rarg{ci.arg}, passed in this case to the low-level function \Rfun{lines}.
 
 Similarly to the previous example, we can extract from \Robj{pred.o3} the estimated overall effect for a 10-unit increase in ozone above the threshold ($50.3-40.3$ \microg{}), together with its 95\% confidence intervals:
 
@@ -495,7 +498,8 @@ plot(pred.temp, "slices", var=-20, ci="n", col=1, ylim=c(0.95,1.15), lwd=1.5,
 	main="Lag-specific effects at different temperature, ref. 21C")
 for(i in 1:3) lines(pred.temp, "slices", var=c(0,27,33)[i], col=i+1, lwd=1.5)
 legend("topright",paste("Temperature =",c(-20,0,27,33)), col=1:4, lwd=1.5)
-plot(pred.temp, "slices", var=c(-20,33), lag=c(0,5), col=4)
+plot(pred.temp, "slices", var=c(-20,33), lag=c(0,5), col=4,
+  ci.arg=list(density=40,col=grey(0.7)))
 @
 
 <<example3slices,fig=T,echo=F>>=
@@ -506,10 +510,13 @@ legend("topright",paste("Temperature =",c(-20,0,27,33)), col=1:4, lwd=1.5)
 @
 
 <<example3slices2,fig=T,echo=F>>=
-plot(pred.temp, "slices", var=c(-20,33), lag=c(0,5), col=4)
+plot(pred.temp, "slices", var=c(-20,33), lag=c(0,5), col=4,
+  ci.arg=list(density=40,col=grey(0.7)))
 @
 
-The results are reported in Figures~\ref{fig:example3slices}~-~\ref{fig:example3slices2}. Figure~\ref{fig:example3slices} illustrates lag-specific effects for mild and extreme cold and hot temperatures of -20\Ctemp{}, 0\Ctemp{}, 27\Ctemp{}, and 33\Ctemp{} (with reference at 21\Ctemp{}). Figures~\ref{fig:example3slices2} depicts both effects along the predictor range at lag 0 and 5 (left column), and effects along lags at temperatures -20\Ctemp{} and 33\Ctemp{} (right column). The arguments \Rarg{var} and \Rarg{lag} define the "slices" to be cut in the effect surface in Figure~\ref{fig:example3plot3d}~-~\ref{fig:example3plotcontour}. The argument \Rcode{ci="n"} in the first expression states that confidence intervals must not be plotted. The preliminary interpretation suggests that cold temperatures are associated with longer mortality risk than heat, but not immediate, showing a "protective" effect at lag 0. This analytical proficiency would be hardly achieved with simpler models, probably losing important details of the association.
+The results are reported in Figures~\ref{fig:example3slices}~-~\ref{fig:example3slices2}. Figure~\ref{fig:example3slices} illustrates lag-specific effects for mild and extreme cold and hot temperatures of -20\Ctemp{}, 0\Ctemp{}, 27\Ctemp{}, and 33\Ctemp{} (with reference at 21\Ctemp{}). Figures~\ref{fig:example3slices2} depicts both effects along the predictor range at lag 0 and 5 (left column), and effects along lags at temperatures -20\Ctemp{} and 33\Ctemp{} (right column). The arguments \Rarg{var} and \Rarg{lag} define the "slices" to be cut in the effect surface in Figure~\ref{fig:example3plot3d}~-~\ref{fig:example3plotcontour}. The argument \Rcode{ci="n"} in the first expression states that confidence intervals must not be plotted. In the multi-panel Figure~\ref{fig:example3slices2}, the list argument \Rarg{ci.arg} is used to plot confidence intervals as shading lines with increased grey contrast, more visible here.
+
+The preliminary interpretation suggests that cold temperatures are associated with longer mortality risk than heat, but not immediate, showing a "protective" effect at lag 0. This analytical proficiency would be hardly achieved with simpler models, probably losing important details of the association.
 
 
 %--------------------------------%%--------------------------------%%--------------------------------%

@@ -11,13 +11,14 @@ High and low-level method functions for graphs (3d, contour, slices and overall 
 }
 
 \usage{
-\method{plot}{crosspred}(x, ptype="3d", var=NULL, lag=NULL, ci="area", ci.level=x$ci.level, 
-	cumul=FALSE, exp=NULL, ...)
+\method{plot}{crosspred}(x, ptype="3d", var=NULL, lag=NULL, ci="area", ci.arg, 
+	ci.level=x$ci.level, cumul=FALSE, exp=NULL, ...)
 
-\method{lines}{crosspred}(x, ptype="overall", var=NULL, lag=NULL, ci="n", ci.level=x$ci.level, 
-	cumul=FALSE, exp=NULL, ...)
-\method{points}{crosspred}(x, ptype="overall", var=NULL, lag=NULL, ci="n", ci.level=x$ci.level, 
-	cumul=FALSE, exp=NULL, ...)
+\method{lines}{crosspred}(x, ptype="overall", var=NULL, lag=NULL, ci="n", ci.arg, 
+	ci.level=x$ci.level, cumul=FALSE, exp=NULL, ...)
+
+\method{points}{crosspred}(x, ptype="overall", var=NULL, lag=NULL, ci="n", ci.arg, 
+	ci.level=x$ci.level, cumul=FALSE, exp=NULL, ...)
 }
 
 \arguments{
@@ -25,6 +26,7 @@ High and low-level method functions for graphs (3d, contour, slices and overall 
   \item{ptype }{ type of plot. See Details below.}
    \item{var, lag }{ vectors (for \code{plot}) or numeric scalars (for \code{lines}-\code{points}) of predictor values and lags for which specific effects must be plotted. Used only if \code{type="slices"}.}
   \item{ci }{ type of confidence intervals representation, one of \code{"area"}, \code{"bars"}, \code{"lines"} or \code{"n"}.}
+  \item{ci.arg }{ list of arguments to be passed to low-level plotting functions to draw the confidence intervals. See Details.}
   \item{ci.level }{ confidence level for the computation of confidence intervals.}
   \item{cumul }{ logical. If \code{TRUE}, cumulative effects along lags are reported. Used only if \code{type="slices"}. See Details.}
    \item{exp }{ logical. It forces the choice about the exponentiation of effects. See Details.}
@@ -42,6 +44,12 @@ Different plots can be obtained choosing the following values for the argument \
 
 \bold{\code{"slices"}}: a (optionally multiple) plot of effects along lags at specific predictor values and effects along the predictor at specific lags, chosen by \code{var} and \code{lag}, respectively. See \code{\link[graphics]{plot.default}}, \code{\link[graphics]{lines}} and \code{\link[graphics]{points}} for information on additional graphical arguments.
 
+The method function \code{plot} calls the high-level functions listed above for each \code{ptype}, while \code{lines}-\code{points} add lines or points for \code{ptype} equal to \code{"overall"} or \code{"slices"}. These methods allow a great flexibility in the choice of graphical parameters, specified through arguments of the original plotting functions. Some arguments, if not specified, are set to different default values than the original functions.
+
+Similarly, confidence intervals are plotted for \code{ptype} equal to \code{"overall"} or \code{"slices"} through \code{ci.arg}. This is a list of arguments to be passed to low-level plotting functions, determined by \code{ci}: \code{\link[graphics]{polygon}} for \code{"area"}, \code{\link[graphics]{segments}} for \code{"bars"} and \code{\link[graphics]{lines}} for \code{"lines"}. See the original functions for a complete list of the arguments. This option offers flexibility in the choice of confidence intervals display. As above some unspecified arguments are set to different default values.
+
+For \code{ptype="slices"}, up to 4 plots for each dimension of predictor and lags are allowed in \code{plot}, while for \code{lines}-\code{points} a single plot in one of the two dimension must be chosen. Cumulative effects along lags are reported if \code{cumul=TRUE}: in this case, the same option must have been set to obtain the prediction saved in the \code{crosspred} object (see \code{\link{crosspred}}). 
+
 For a detailed illustration of the use of the functions, see:
 
 \code{vignette("dlnmOverview")}
@@ -54,9 +62,7 @@ Gasparrini A., Armstrong, B.,Kenward M. G. Distributed lag non-linear models. \e
 \author{Antonio Gasparrini, \email{antonio.gasparrini@lshtm.ac.uk}}
 
 \note{
-These methods for class \code{"crosspred"} have replaced the old function \code{crossplot} since version 1.3.0, with high-level (\code{plot}) and low-level (\code{lines}-\code{points}) plotting functions. \code{plot} calls the high-level functions listed above for each \code{ptype}, while \code{lines}-\code{points} add lines or points for \code{ptype} equal to \code{"overall"} or \code{"slices"}. These methods allow a greater flexibility in the choice of graphical parameters, specified through arguments of the original plotting functions. Some arguments, if not specified, are set to different default values than the original functions.
-
-For \code{ptype="slices"}, up to 4 plots for each dimension of predictor and lags are allowed in \code{plot}, while for \code{lines}-\code{points} a single plot in one of the two dimension must be chosen. Cumulative effects along lags are reported if \code{cumul=TRUE}: in this case, the same option must have been set to obtain the prediction saved in the \code{crosspred} object (see \code{\link{crosspred}}). 
+These methods for class \code{"crosspred"} have replaced the old function \code{crossplot} since version 1.3.0. The old function has been kept in the namespace of the package, but its use is discouraged.
 
 All the effects are reported versus a reference value. For continuous functions, this is specified by the centering point defined in the \code{crossbasis} object (see \code{\link{crossbasis}}). Exponentiated effects are automatically returned if \code{x} has \code{model.link} equal to \code{log} or \code{logit}, or forced with \code{exp=TRUE}.
 }
@@ -85,6 +91,7 @@ summary(basis.pm)
 summary(basis.temp)
 
 # RUN THE MODEL AND GET THE PREDICTION FOR TEMPERATURE
+library(splines)
 model <- glm(death ~  basis.pm + basis.temp + ns(time, 7*14) + dow,
 	family=quasipoisson(), chicagoNMMAPS)
 pred.temp <- crosspred(basis.temp, model, by=1)
@@ -100,7 +107,8 @@ plot(pred.temp, "slices", var=-20, ci="n", col=1, ylim=c(0.95,1.15), lwd=1.5,
 	main="Lag-specific effects at different temperature, ref. 21C")
 for(i in 1:3) lines(pred.temp, "slices", var=c(0,27,33)[i], col=i+1, lwd=1.5)
 legend("topright",paste("Temperature =",c(-20,0,27,33)), col=1:4, lwd=1.5)
-plot(pred.temp, "slices", var=c(-20,0,27,33), lag=c(0,5,15,28), col=4)
+plot(pred.temp, "slices", var=c(-20,0,27,33), lag=c(0,5,15,28), col=4,
+	ci.arg=list(density=40,col=grey(0.7)))
 
 ### See the vignette 'dlnmOverview' for a detailed explanation of this example
 }

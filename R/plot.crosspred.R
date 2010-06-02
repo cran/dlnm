@@ -1,5 +1,5 @@
 `plot.crosspred` <-
-function(x, ptype="3d", var=NULL, lag=NULL, ci="area", 
+function(x, ptype="3d", var=NULL, lag=NULL, ci="area", ci.arg,
 	ci.level=x$ci.level, cumul=FALSE, exp=NULL, ...) {
 
 ###########################################################################
@@ -30,6 +30,9 @@ if(!is.null(lag)&&sum(lag%in%0:x$maxlag)!=length(lag)&&(ptype=="slices")) {
 if(!ci%in%c("area","bars","lines","n")) {
 	stop("'ci' must be one of 'area', 'bars', 'lines' or 'n'")
 }
+if(missing(ci.arg)) {
+	ci.arg <- list()
+} else if(!is.list(ci.arg)) stop("'ci.arg' must be a list")
 if(!is.numeric(ci.level)||ci.level>=1||ci.level<=0) {
 	stop("'ci.level' must be numeric and between 0 and 1")
 }
@@ -72,17 +75,28 @@ if((is.null(exp)&&x$model.link%in%c("log","logit"))||
 # GRAPHS
 
 # FUNCTION TO CREATE CONFIDENCE INTERVALS
-fci <- function(ci,x,high,low,colarea=grey(0,9),collines=2,noeff) {
+fci <- function(ci,x,high,low,ci.arg,plot.arg,noeff) {
 	if(ci=="area") {
-		polygon(c(x,rev(x)),c(high,rev(low)),col=colarea,border="white")
+		polygon.arg <- modifyList(list(col=grey(0.9),border=NA),ci.arg)
+		polygon.arg <- modifyList(polygon.arg,
+			list(x=c(x,rev(x)),y=c(high,rev(low))))
+		do.call(polygon,polygon.arg)
 	} else if(ci=="bars") {
 		range <- diff(range(x))/300
-		segments(x,high,x,low)
-		segments(x-range,high,x+range,high)
-		segments(x-range,low,x+range,low)
+		segments.arg <- modifyList(ci.arg,list(x0=x,y0=high,x1=x,y1=low))
+		do.call(segments,segments.arg)
+		segments.arg <- modifyList(segments.arg,list(x0=x-range,y0=high,
+			x1=x+range,y1=high))
+		do.call(segments,segments.arg)
+		segments.arg <- modifyList(segments.arg,list(x0=x-range,y0=low,
+			x1=x+range,y1=low))
+		do.call(segments,segments.arg)
 	} else if(ci=="lines") {
-		lines(x,high,lty=2,col=collines)
-		lines(x,low,lty=2,col=collines)
+		lines.arg <- modifyList(list(lty=2,col=plot.arg$col),ci.arg)
+		lines.arg <- modifyList(lines.arg,list(x=x,y=high))
+		do.call(lines,lines.arg)
+		lines.arg <- modifyList(lines.arg,list(x=x,y=low))
+		do.call(lines,lines.arg)
 	}
 	abline(h=noeff)
 }
@@ -113,25 +127,23 @@ if(ptype=="slices") {
 		for(i in seq(along=lag)) {
 
 			# SET DEFAULT VALUES IF NOT INCLUDED BY THE USER
-			argdef <- list(type="l",col=2,xlab="Var",ylab="Effect",
+			plot.arg <- list(type="l",col=2,xlab="Var",ylab="Effect",
 				ylim=c(min(x$matlow[,xlag]),
 				max(x$mathigh[,xlag])),frame.plot=FALSE)
-			if(length(lag)+length(var)>1)  argdef$cex.axis <- 0.7
-			argdef <- modifyList(argdef,list(...))		
-
+			if(length(lag)+length(var)>1)  plot.arg$cex.axis <- 0.7
+			plot.arg <- modifyList(plot.arg,list(...))		
 			# SET CONFIDENCE INTERVALS
 			ci.list <- list(panel.first=call("fci",ci=ci,
 				x=x$predvar,high=x$mathigh[,xlag[i]],
-				low=x$matlow[,xlag[i]],colarea=grey,
-				collines=argdef$col,noeff=noeff))
-			argdef <- modifyList(argdef,c(ci.list,
+				low=x$matlow[,xlag[i]],ci.arg,plot.arg,noeff=noeff))
+			plot.arg <- modifyList(plot.arg,c(ci.list,
 				list(x=x$predvar,y=x$matfit[,xlag[i]])))
 			if(length(lag)+length(var)>1) {
-				argdef$main <- ""
-				argdef$xlab <- "Var"
+				plot.arg$main <- ""
+				plot.arg$xlab <- "Var"
 			}
 			# PLOT
-			do.call(plot,argdef)
+			do.call(plot,plot.arg)
 			if(length(lag)>1) mtext(paste("Lag =",lag[i]),cex=0.8)
 		}
 	}
@@ -144,26 +156,25 @@ if(ptype=="slices") {
 		for(i in seq(along=var)) {
 
 			# SET DEFAULT VALUES IF NOT INCLUDED BY THE USER
-			argdef <- list(type="l",col=2,xlab="Lag",ylab="Effect",
+			plot.arg <- list(type="l",col=2,xlab="Lag",ylab="Effect",
 				ylim=c(min(x$matlow[xvar,]),
 				max(x$mathigh[xvar,])),frame.plot=FALSE)
-			if(length(lag)+length(var)>1)  argdef$cex.axis <- 0.7
+			if(length(lag)+length(var)>1)  plot.arg$cex.axis <- 0.7
 
-			argdef <- modifyList(argdef,list(...))		
+			plot.arg <- modifyList(plot.arg,list(...))		
 
 			# SET CONFIDENCE INTERVALS
 			ci.list <- list(panel.first=call("fci",ci=ci,
 				x=0:x$maxlag,high=x$mathigh[xvar[i],],
-				low=x$matlow[xvar[i],],colarea=grey,
-				collines=argdef$col,noeff=noeff))
-			argdef <- modifyList(argdef,c(ci.list,
+				low=x$matlow[xvar[i],],ci.arg,plot.arg,noeff=noeff))
+			plot.arg <- modifyList(plot.arg,c(ci.list,
 				list(x=0:x$maxlag,y=x$matfit[xvar[i],])))
 			if(length(lag)+length(var)>1) {
-				argdef$main <- ""
-				argdef$xlab <- "Lag"
+				plot.arg$main <- ""
+				plot.arg$xlab <- "Lag"
 			}
 			# PLOT
-			do.call(plot,argdef)
+			do.call(plot,plot.arg)
 			if(length(lag)>1) mtext(paste("Var =",var[i]),cex=0.8)
 		}
 	}
@@ -178,19 +189,18 @@ if(ptype=="slices") {
 if(ptype=="overall") {
 
 	# SET DEFAULT VALUES IF NOT INCLUDED BY THE USER
-	argdef <- list(type="l",ylim=c(min(x$alllow),max(x$allhigh)),
+	plot.arg <- list(type="l",ylim=c(min(x$alllow),max(x$allhigh)),
 		col=2,xlab="Var",ylab="Effect",frame.plot=FALSE)
-	argdef <- modifyList(argdef,list(...))
+	plot.arg <- modifyList(plot.arg,list(...))
 	
 	# SET CONFIDENCE INTERVALS
 	ci.list <- list(panel.first=call("fci",ci=ci,x=x$predvar,
-		high=x$allhigh,low=x$alllow,colarea=grey(0.9),
-		collines=argdef$col,noeff=noeff))
-	argdef <- modifyList(argdef,c(ci.list,
+		high=x$allhigh,low=x$alllow,ci.arg,plot.arg,noeff=noeff))
+	plot.arg <- modifyList(plot.arg,c(ci.list,
 		list(x=x$predvar,y=x$allfit)))
 
 	# PLOT
-	do.call(plot,argdef)
+	do.call(plot,plot.arg)
 }
 
 ##############
@@ -216,15 +226,15 @@ if(ptype=="contour") {
 if(ptype=="3d") {
 
 	# SET DEFAULT VALUES IF NOT INCLUDED BY THE USER
-	argdef <- list(ticktype="detailed",theta=210,phi=30,xlab="Var",
+	plot.arg <- list(ticktype="detailed",theta=210,phi=30,xlab="Var",
 		ylab="Lag",	zlab="Effect",col="lightskyblue",
 		zlim=c(min(x$matfit),max(x$matfit)),
 		ltheta=290,shade=0.75,r=sqrt(3),d=5)
-	argdef <- modifyList(argdef,list(...))
-	argdef <- modifyList(argdef,list(x=x$predvar,y=0:x$maxlag,z=x$matfit))
+	plot.arg <- modifyList(plot.arg,list(...))
+	plot.arg <- modifyList(plot.arg,list(x=x$predvar,y=0:x$maxlag,z=x$matfit))
 
 	# PLOT
-	do.call(persp,argdef)
+	do.call(persp,plot.arg)
 }
 }
 

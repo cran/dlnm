@@ -106,14 +106,15 @@ summary(basis.pm)
 summary(basis.temp)
 
 # RUN THE MODEL AND GET THE PREDICTION FOR PM10
+library(splines)
 model <- glm(death ~ basis.pm + basis.temp + ns(time, 7*14) + dow,
 	family=quasipoisson(), chicagoNMMAPS)
 pred.pm <- crosspred(basis.pm, model, at=0:20, cumul=TRUE)
 
 # PLOT THE LINEAR EFFECT OF PM10 ALONG LAGS
-plot(pred.pm, "slices", var=10, col=3, ylab="RR",
+plot(pred.pm, "slices", var=10, col=3, ylab="RR", ci.arg=list(density=15,lwd=2),
 	main="Effect of a 10-unit increase in PM10 along lags")
-plot(pred.pm, "slices", var=10, cumul=TRUE,  ylab="Cumulative RR",
+plot(pred.pm, "slices", var=10, cumul=TRUE, ylab="Cumulative RR",
 	main="Cumulative effect of a 10-unit increase in PM10 along lags")
 
 # GET THE FIGURES FOR THE OVERALL EFFECT, WITH CI
