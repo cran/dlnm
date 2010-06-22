@@ -24,26 +24,17 @@ if(!type%in%c("ns","bs","strata","poly","integer","dthr","lthr","hthr","lin")) {
 }
 # CHECK ARGUMENT TYPE
 if(!is.numeric(var)) stop("'var' must be a numeric vector")
-if(!is.null(df)&!is.numeric(df)) stop("'df' must be numeric")
+if(!is.numeric(df)|df<1) stop("'df' must be numeric and >=1")
 if(!is.null(knots)&!is.numeric(knots)) stop("'knots' must be numeric")
 if(!is.null(bound)&!is.numeric(bound)) stop("'bound' must be numeric")
 if(!is.logical(int)) stop("'int' must be logical")
-if(!is.logical(cen)) stop("'cen' must be logical")
+if(!is.null(cen)&!is.logical(cen)) stop("'cen' must be logical")
 if(!is.null(cenvalue)&!is.numeric(cenvalue)) stop("'cenvalue' must be numeric")
-if(!is.null(degree)&!is.numeric(degree)) stop("'df' must be numeric")
+if(!is.null(degree)) if(!is.numeric(degree)|degree<1)  stop("'degree' must be numeric")
 
-# ONE OF DF OR KNOTS MUST BE GIVEN
-if(is.null(df)&is.null(knots) & !type%in%c("poly","integer","dthr","lin")) {
-	stop("at least df or knots must be specified")
-}
-# DEGREE MUST BE GIVEN FOR POLY, AND OVERCOMES DF
-if(type=="poly") {
-	if(degree<1) stop("for type 'ns' and 'poly' degree must be >=1")
-	df <- degree+int
-	knots <- NULL
-}
 # DF FIXED FOR TYPES INTEGER (SOLVED LATER), DTHR AND LIN
-if(type=="integer") df <- 1
+if(type=="poly") df <- degree+int
+if(type=="integer") df <- 1+int
 if(type=="dthr") df <- 2+int
 if(type=="lin") df <- 1+int
 
@@ -54,19 +45,9 @@ if(!is.null(knots)) {
 	if(type=="bs") df <- length(knots)+degree+int
 	if(type%in%c("strata","hthr","lthr")) df <- length(knots)+int
 }
-# MINIMUM DF=1 AND INT ONLY IF DF>1
-if(df<1) stop("df must be >=1") 
-if(df==1 & !type%in%c("integer","dthr","lin")) int <- F
 
-# DF MUST BE >=DEGREE+INT FOR BS
-if(type=="bs") {
-	if(df==1) {
-		degree <- 1
-	}
-	if(df<degree+int) stop("df must be >=degree+int for type='bs'")
-}
 # DF MUST BE <= N. OBS
-if(df>length(var)) {
+if(df+int>length(var)) {
 	stop("df+int must be <= length(var)")
 }
 # CENVALUE ONLY WITH CEN=T
@@ -82,15 +63,17 @@ if(type=="ns")	{
 	if(is.null(knots)&df>(1+int)) {
 		knots <- quantile(var,1/(df-int)*1:((df-int)-1),na.rm=TRUE)
 	}
-	if(cen==TRUE) {
-	list$basis <- as.matrix(ns(var,df=df,knots=knots,Bound=bound,
-		int=int)[,] - matrix(ns(cenvalue,df=df,knots=knots,
-		Bound=bound,int=int)[,], 
-		nrow=length(var),ncol=length(knots)+1+int,byrow=TRUE))
-	} else {
-		list$basis <- as.matrix(ns(var,df=df,knots=knots,
-		Bound=bound,int=int)[,])
-	}
+	if(df>=(1+int)) {
+		if(cen==TRUE) {
+		list$basis <- as.matrix(ns(var,df=df,knots=knots,Bound=bound,
+			int=int)[,] - matrix(ns(cenvalue,df=df,knots=knots,
+			Bound=bound,int=int)[,], 
+			nrow=length(var),ncol=length(knots)+1+int,byrow=TRUE))
+		} else {
+			list$basis <- as.matrix(ns(var,df=df,knots=knots,
+			Bound=bound,int=int)[,])
+		}
+	} else list$basis <- as.matrix(rep(1,length(var)))
 	degree <- NULL
 }
 
@@ -99,19 +82,23 @@ if(type=="ns")	{
 #######
 # IF NOT PROVIDED, KNOTS SET TO EQUALLY SPACED QUANTILES
 if(type=="bs")	{
+	if(df<degree+int) stop("df must be >=degree+int for type='bs'")
 	if(is.null(knots)&df>(degree+int)) {
 		knots <- quantile(var,1/(df-int-degree+1)*1:((df-int)-degree),
 			na.rm=TRUE)
 	}
-	if(cen==TRUE) {
-	list$basis <- as.matrix(bs(var,df=df,knots=knots,Bound=bound,
-		int=int,degree=degree)[,] - matrix(bs(cenvalue,df=df,knots=knots,
-		Bound=bound,int=int,degree=degree)[,], 
-		nrow=length(var),ncol=length(knots)+degree+int,byrow=TRUE))
-	} else {
-		list$basis <- as.matrix(bs(var,df=df,knots=knots,
-		Bound=bound,int=int,degree=degree)[,])
-	}
+	if(df>=(1+int)) {
+		if(cen==TRUE) {
+		list$basis <- as.matrix(bs(var,df=df,knots=knots,Bound=bound,
+			int=int,degree=degree)[,] - matrix(bs(cenvalue,df=df,
+			knots=knots,Bound=bound,int=int,degree=degree)[,], 
+			nrow=length(var),ncol=length(knots)+degree+int,byrow=TRUE))
+		} else {
+			list$basis <- as.matrix(bs(var,df=df,knots=knots,
+			Bound=bound,int=int,degree=degree)[,])
+		}
+	} else list$basis <- as.matrix(rep(1,length(var)))
+
 }
 
 ##########
