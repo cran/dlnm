@@ -70,13 +70,13 @@ options(continue="  ")
 \section{Preamble}
 \label{sec:preamble}
 
-The \R{} package \Rpkg{dlnm} offers some facilities to run \emph{distributed lag non-linear models} (DLNM's), a modelling framework to describe simultaneously non-linear and delayed effects between predictors and an outcome in time-series data. 
+The \R{} package \Rpkg{dlnm} offers some facilities to run \emph{distributed lag non-linear models} (DLNM's), a modelling framework to describe simultaneously non-linear and delayed effects between predictors and an outcome in time-series data. This document complements the description provided in \citet{gasparrini2011jss} (freely available at \url{http://www.jstatsoft.org/v43/i08/}), which represents the main reference to the package.
 
-The aim of this document is to provide an overview of the capabilities of the package, together with extensive examples of application with real data. Some information on installation procedures and on the data included in the package are given in Section~\ref{sec:installdata}. The theory underlying the DLNM methodology is briefly illustrated in Section~\ref{sec:dlnm}, while the functions included in the package are described in Section~\ref{sec:functions}. Some examples of applications are provided in Section~\ref{sec:examples}: users mainly interested in the application can skip the previous Sections and and start with these examples. Finally, Section~\ref{sec:conclusions} offers some conclusions.
+The aim of this contribution is to provide an extended overview of the capabilities of the package, together with additional examples of application with real data. Some information on installation procedures and on the data included in the package are given in Section~\ref{sec:installdata}. The theory underlying the DLNM methodology is briefly illustrated in Section~\ref{sec:dlnm}, while the functions included in the package are described in Section~\ref{sec:functions}. Some examples of applications are provided in Section~\ref{sec:examples}: users mainly interested in the application can skip the previous Sections and and start with these examples. Finally, Section~\ref{sec:conclusions} offers some conclusions.
 
 The DLNM's methodology has been previously described in \citet{gasparrini2010statmed}, together with a detailed algebraical development. This framework was originally conceived and proposed to investigate the health effect of temperature by \citet{armstrong2006}.
 
-Type \Rcomm{citation("dlnm")} in \R{} to cite the \Rpkg{dlnm} package after installation (see Section~\ref{sec:installdata}). A list of changes included in the current and previous versions can be found typing \Rcomm{file.show(system.file("ChangeLog", package = "dlnm"))}.
+Type \Rcomm{citation("dlnm")} in \R{} to cite the \Rpkg{dlnm} package after installation (see Section~\ref{sec:installdata}). A list of changes included in the current and previous versions can be found typing \Rcomm{file.show(system.file( "ChangeLog", package = "dlnm"))}.
 
 Please send comments or suggestions and report bugs to \texttt{antonio.gasparrini@lshtm.ac.uk}.
 
@@ -90,7 +90,7 @@ Please send comments or suggestions and report bugs to \texttt{antonio.gasparrin
 
 The \Rpkg{dlnm} package is installed in the standard way for CRAN packages from version 2.9.0 onwards, for example typing \Rcomm{install.packages("dlnm")} or directly through the menu in \R{}, clicking on \emph{Packages} and then on \emph{Install package(s)...}. The package can be alternatively installed using the .zip file containing the binaries, via \emph{Packages} and then \emph{Install package(s) from local zip files...}. 
 
-The functionalities of \Rpkg{dlnm} depend on other packages whose commands are called to specify the \Rpkg{dlnm} functions. This hierarchy is ruled by the field \emph{Imports} of the file \texttt{description} included in the package. The functions are imported from the packages \Rpkg{splines} (functions \Rfun{ns} and \Rfun{bs}) and \Rpkg{tsModel} (function \Rfun{Lag}). While \Rpkg{splines} is present in the basic installation of \R{}, the package \Rpkg{tsModel} is automatically downloaded if \Rpkg{dlnm} is installed through \R{} using the CRAN, but must be independently installed if a .zip file is used.
+The functionalities of \Rpkg{dlnm} depend on other packages whose commands are called to specify the \Rpkg{dlnm} functions. This hierarchy is ruled by the field \emph{Imports} of the file \texttt{description} included in the package. The functions are imported from the packages \Rpkg{splines} (functions \Rfun{ns} and \Rfun{bs}) and \Rpkg{tsModel} (function \Rfun{Lag}). The former must be independently installed if a .zip file is used.
 
 %--------------------------------%%--------------------------------%
 \subsection{Data}
@@ -104,7 +104,7 @@ In this version the package contains its own dataset \Rdata{chicagoNMMAPS}, with
 \section{Distributed lag non-linear models (DLNM's)}
 \label{sec:dlnm}
 
-The aim of this Section is to provide a methodological summary of the DLNM framework. A detailed description of this methodology and the algebraical development have been published elsewhere \citep{gasparrini2010statmed,armstrong2006}.
+The aim of this Section is to provide a methodological summary of the DLNM framework. A detailed description of this methodology and the algebraical development have been published elsewhere \citep{gasparrini2011jss,gasparrini2010statmed,armstrong2006}.
 
 %--------------------------------%%--------------------------------%
 \subsection{The issue}
@@ -159,7 +159,7 @@ The choice of the two set of basis functions for each space is perfectly indepen
 \section{The functions in the package \Rpkg{dlnm}}
 \label{sec:functions}
 
-This section describes the main functions included in the package \Rpkg{dlnm}. Here we provide a description of all the stages involved in the definition, estimation and interpretation of DLNMs, summarizing the conceptual and analytical steps. In addition, we illustrate the structure of the functions and discuss specific issues about their usage. Examples of applications to real time series data are described in Section~\ref{sec:examples}.
+This section describes the main functions included in the package \Rpkg{dlnm}. Here we provide a description of all the stages involved in the definition, estimation and interpretation of DLNMs, summarizing the conceptual and analytical steps. In addition, we illustrate the structure of the functions and discuss specific issues about their usage. Examples of applications to real time series data are described in Section~\ref{sec:examples}. Additional information is provided in \citet{gasparrini2011jss}.
 
 %--------------------------------%%--------------------------------%
 \subsection{Internal functions: \Rfun{mkbasis} and \Rfun{mklagbasis}}
@@ -523,7 +523,7 @@ The preliminary interpretation suggests that cold temperatures are associated wi
 \section{Conclusions}
 \label{sec:conclusions}
 
-This document illustrates the functionalities of the \Rpkg{dlnm} package, providing a detailed overview of the process to specify and run a DLNM and then to predict and plot its results. The main advantage of this family of models is to unify many of the previous methods to deal with delayed effects in a unique framework, also providing more flexible alternatives regarding the shape of the relationships. Section~\ref{sec:dlnm} provides a brief summary of the theory underpinning DLNM's: a more detailed overview has been published elsewhere \citep{gasparrini2010statmed,armstrong2006}, together with a complete specification of the algebra \citep{gasparrini2010statmed}.
+This document illustrates the functionalities of the \Rpkg{dlnm} package, providing a detailed overview of the process to specify and run a DLNM and then to predict and plot its results. The main advantage of this family of models is to unify many of the previous methods to deal with delayed effects in a unique framework, also providing more flexible alternatives regarding the shape of the relationships. Section~\ref{sec:dlnm} provides a brief summary of the theory underpinning DLNM's: a more detailed overview has been published elsewhere \citep{gasparrini2011jss, gasparrini2010statmed, armstrong2006}, together with a complete specification of the algebra \citep{gasparrini2010statmed}.
 
 The flexibility is kept when this framework is implemented in the \Rpkg{dlnm} package: several different models with an increasing level of complexity can be performed using a simple and general procedure, as showed in the examples in Section~\ref{sec:examples}. As already explained, this method is not limited to the examples on the effect of air pollution and temperature on mortality, but can be applied to investigate the relationship between any predictor and outcomes in time-series data.
 
