@@ -9,27 +9,27 @@ Generate the basis functions for the two spaces of predictor and lags, choosing 
 }
 
 \usage{
-crossbasis(var, group=NULL, vartype="ns", vardf=1, vardegree=1,
-	varknots=NULL, varbound=range(var), varint=FALSE, cen=TRUE,
-	cenvalue=mean(var), maxlag=0, lagtype="ns", lagdf=1, lagdegree=1,
-	lagknots=NULL, lagbound=c(0,maxlag), lagint=TRUE)
+crossbasis(x, vartype="ns", vardf=1, vardegree=1, varknots=NULL,
+	varbound=range(x), varint=FALSE, cen=TRUE, cenvalue=mean(x),
+	maxlag=0, lagtype="ns", lagdf=1, lagdegree=1,lagknots=NULL,
+	lagbound=c(0,maxlag), lagint=TRUE, group=NULL)
 
 \method{summary}{crossbasis}(object, ...)
 }
 
 \arguments{
-The arguments below define two set of basis functions calling the internal functions \code{\link{mkbasis}} and \code{\link{mklagbasis}}. The first one is applied to \code{var}, in order to describe the relationship in the space of the predictor. The second one is applied to a new vector \code{0:maxlag}, in order to describe the relationship in the space of lags. Many arguments refer to the specific basis for each space (with stub \code{var-} or \code{lag-}). Then, the two set of basis functions are combined in order to create the related cross-basis functions.
-  \item{var }{ the predictor variable, defined as a numeric vector of ordered observations.}
-  \item{group }{ a factor defining groups of observations (multiple series).}
+The arguments below define two set of basis functions calling the functions \code{\link{mkbasis}} and \code{\link{mklagbasis}}. The first one is applied to \code{x}, in order to describe the relationship in the space of the predictor. The second one is applied to a new vector \code{0:maxlag}, in order to describe the relationship in the space of lags. Many arguments refer to the specific basis for each space (with optional prefix \code{var-} or \code{lag-}). Then, the two set of basis variables are combined in order to create the related cross-basis matrix.
+  \item{x }{ the predictor variable, defined as a numeric vector of ordered observations.}
   \item{vartype, lagtype }{ type of basis. See Details below for the list of possible choices.}
   \item{vardf, lagdf }{ dimension of the basis, equivalent to number of degrees of freedom spent to specify the relationship in each space. They depend on \code{knots} if provided, or on \code{degree} for \code{type="poly"}.}
   \item{vardegree, lagdegree}{ degree of polynomial. Used only for \code{type} equal to \code{"bs"} (degree of the piecewise polynomial for the B-spline) or \code{"poly"} (degree of the polynomial).}
   \item{varknots, lagknots }{ knots location for the basis. They specify the position of the internal knots for \code{"ns"} and \code{"bs"}, the cut-off points for \code{"strata"} (defining right-open intervals) and the threshold(s)/cut-off points for \code{"lthr"}, \code{"hthr"} and \code{"dthr"}. If provided, are automatically ordered and made unique, determining the value of \code{df}. If only \code{df} is provided, \code{varknots} are placed at equally spaced quantiles (in the space of predictor), and \code{lagknots} at equally spaced values on the log scale of lags.}
   \item{varbound, lagbound }{ boundary knots (sometimes called external knots). Used only for \code{type} equal to \code{"ns"} and \code{"bs"}.}
-  \item{varint, lagint }{ logical. If \code{TRUE}, an 'intercept' is included in the basis. The default values should not be changed: see Warnings below.}
+  \item{varint, lagint }{ logical. If \code{TRUE}, an 'intercept' is included in the basis, with different meanings depending on \code{type} above: see Details below. The default values should not be changed: see Warnings below.}
   \item{cen }{ logical. If \code{TRUE}, the basis functions for the space of predictor are centered. See Note below.}
   \item{cenvalue }{ centering value, used as a reference point for the predicted effects.}
   \item{maxlag }{ a positive value defining the maximum lag.}
+ \item{group }{ a factor defining groups of observations (multiple series).}
   \item{object }{ a object of class \code{"crossbasis"}.}
   \item{\dots }{ additional arguments to be passed to \code{summary}.}
 }
@@ -63,19 +63,19 @@ For a detailed illustration of the use of the functions, see:
 }
 
 \value{
-A matrix object of class \code{"crossbasis"} which can be included in a model formula in order to fit a DLNM. It contains the attributes \code{crossdf} (global number of degrees of freedom) and \code{range} (range of the original vector of observations). Additional attributes are returned that correspond to the arguments to \code{crossbasis}, and explicitly give \code{type}, \code{df}, \code{degree}, \code{knots}, \code{bound}, \code{cen}, \code{cenvalue} and \code{maxlag} related to the corresponding basis ( with stub \code{var-} or \code{lag-}) for use of \code{\link{crosspred}}. The function \code{\link{summary.crossbasis}} returns a summary of the cross-basis matrix and the related attributes, and can be used to check the options for the bases chosen for the two dimensions.
+A matrix object of class \code{"crossbasis"} which can be included in a model formula in order to fit a DLNM. It contains the attributes \code{crossdf} (global number of degrees of freedom) and \code{range} (range of the original vector of observations). Additional attributes are returned that correspond to the arguments to \code{crossbasis}, and explicitly give \code{type}, \code{df}, \code{degree}, \code{knots}, \code{bound}, \code{cen}, \code{cenvalue} and \code{maxlag} related to the corresponding basis ( with prefix \code{var-} or \code{lag-}) for use of \code{\link{crosspred}}. The function \code{\link{summary.crossbasis}} returns a summary of the cross-basis matrix and the related attributes, and can be used to check the options for the bases chosen for the two dimensions.
 }
 
-\references{ 
-Armstrong, B. Models for the relationship between ambient temperature and daily mortality. \emph{Epidemiology}. 2006, \bold{17}(6):624-31.
+\references{
+Gasparrini A., Armstrong, B.,Kenward M. G. Distributed lag non-linear models. \emph{Statistics in Medicine}. 2010; \bold{29}(21):2224-2234.
 }
 
 \author{Antonio Gasparrini, \email{antonio.gasparrini@lshtm.ac.uk}}
 
 \note{
-The values in \code{var} are expected to be equally-spaced (with the interval defining the lag unit) and ordered in time. \code{NA} values are allowed, but the series must be complete. If \code{group} is defined, each groups is treated as a separate series (assumed ordered in time).
+The values in \code{x} are expected to be equally-spaced (with the interval defining the lag unit) and ordered in time. The series must be complete. Each value in the series of transformed variables is computed also using previous observations included in the lag period considered: therefore, the first \code{maxlag} observations in the transformed variables are set to \code{NA}. Missing values in \code{x} are allowed, but, for the same reason, the same and the next \code{maxlag} transformed values will be set to \code{NA}. Although correct, this could generate computational problems for DLNMs with long lag periods in the presence of scattered missing observations. If \code{group} is defined, each groups is treated as a separate series (assumed ordered in time).
 
-The name of the crossbasis object will be used by \code{\link{crosspred}} in order to extract the related estimated parameters. This name must not match the names of other predictors in the model formula. In addition, if more than one variable is transformed by cross-basis functions in the same model, different names must be specified. 
+The name of the crossbasis object will be used by \code{\link{crosspred}} in order to extract the related estimated parameters. If more than one variable is transformed by cross-basis functions in the same model, different names must be specified. 
 
 For continuous functions specified with \code{vartype} equal to \code{"ns"}, \code{"bs"}, \code{"poly"} or \code{"lin"}, the reference for the effects predicted by \code{\link{crosspred}} is set at \code{cenvalue}. For the other choices, the reference is automatic:  for \code{vartype} equal to \code{"strata"} and \code{"integer"}, the reference is the first interval, while for \code{vartype} equal to \code{"hthr"}, \code{"lthr"} and \code{"dthr"}, the reference is the region of null effect below, above or between the threshold(s), respectively. The inclusion of the intercept term nullifies the centering.
 }
@@ -83,13 +83,13 @@ For continuous functions specified with \code{vartype} equal to \code{"ns"}, \co
 \section{Warnings}{
 Meaningless combinations of arguments (for example the inclusion of knots lying outside the range for \code{type} equal to \code{"strata"} or \code{thr}-type) could lead to collinear variables, with identifiability problems in the model and the exclusion of some of them.
 
-It is strongly recommended to avoid the inclusion of an intercept in the basis for \code{var}, otherwise the presence of the additional intercept (when included) in the model used to fit the data will cause some of the cross-basis variables to be excluded. Conversely, an intercept should always be included in the basis for the space of lags when \code{lagtype} is equal to \code{"ns"}, \code{"bs"}, \code{"strata"} or \code{"poly"}.
+It is strongly recommended to avoid the inclusion of an intercept in the basis for \code{x} (\code{varint} should be \code{FALSE}), otherwise a rank-deficient cross-basis matrix will be specified, causing some of the cross-variables to be excluded in the regression model. Conversely, an intercept should always be included in the basis for the space of lags when \code{lagtype} is equal to \code{"ns"}, \code{"bs"}, \code{"strata"} or \code{"poly"}.
 }
 
-\seealso{ \code{\link{crosspred}}, \code{\link{crossplot}}}
+\seealso{ \code{\link{crosspred}}, \code{\link{plot.crosspred}}}
 
 \examples{
-# Example 1. See crosspred and crossplot for other examples
+# Example 1. See crosspred and plot.crosspred for other examples
 
 ### simple DLM
 ### space of predictor: linear effect for PM10
@@ -97,22 +97,26 @@ It is strongly recommended to avoid the inclusion of an intercept in the basis f
 ### lag function: 4th degree polynomial for PM10 up to lag15
 ### lag function: strata intervals at lag 0 and 1-3 for temperature
 
-data(chicagoNMMAPS)
+# CREATE THE CROSS-BASIS FOR EACH PREDICTOR AND CHECK WITH SUMMARY
 basis.pm <- crossbasis(chicagoNMMAPS$pm10, vartype="lin", lagtype="poly",
 	lagdegree=4, cen=FALSE, maxlag=15)
 basis.temp <- crossbasis(chicagoNMMAPS$temp, vardf=5, lagtype="strata",
 	lagknots=1, cenvalue=21, maxlag=3)
 summary(basis.pm)
 summary(basis.temp)
-model <- glm(death ~  basis.pm + basis.temp + ns(time, 7*14) + dow,
+
+# RUN THE MODEL AND GET THE PREDICTION FOR PM10
+model <- glm(death ~ basis.pm + basis.temp + ns(time, 7*14) + dow,
 	family=quasipoisson(), chicagoNMMAPS)
 pred.pm <- crosspred(basis.pm, model, at=0:20, cumul=TRUE)
 
-crossplot(pred.pm, "slices", var=10,
-	title="Effects of a 10-unit increase in PM10 along lags")
-crossplot(pred.pm, "slices", var=10, cumul=TRUE,
-	title="Cumulative effects of a 10-unit increase in PM10 along lags")
-# overall effect for a 10-unit increase in PM over 15 days of lag, with CI
+# PLOT THE LINEAR EFFECT OF PM10 ALONG LAGS
+plot(pred.pm, "slices", var=10, col=3, ylab="RR",
+	main="Effect of a 10-unit increase in PM10 along lags")
+plot(pred.pm, "slices", var=10, cumul=TRUE,  ylab="Cumulative RR",
+	main="Cumulative effect of a 10-unit increase in PM10 along lags")
+
+# GET THE FIGURES FOR THE OVERALL EFFECT, WITH CI
 pred.pm$allRRfit["10"]
 cbind(pred.pm$allRRlow, pred.pm$allRRhigh)["10",]
 

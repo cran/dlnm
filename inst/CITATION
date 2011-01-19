@@ -6,34 +6,34 @@ vers <- paste("R package version", meta$Version)
 
 citEntry(entry="Manual",
 	title = "dlnm: Distributed Lag Non-linear Models.",
-	author = personList(as.person("Gasparrini, A"),as.person("Armstrong, B")),
+	author = personList(as.person("Gasparrini A"),as.person("Armstrong B")),
 	year = year,
 	note = vers,
 	textVersion =
-	paste("Antonio Gasparrini and Ben Armstrong. dlnm: Distributed Lag Non-linear Models. ",year,", ",vers, ".", sep=""))
+	paste("Gasparrini A. and Armstrong B. dlnm: Distributed Lag Non-linear Models. ",year,", ",vers, ".", sep=""))
 
 citEntry(
 	entry="Article",
- 	author = personList(as.person("Gasparrini, A"),as.person("Armstrong, B"),as.person("Kenward, MG")),
+ 	author = personList(as.person("Gasparrini A."),as.person("Armstrong B."),as.person("Kenward M. G.")),
 	 title= "Distributed lag non-linear models",
  	journal="Statistics in Medicine",
-	volume= "",
-	number="",
-	note="Epub ahead of print May 7. DOI: 10.1002/sim.3940",
+	volume= "29",
+	number="21",
+	pages="2224-2234",
 	year="2010",
-	textVersion="Gasparrini A., Armstrong, B.,Kenward MG. Distributed lag non-linear models. Statistics in Medicine. 2010, Epub ahead of print May 7. DOI: 10.1002/sim.3940."
+	textVersion="Gasparrini A., Armstrong, B., Kenward M. G. Distributed lag non-linear models. Statistics in Medicine. 2010; 29(21):2224-2234"
 )
 
 citEntry(
 	entry="Article",
-	author = personList(as.person("Armstrong, B")),
+	author = personList(as.person("Armstrong B.")),
 	title= "Models for the relationship between ambient temperature and daily mortality",
 	journal="Epidemiology",
 	volume= "17",
 	number="6",
 	pages="624-631",
 	year="2006",
-	textVersion="Armstrong, B. Models for the relationship between ambient temperature and daily mortality. Epidemiology. 2010, 17(6):624-631."
+	textVersion="Armstrong B. Models for the relationship between ambient temperature and daily mortality. Epidemiology. 2010, 17(6):624-631."
 )
 
 citFooter("A BibTeX entry for LaTeX users is returned by: toBibtex(citation('dlnm'))")
