@@ -51,7 +51,7 @@ if(df+int>length(x)) {
 	stop("df+int must be <= length(x)")
 }
 # CENVALUE ONLY WITH CEN=T
-if(cen==F) cenvalue <- NULL
+if(cen==FALSE) cenvalue <- NULL
 
 ###########################################################################
 

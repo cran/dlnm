@@ -19,7 +19,7 @@ crossbasis(x, vartype="ns", vardf=1, vardegree=1, varknots=NULL,
 
 \arguments{
 The arguments below define two set of basis functions calling the functions \code{\link{mkbasis}} and \code{\link{mklagbasis}}. The first one is applied to \code{x}, in order to describe the relationship in the space of the predictor. The second one is applied to a new vector \code{0:maxlag}, in order to describe the relationship in the space of lags. Many arguments refer to the specific basis for each space (with optional prefix \code{var-} or \code{lag-}). Then, the two set of basis variables are combined in order to create the related cross-basis matrix.
-  \item{x }{ the predictor variable, defined as a numeric vector of ordered observations.}
+  \item{x }{ the predictor variable, defined as a numeric vector representing a complete series of ordered observations.}
   \item{vartype, lagtype }{ type of basis. See Details below for the list of possible choices.}
   \item{vardf, lagdf }{ dimension of the basis, equivalent to number of degrees of freedom spent to specify the relationship in each space. They depend on \code{knots} if provided, or on \code{degree} for \code{type="poly"}.}
   \item{vardegree, lagdegree}{ degree of polynomial. Used only for \code{type} equal to \code{"bs"} (degree of the piecewise polynomial for the B-spline) or \code{"poly"} (degree of the polynomial).}
@@ -29,7 +29,7 @@ The arguments below define two set of basis functions calling the functions \cod
   \item{cen }{ logical. If \code{TRUE}, the basis functions for the space of predictor are centered. See Note below.}
   \item{cenvalue }{ centering value, used as a reference point for the predicted effects.}
   \item{maxlag }{ a positive value defining the maximum lag.}
- \item{group }{ a factor defining groups of observations (multiple series).}
+ \item{group }{ a factor defining groups of observations, representing multiple series. Each series must be consecutive, complete and ordered.}
   \item{object }{ a object of class \code{"crossbasis"}.}
   \item{\dots }{ additional arguments to be passed to \code{summary}.}
 }
@@ -55,7 +55,7 @@ The value in \code{type} defines the basis for each space (predictor and lags). 
 
 Some arguments can be automatically changed for not sensible combinations, or set to \code{NULL} if not required. Use \code{\link{summary.crossbasis}} to check the result.
 
-The argument \code{group} defines groups of observations with independent series. \code{crossbasis} is run on each of them applying the same cross-basis functions: default choices (knots position, range, etc.) are taken considering the pooled distribution.
+The argument \code{group} defines groups of observations representing independent series. Each series must be consecutive, complete and ordered. \code{crossbasis} is run on each of them applying the same cross-basis functions: default choices (knots position, range, etc.) are taken considering the pooled distribution.
 
 For a detailed illustration of the use of the functions, see:
 
