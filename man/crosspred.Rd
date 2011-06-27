@@ -101,6 +101,7 @@ summary(basis.o3)
 summary(basis.temp)
 
 # RUN THE MODEL AND GET THE PREDICTION FOR 03
+library(splines)
 model <- glm(death ~  basis.o3 + basis.temp + ns(doy, 4) + dow,
 	family=quasipoisson(), chicagoNMMAPSseas)
 pred.o3 <- crosspred(basis.o3, model, at=c(0:65,40.3,50.3))
@@ -109,7 +110,7 @@ pred.o3 <- crosspred(basis.o3, model, at=c(0:65,40.3,50.3))
 plot(pred.o3, "slices", var=50.3, ci="bars", type="p", pch=19, ci.level=0.80,
 	main="Effects of 10-unit increase above the threshold (80CI)")
 plot(pred.o3,"overall",xlab="Ozone", ci="lines", ylim=c(0.9,1.3), lwd=2,
-	ci.level=0.80, main="Overall effect over 5 days of lag (80CI)")
+	ci.arg=list(col=1,lty=3), main="Overall effect over 5 days of lag")
 
 # GET THE FIGURES FOR THE OVERALL EFFECT ABOVE, WITH CI
 pred.o3$allRRfit["50.3"]

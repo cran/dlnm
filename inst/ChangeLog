@@ -1,3 +1,27 @@
+==============================================================================
+Changes in dlnm 1.4.0
+=======================
+
+Major changes
+-------------
+
+    o	Argument 'ci.arg' added to plotting functions. Now it is possible to 
+	(almost) completely specify the confidence intervals display.
+
+    o	onAttach function added, to display a message when the package is
+	attached.
+
+    o	Dependencies revised: splines excluded from Depends, and accordingly
+	library(splines) included in examples and vignette. Also excluded 
+	graphics and stats, already imported.
+	
+Minor changes
+-------------
+
+    o	Documentation and examples changed accondingly.
+
+
+==============================================================================
 Changes in dlnm 1.3.2
 =======================
 
@@ -8,6 +32,7 @@ Minor changes
 	series. Documentation changed accordingly.
 
 
+==============================================================================
 Changes in dlnm 1.3.1
 =======================
 
@@ -48,6 +73,7 @@ Minor changes
     o	Help pages, vignette and citation changes accordingly.
 
 
+==============================================================================
 Changes in dlnm 1.2.4
 =======================
 
@@ -58,6 +84,7 @@ Major changes
 	then relation 'type'-'df'-'int' more logical.
 
 
+==============================================================================
 Changes in dlnm 1.2.3
 =======================
 
@@ -67,6 +94,7 @@ Minor changes
     o	Updated reference.
 
 
+==============================================================================
 Changes in dlnm 1.2.2
 =======================
 
@@ -76,6 +104,7 @@ Minor changes
     o	Bug in crosspred() for vcov-coef: fixed.
 
 
+==============================================================================
 Changes in dlnm 1.2.1
 =======================
 
@@ -89,6 +118,7 @@ Minor changes
     o	Help pages and citation changed accordingly.
 
 
+==============================================================================
 Changes in dlnm 1.2.0
 =======================
 
@@ -115,6 +145,7 @@ Minor changes
     o	Help pages and citation changed accordingly.
 
 
+==============================================================================
 Changes in dlnm 1.1.1
 =======================
 
@@ -124,6 +155,7 @@ Minor changes
     o	Bug in mkbasis() with 'type="strata"': fixed.
 
 
+==============================================================================
 Changes in dlnm 1.1.0
 =======================
 
@@ -144,6 +176,7 @@ Minor changes
     o	Help pages, examples and vignette changed accordingly.
 
 
+==============================================================================
 Changes in dlnm 1.0.2
 =======================
 
@@ -153,6 +186,7 @@ Minor changes
     o	Some html links giving warnings have been fixed.
 
 
+==============================================================================
 Changes in dlnm 1.0.1
 =======================
 
@@ -178,7 +212,7 @@ Minor changes
     o	Help pages, examples and vignette changed accordingly.
 
 
-=======================
+==============================================================================
 Changes in dlnm 0.4.1
 =======================
 
@@ -226,7 +260,7 @@ Minor changes
     o	Help pages, examples and vignette changed accordingly.
 
 
-=======================
+==============================================================================
 Changes in dlnm 0.3.0
 =======================
 
@@ -260,7 +294,7 @@ Corrections
 	and *mtrend, not *mean and *trend. Corrected
 
 
-=======================
+==============================================================================
 Changes in dlnm 0.2.1
 =======================
 
@@ -272,7 +306,7 @@ Fixed bugs
     o	titles for 'slices' in crossplot()
 
 
-=======================
+==============================================================================
 Changes in dlnm 0.2.0
 =======================
 
@@ -314,7 +348,7 @@ Minor changes
  	40.3, in order to show the ordering functionality.
 
 
-==================================
+==============================================================================
 First version in R CRAN dlnm 0.1.0
-==================================
+==============================================================================
 
