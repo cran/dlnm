@@ -38,6 +38,8 @@ Maintainer: Antonio Gasparrini, \email{antonio.gasparrini@lshtm.ac.uk}
 }
 
 \references{
+Gasparrini A. Distributed lag linear and non-linear models in R: the package dlnm. \emph{Journal of Statistical Software}. 2011; \bold{43}(8):1-20. URL http://www.jstatsoft.org/v43/i08/.
+  
 Gasparrini A., Armstrong, B.,Kenward M. G. Distributed lag non-linear models. \emph{Statistics in Medicine}. 2010; \bold{29}(21):2224-2234.
 
 Armstrong, B. Models for the relationship between ambient temperature and daily mortality. \emph{Epidemiology}. 2006, \bold{17}(6):624-31.
