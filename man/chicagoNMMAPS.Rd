@@ -2,7 +2,7 @@
 \alias{chicagoNMMAPS}
 \docType{data}
 
-\title{  Daily mortality weather and pollution data for Chicago}
+\title{  Daily Mortality Weather and Pollution Data for Chicago}
 
 \description{
 The dataset contains daily mortality (all causes, CVD, respiratory), weather (temperature, dew point temperature, relative humidity) and pollution data (PM10 and ozone) for Chicago in the period 1987-2000 from the National Morbidity, Mortality and Air Pollution Study

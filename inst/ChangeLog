@@ -1,4 +1,61 @@
 ==============================================================================
+Changes in dlnm 1.5.2 (05 Jan 2011)
+===================================
+
+See also: file.show(system.file("Changesince151",package="dlnm"))
+
+Major changes
+-------------
+
+    o New function 'onebasis' to create the 1-dimensional basis matrices. The 
+      function is made available and documented. This replace 'mkbasis' and
+      'mklagbasis', which are kept only for compatibility. The functions returns
+      a matrix with attributes.
+
+    o The usage of 'crossbasis' has been extensively revised. Now the function
+      has 2 arguments var and lag with a list of arguments for each space. Also,
+      maxlag has been replaced by lag, defining the lag range (min and max). Old
+      usage has been kept (with a warning) for compatibility reasons. 
+
+    o New function 'crossreduce' to reduce the fit to one of the 2 dimensions. 
+      Methods functions (summary, plot, points, lines) are also included.
+      
+    o	'crosspred' changed accordingly: now prediction also from simple basis,
+      and computation based on faster new method in 'crossreduce'.
+
+    o Argument cenvalue eliminated from 'basis'-crossbasis': centering now
+      entirily determined by cen, which can be logical or numeric.
+	
+Minor changes
+-------------
+
+    o Bug fixed in 'onebasis' (previously 'mkbasis') for type hthr-lthr.
+
+    o Internal functions included: '.onAttach' and '.fci'.
+
+    o coef and vcov methods for 'crosspred' and 'crossreduce'.
+
+    o	In 'onebasis'-'crossbasis': bound and cen argument now with no default.
+      degree=3 returned now for type='ns', similarly to the original function.
+
+    o In plot functions: changed default of ptype, added default titles.
+
+    o In plots and documentation: effects changed to outcome-association.
+
+    o Documentation and examples changed accondingly with changed above.
+
+
+==============================================================================
+Changes in dlnm 1.4.2
+=======================
+
+Minor changes
+-------------
+
+    o Partial matching fixed in mkbasis() and plot.crosspred().
+
+
+==============================================================================
 Changes in dlnm 1.4.1
 =======================
 
