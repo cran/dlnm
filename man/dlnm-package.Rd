@@ -8,13 +8,15 @@ Distributed Lag Non-linear Models (DLNM)
 }
 
 \description{
-The package \pkg{dlnm} contains functions to specify basis and cross-basis matrices in order to run distributed lag models (DLM) and their non-linear extension (DLNM), then to predict and plot the results for a fitted model.
+The package \pkg{dlnm} contains functions to specify and run distributed lag linear and non-linear models. These functions are used to specify basis and cross-basis matrices among a set of available options, then to predict and plot the results for a fitted model.
 }
 
 \details{
 Distributed lag non-linear models (DLNM) represent a modelling framework to describe simultaneously non-linear and delayed dependencies in time-series data. This methodology is based on the definition of a \emph{cross-basis}, a bi-dimensional space of functions specifying the dependency along the space of the predictor and along lags. The cross-basis functions are built combining the basis functions for the two dimensions, chosen among a set of possible bases. This family includes simple distributed lag models (DLM) as a special case. A thorough methodological overview is given in the references below.
 
-Given a series of observations ordered and equally spaced in time, \code{\link{crossbasis}} creates two set of basis functions to define the relationship in the two dimensions of predictor and lags, by calling the two internal functions \code{\link{mkbasis}} and \code{\link{mklagbasis}}, respectively. The two matrices produced by these functions are then combined in a matrix object of class \code{"crossbasis"}, containing the transformed variables to be included in the model formula. After the model fitting, \code{\link{crosspred}} predicts the results for a set of suitable values of the original predictor and stores them in a \code{"crosspred"} object. Finally, the plotting method functions \code{\link[dlnm:plot.crosspred]{plot}}, \code{\link[dlnm:lines.crosspred]{lines}} and \code{\link[dlnm:points.crosspred]{points}} offer a set of choices to plot the results.
+Given a series of observations ordered and equally spaced in time, \code{\link{crossbasis}} creates two set of basis functions to define the relationship in the two dimensions of predictor and lags, by calling the function \code{\link{onebasis}}, which provides a list of possible options (splines, strata, and threshold functions, among others). The two matrices are then combined in a matrix object of class \code{"crossbasis"}, containing the transformed variables to be included in the model formula. After the model fitting, \code{\link{crosspred}} generate predictions for a set of suitable values of the original predictor and stores them in a \code{"crosspred"} object. The fit of a DLNM can be reduced and re-expressed as the chosen function of one of the two dimensions through the function \code{\link{crossreduce}}. It returns a \code{"crossreduce"} object storing the new parameters and predictions.
+
+Method functions are available for both objects \code{"crosspred"} and \code{"crossreduce"}. The plotting functions \code{\link[dlnm:plot.crosspred]{plot}}, \code{\link[dlnm:lines.crosspred]{lines}} and \code{\link[dlnm:points.crosspred]{points}}, offer a set of choices to plot the results, while \code{\link[dlnm:coef.crosspred]{coef}} and \code{\link[dlnm:vcov.crosspred]{vcov}} return the coefficients and associated (co)variance matrix for a (optionally reduced) DLNM.
 
 The DLNM framework is developed for time series data: the data are assumed to be an equally-spaced, complete and ordered series of observations, where the interval defines the lag unit. The estimation can be carried out with the default regression functions, such as \code{\link{lm}}, \code{\link{glm}} or \code{gam} (package \pkg{mgcv}). The function \code{\link{crosspred}} extracts the relevant parameters directly from the model object if methods for \code{\link{coef}} and \code{\link{vcov}} are available for that model class. Alternatively, the user must extract the parameters manually.
 
@@ -28,7 +30,7 @@ Use \code{citation("dlnm")} to cite this package.
 
 A list of changes included in the current and previous versions can be found by typing:
 
-\code{file.show(system.file("ChangeLog", package = "dlnm"))}
+\code{file.show(system.file("ChangeLog",package="dlnm"))}
 }
 
 \author{
@@ -48,6 +50,10 @@ Armstrong, B. Models for the relationship between ambient temperature and daily 
 \keyword{package}
 
 \seealso{
-\code{\link{crossbasis}} to create the basis and cross-basis matrices. \code{\link{crosspred}} to predict the effects after model fitting. \code{\link{plot.crosspred}} to plot several type of graphs.
+\code{\link{onebasis}} to generate simple basis matrices.
+\code{\link{crossbasis}} to generate cross-basis matrices. \code{\link{crosspred}} to obtain predictions after model fitting. \code{\link{crossreduce}} to reduce the fit to one dimension.
+\code{\link{plot.crosspred}} and \code{\link{plot.crossreduce}} to plot several type of graphs.
+
+Type \code{'vignette(dlnmOverview)'} for a detailed description.
 }
 

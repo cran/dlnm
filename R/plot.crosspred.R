@@ -1,54 +1,62 @@
 `plot.crosspred` <-
-function(x, ptype="3d", var=NULL, lag=NULL, ci="area", ci.arg,
-	ci.level=x$ci.level, cumul=FALSE, exp=NULL, ...) {
+function(x, ptype, var=NULL, lag=NULL, ci="area", ci.arg,
+  ci.level=x$ci.level, cumul=FALSE, exp=NULL, ...) {
 
 ###########################################################################
 # CHECKS
 
 if(class(x)!="crosspred") stop("'x' must be of class 'crosspred'")
+# SETTING DEFAULT FOR ptype: OVERALL FOR NO LAG, SLICES FOR VAR/LAG, OTHERWISE 3D
+if(missing(ptype)) {
+  if(!is.null(var)||!is.null(lag)) {
+    ptype <- "slices"
+  }else if(x$lag[2]==0) {
+    ptype <- "overall"
+  } else ptype <- "3d"
+}
 if(!ptype%in%c("slices","3d","contour","overall")) {
-	stop("'ptype' must be one of 'slices','3d','contour','overall'")
+  stop("'ptype' must be one of 'slices','3d','contour','overall'")
 }
 if(is.null(var)&&is.null(lag)&&(ptype=="slices")) {
-	stop("at least 'var' or 'lag' must be provided when ptype='slices'")
+  stop("at least 'var' or 'lag' must be provided when ptype='slices'")
 }
 if(!is.null(var)&&!is.numeric(var)&&length(var)>4&&ptype=="slices") {
-	stop("'var' and 'lag' must be numeric and of length <=4")
+  stop("'var' and 'lag' must be numeric and of length <=4")
 }
 if(!is.null(lag)&&!is.numeric(lag)&&length(lag)>4&&ptype=="slices") {
-	stop("'var' and 'lag' must be numeric and of length <=4")
+  stop("'var' and 'lag' must be numeric and of length <=4")
 }
 if((!is.null(var)&!is.null(lag))&&length(var)!=length(lag)&&ptype=="slices") {
-	stop("if both are provided, length of 'var' and 'lag' must be the same")
+  stop("if both are provided, length of 'var' and 'lag' must be the same")
 }
 if(!is.null(var)&&sum(var%in%x$predvar)!=length(var)&&(ptype=="slices")) {
-	stop("'var' must match values used for prediction")
+  stop("'var' must match values used for prediction")
 }
-if(!is.null(lag)&&sum(lag%in%0:x$maxlag)!=length(lag)&&(ptype=="slices")) {
-	stop("'lag' must match values in 0:maxlag")
+if(!is.null(lag)&&sum(lag%in%.seq(x$lag))!=length(lag)&&(ptype=="slices")) {
+  stop("'lag' must match values used for prediction")
 }
 if(!ci%in%c("area","bars","lines","n")) {
-	stop("'ci' must be one of 'area', 'bars', 'lines' or 'n'")
+  stop("'ci' must be one of 'area', 'bars', 'lines' or 'n'")
 }
 if(missing(ci.arg)) {
-	ci.arg <- list()
+  ci.arg <- list()
 } else if(!is.list(ci.arg)) stop("'ci.arg' must be a list")
 if(!is.numeric(ci.level)||ci.level>=1||ci.level<=0) {
-	stop("'ci.level' must be numeric and between 0 and 1")
+  stop("'ci.level' must be numeric and between 0 and 1")
 }
 if(cumul==TRUE&&is.null(x$cumfit)) {
-	stop("Cumulative effects can be plotted if predicted in the 'crosspred'
+  stop("Cumulative outcomes can be plotted if predicted in the 'crosspred'
 object. Set the argument 'cumul=TRUE' in the function crosspred()")
 }
 if(!is.null(exp)&&!is.logical(exp)) stop("'exp' must be logical")
 
 ##########################################################################
-# COMPUTE EFFECTS
+# COMPUTE OUTCOMES
 
 # CUMULATIVE IF CUMUL==T
 if(cumul==TRUE) {
-	x$matfit <- x$cumfit
-	x$matse <- x$cumse
+  x$matfit <- x$cumfit
+  x$matse <- x$cumse
 }
 
 # SET THE Z LEVEL EQUAL TO THAT STORED IN OBJECT IF NOT PROVIDED
@@ -61,45 +69,18 @@ noeff <- 0
 
 # EXPONENTIAL
 if((is.null(exp)&&x$model.link%in%c("log","logit"))||
-	(!is.null(exp)&&exp==TRUE)) {
-	x$matfit <- exp(x$matfit)
-	x$mathigh <- exp(x$mathigh)
-	x$matlow <- exp(x$matlow)
-	x$allfit <- exp(x$allfit)
-	x$allhigh <- exp(x$allhigh)
-	x$alllow <- exp(x$alllow)
-	noeff <- 1
+  (!is.null(exp)&&exp==TRUE)) {
+  x$matfit <- exp(x$matfit)
+  x$mathigh <- exp(x$mathigh)
+  x$matlow <- exp(x$matlow)
+  x$allfit <- exp(x$allfit)
+  x$allhigh <- exp(x$allhigh)
+  x$alllow <- exp(x$alllow)
+  noeff <- 1
 }
 
 ##########################################################################
 # GRAPHS
-
-# FUNCTION TO CREATE CONFIDENCE INTERVALS
-fci <- function(ci,x,high,low,ci.arg,plot.arg,noeff) {
-	if(ci=="area") {
-		polygon.arg <- modifyList(list(col=grey(0.9),border=NA),ci.arg)
-		polygon.arg <- modifyList(polygon.arg,
-			list(x=c(x,rev(x)),y=c(high,rev(low))))
-		do.call(polygon,polygon.arg)
-	} else if(ci=="bars") {
-		range <- diff(range(x))/300
-		segments.arg <- modifyList(ci.arg,list(x0=x,y0=high,x1=x,y1=low))
-		do.call(segments,segments.arg)
-		segments.arg <- modifyList(segments.arg,list(x0=x-range,y0=high,
-			x1=x+range,y1=high))
-		do.call(segments,segments.arg)
-		segments.arg <- modifyList(segments.arg,list(x0=x-range,y0=low,
-			x1=x+range,y1=low))
-		do.call(segments,segments.arg)
-	} else if(ci=="lines") {
-		lines.arg <- modifyList(list(lty=2,col=plot.arg$col),ci.arg)
-		lines.arg <- modifyList(lines.arg,list(x=x,y=high))
-		do.call(lines,lines.arg)
-		lines.arg <- modifyList(lines.arg,list(x=x,y=low))
-		do.call(lines,lines.arg)
-	}
-	abline(h=noeff)
-}
 
 ##########
 # SLICES
@@ -107,80 +88,78 @@ fci <- function(ci,x,high,low,ci.arg,plot.arg,noeff) {
 
 if(ptype=="slices") {
 
-	# SET FRAME AND GREY SCALE
-	mar.old <- par()$mar
-	mfrow.old <- par()$mfrow
-	mgp.old <- par()$mgp
-	grey <- grey(0.9)
-	if(length(lag)+length(var)>1) {
-		layout(matrix(1:(length(var)+length(lag)),
-			ncol=sum(!is.null(var),!is.null(lag))))
-		grey <- grey(0.8)
-		par(mgp=c(2,0.7,0),mar=c(4.1,4.1,2.1,1.1))
-	}
+  # SET FRAME AND GREY SCALE
+  mar.old <- par()$mar
+  mfrow.old <- par()$mfrow
+  mgp.old <- par()$mgp
+  grey <- grey(0.9)
+  if(length(lag)+length(var)>1) {
+    layout(matrix(1:(length(var)+length(lag)),
+      ncol=sum(!is.null(var),!is.null(lag))))
+    grey <- grey(0.8)
+    par(mgp=c(2,0.7,0),mar=c(4.1,4.1,2.1,1.1))
+  }
 
-	# LAG
-	if(!is.null(lag)) {
+  # LAG
+  if(!is.null(lag)) {
 
-		# START LOOP FOR LAG
-		xlag <- paste("lag",lag,sep="")
-		for(i in seq(along=lag)) {
+    # START LOOP FOR LAG
+    xlag <- paste("lag",lag,sep="")
+    for(i in seq(along=lag)) {
 
-			# SET DEFAULT VALUES IF NOT INCLUDED BY THE USER
-			plot.arg <- list(type="l",col=2,xlab="Var",ylab="Effect",
-				ylim=c(min(x$matlow[,xlag]),
-				max(x$mathigh[,xlag])),frame.plot=FALSE)
-			if(length(lag)+length(var)>1)  plot.arg$cex.axis <- 0.7
-			plot.arg <- modifyList(plot.arg,list(...))		
-			# SET CONFIDENCE INTERVALS
-			ci.list <- list(panel.first=call("fci",ci=ci,
-				x=x$predvar,high=x$mathigh[,xlag[i]],
-				low=x$matlow[,xlag[i]],ci.arg,plot.arg,noeff=noeff))
-			plot.arg <- modifyList(plot.arg,c(ci.list,
-				list(x=x$predvar,y=x$matfit[,xlag[i]])))
-			if(length(lag)+length(var)>1) {
-				plot.arg$main <- ""
-				plot.arg$xlab <- "Var"
-			}
-			# PLOT
-			do.call(plot,plot.arg)
-			if(length(lag)>1) mtext(paste("Lag =",lag[i]),cex=0.8)
-		}
-	}
+      # SET DEFAULT VALUES IF NOT INCLUDED BY THE USER
+      plot.arg <- list(type="l",col=2,xlab="Var",ylab="Outcome",
+        ylim=c(min(x$matlow[,xlag]),max(x$mathigh[,xlag])),frame.plot=FALSE)
+      if(length(lag)+length(var)>1)  plot.arg$cex.axis <- 0.7
+      plot.arg <- modifyList(plot.arg,list(...))		
+      # SET CONFIDENCE INTERVALS
+      ci.list <- list(panel.first=call(".fci",ci=ci,x=x$predvar,
+        high=x$mathigh[,xlag[i]],low=x$matlow[,xlag[i]],ci.arg,plot.arg,
+        noeff=noeff))
+      plot.arg <- modifyList(plot.arg,c(ci.list,
+        list(x=x$predvar,y=x$matfit[,xlag[i]])))
+      if(length(lag)+length(var)>1) {
+        plot.arg$main <- ""
+        plot.arg$xlab <- "Var"
+      }
+      # PLOT
+      do.call("plot",plot.arg)
+      if(length(lag)>1) mtext(paste("Lag =",lag[i]),cex=0.8)
+    }
+  }
 
-	# VAR
-	if(!is.null(var)) {
+  # VAR
+  if(!is.null(var)) {
 
-		# START LOOP FOR VAR
-		xvar <- as.character(var)
-		for(i in seq(along=var)) {
+    # START LOOP FOR VAR
+    xvar <- as.character(var)
+    for(i in seq(along=var)) {
 
-			# SET DEFAULT VALUES IF NOT INCLUDED BY THE USER
-			plot.arg <- list(type="l",col=2,xlab="Lag",ylab="Effect",
-				ylim=c(min(x$matlow[xvar,]),
-				max(x$mathigh[xvar,])),frame.plot=FALSE)
-			if(length(lag)+length(var)>1)  plot.arg$cex.axis <- 0.7
+      # SET DEFAULT VALUES IF NOT INCLUDED BY THE USER
+      plot.arg <- list(type="l",col=2,xlab="Lag",ylab="Outcome",
+        ylim=c(min(x$matlow[xvar,]),max(x$mathigh[xvar,])),frame.plot=FALSE)
+      if(length(lag)+length(var)>1)  plot.arg$cex.axis <- 0.7
 
-			plot.arg <- modifyList(plot.arg,list(...))		
+      plot.arg <- modifyList(plot.arg,list(...))		
 
-			# SET CONFIDENCE INTERVALS
-			ci.list <- list(panel.first=call("fci",ci=ci,
-				x=0:x$maxlag,high=x$mathigh[xvar[i],],
-				low=x$matlow[xvar[i],],ci.arg,plot.arg,noeff=noeff))
-			plot.arg <- modifyList(plot.arg,c(ci.list,
-				list(x=0:x$maxlag,y=x$matfit[xvar[i],])))
-			if(length(lag)+length(var)>1) {
-				plot.arg$main <- ""
-				plot.arg$xlab <- "Lag"
-			}
-			# PLOT
-			do.call(plot,plot.arg)
-			if(length(lag)>1) mtext(paste("Var =",var[i]),cex=0.8)
-		}
-	}
-	if(length(lag)+length(var)>1) {
-		par(mar=mar.old,mfrow=mfrow.old,mgp=mgp.old)
-	}
+      # SET CONFIDENCE INTERVALS
+      ci.list <- list(panel.first=call(".fci",ci=ci,x=.seq(x$lag),
+        high=x$mathigh[xvar[i],],low=x$matlow[xvar[i],],ci.arg,plot.arg,
+        noeff=noeff))
+      plot.arg <- modifyList(plot.arg,c(ci.list,
+        list(x=.seq(x$lag),y=x$matfit[xvar[i],])))
+      if(length(lag)+length(var)>1) {
+        plot.arg$main <- ""
+        plot.arg$xlab <- "Lag"
+      }
+      # PLOT
+      do.call("plot",plot.arg)
+      if(length(lag)>1) mtext(paste("Var =",var[i]),cex=0.8)
+    }
+  }
+  if(length(lag)+length(var)>1) {
+    par(mar=mar.old,mfrow=mfrow.old,mgp=mgp.old)
+  }
 }
 
 ##########
@@ -188,19 +167,19 @@ if(ptype=="slices") {
 ##########
 if(ptype=="overall") {
 
-	# SET DEFAULT VALUES IF NOT INCLUDED BY THE USER
-	plot.arg <- list(type="l",ylim=c(min(x$alllow),max(x$allhigh)),
-		col=2,xlab="Var",ylab="Effect",frame.plot=FALSE)
-	plot.arg <- modifyList(plot.arg,list(...))
+  # SET DEFAULT VALUES IF NOT INCLUDED BY THE USER
+  plot.arg <- list(type="l",ylim=c(min(x$alllow),max(x$allhigh)),
+    col=2,xlab="Var",ylab="Outcome",frame.plot=FALSE)
+  plot.arg <- modifyList(plot.arg,list(...))
 	
-	# SET CONFIDENCE INTERVALS
-	ci.list <- list(panel.first=call("fci",ci=ci,x=x$predvar,
-		high=x$allhigh,low=x$alllow,ci.arg,plot.arg,noeff=noeff))
-	plot.arg <- modifyList(plot.arg,c(ci.list,
-		list(x=x$predvar,y=x$allfit)))
+  # SET CONFIDENCE INTERVALS
+  ci.list <- list(panel.first=call(".fci",ci=ci,x=x$predvar,
+    high=x$allhigh,low=x$alllow,ci.arg,plot.arg,noeff=noeff))
+  plot.arg <- modifyList(plot.arg,c(ci.list,
+    list(x=x$predvar,y=x$allfit)))
 
-	# PLOT
-	do.call(plot,plot.arg)
+  # PLOT
+  do.call("plot",plot.arg)
 }
 
 ##############
@@ -209,14 +188,15 @@ if(ptype=="overall") {
 
 if(ptype=="contour") {
 
-	# SET DEFAULT VALUES (NOT TO BE SPECIFIED BY THE USER)
-	level <- pretty(x$matfit,20)
-	col1 <- colorRampPalette(c("blue","white"))
-	col2 <- colorRampPalette(c("white","red"))
-	col <- c(col1(sum(level<noeff)),col2(sum(level>noeff)))
+  if(x$lag[2]==0) stop("contour plot not conceivable for unlagged associations")
+  # SET DEFAULT VALUES (NOT TO BE SPECIFIED BY THE USER)
+  levels <- pretty(x$matfit,20)
+  col1 <- colorRampPalette(c("blue","white"))
+  col2 <- colorRampPalette(c("white","red"))
+  col <- c(col1(sum(levels<noeff)),col2(sum(levels>noeff)))
 
-	filled.contour(x=x$predvar,y=0:x$maxlag,z=x$matfit,col=col,
-		level=level,...)
+  filled.contour(x=x$predvar,y=.seq(x$lag),z=x$matfit,col=col,
+    levels=levels,...)
 }
 
 #########
@@ -225,16 +205,15 @@ if(ptype=="contour") {
 
 if(ptype=="3d") {
 
-	# SET DEFAULT VALUES IF NOT INCLUDED BY THE USER
-	plot.arg <- list(ticktype="detailed",theta=210,phi=30,xlab="Var",
-		ylab="Lag",	zlab="Effect",col="lightskyblue",
-		zlim=c(min(x$matfit),max(x$matfit)),
-		ltheta=290,shade=0.75,r=sqrt(3),d=5)
-	plot.arg <- modifyList(plot.arg,list(...))
-	plot.arg <- modifyList(plot.arg,list(x=x$predvar,y=0:x$maxlag,z=x$matfit))
+  if(x$lag[2]==0) stop("3D plot not conceivable for unlagged associations")
+  # SET DEFAULT VALUES IF NOT INCLUDED BY THE USER
+  plot.arg <- list(ticktype="detailed",theta=210,phi=30,xlab="Var",
+    ylab="Lag",	zlab="Outcome",col="lightskyblue",
+    zlim=c(min(x$matfit),max(x$matfit)),ltheta=290,shade=0.75,r=sqrt(3),d=5)
+  plot.arg <- modifyList(plot.arg,list(...))
+  plot.arg <- modifyList(plot.arg,list(x=x$predvar,y=.seq(x$lag),z=x$matfit))
 
-	# PLOT
-	do.call(persp,plot.arg)
+  # PLOT
+  do.call("persp",plot.arg)
 }
 }
-
