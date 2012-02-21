@@ -229,7 +229,7 @@ list$cenvalue <- cenvalue
 
 warning("the functions 'mkbasis' and 'mklagbasis' has been replaced since version
 1.5.0 by the new function 'onebasis', and only kept for compatibility reasons.
-The users are strongly suggested to apply the new function: see '?basis'")
+The users are strongly suggested to apply the new function: see '?onebasis'")
 
 return(list)
 }

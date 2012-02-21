@@ -27,7 +27,7 @@ if(!is.null(lag)&&!is.numeric(lag)&&length(lag)>1&&ptype=="slices") {
 if(!is.null(var)&&!var%in%x$predvar&&(ptype=="slices")) {
   stop("'var' must match values used for prediction")
 }
-if(!is.null(lag)&&!lag%in%0:x$lag&&(ptype=="slices")) {
+if(!is.null(lag)&&!lag%in%.seq(x$lag)&&(ptype=="slices")) {
   stop("'lag' must match values used for prediction")
 }
 if(!ci%in%c("area","bars","lines","n")) {
