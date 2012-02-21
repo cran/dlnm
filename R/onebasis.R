@@ -1,6 +1,7 @@
 `onebasis` <-
 function(x, type="ns", df=1, degree=1, knots=NULL, bound, int=FALSE, cen) {
 
+x <- as.vector(x)
 # SET DEFAULT TO BOUND AND CEN IF NA OR NULL
 range <- range(x,na.rm=TRUE)
 if(missing(bound)||is.null(bound)||any(is.na(bound))) bound <- range

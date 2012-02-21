@@ -1,5 +1,19 @@
 ==============================================================================
-Changes in dlnm 1.5.2 (05 Jan 2011)
+Changes in dlnm 1.5.3 (21 Feb 2012)
+===================================
+
+Minor changes
+-------------
+
+    o added as.vector(x) to constraint the type of first argument in 'onebasis'.
+
+    o Change in colnames(crossbasis).
+
+    o Fixed bug in lines.crosspred() and points.crosspred()
+
+
+==============================================================================
+Changes in dlnm 1.5.2 (05 Jan 2012)
 ===================================
 
 See also: file.show(system.file("Changesince151",package="dlnm"))

@@ -33,4 +33,4 @@ The authors apologize for the inconvenience.
 Please address any issue about the new version to:
 antonio.gasparrini@lshtm.ac.uk
 
-For general detail on the package, type help(dlnm) and vignette('dlnmOverview')
+For general details on the package, type help(dlnm) and vignette('dlnmOverview')
