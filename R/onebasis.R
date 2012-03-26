@@ -16,7 +16,7 @@ if(!type%in%c("ns","bs","strata","poly","integer","dthr","lthr","hthr","lin")) {
   stop("type must be one of ns,bs,strata,poly,integer,dthr,lthr,hthr,lin")
 }
 # CHECK OTHER ARGUMENTS
-if(!is.numeric(x)) stop("'x' must be a numeric vector")
+if(!is.numeric(x)) stop("'x' must be a numeric vector or matrix")
 if(!is.numeric(df)||df<1) stop("'df' must be numeric and >=1")
 if(!is.null(knots)&&!is.numeric(knots)) stop("'knots' must be numeric")
 if(!is.numeric(bound)) stop("'bound' must be numeric")
@@ -38,10 +38,6 @@ if(!is.null(knots)) {
   if(type%in%c("strata","hthr","lthr")) df <- length(knots)+int
 }
 
-# DF MUST BE <= N. OBS
-if(df+int>length(x)) {
-  stop("df+int must be <= length(x)")
-}
 # CENTERING VALUE
 if(is.logical(cen)) cen <- ifelse(cen,mean(x,na.rm=TRUE),0)
 
@@ -57,8 +53,8 @@ if(type=="ns")	{
   }
   # IF NOT INTERCEPT-ONLY, CREATE THE BASIS, OTHERWISE A COLUMN OF 1'S
   if(df>=(1+int)) {
-    basis <- as.matrix(ns(x,df=df,knots=knots,Boundary.knots=bound,
-      intercept=int)[,])
+    basis <- matrix(ns(x,df=df,knots=knots,Boundary.knots=bound,
+      intercept=int)[,],ncol=df)
     if(cen) basis <- sweep(basis,2,ns(cen,df=df,knots=knots,
       Boundary.knots=bound,intercept=int)[,],"-")
   } else basis <- as.matrix(rep(1,length(x)))
@@ -71,15 +67,15 @@ if(type=="ns")	{
 #######
 # IF NOT PROVIDED, KNOTS SET TO EQUALLY SPACED QUANTILES
 if(type=="bs")	{
-  if(df<degree+int) stop("df must be >=degree+int for type='bs'")
+  if(df<degree+int) df <- degree+int
   if(is.null(knots)&df>(degree+int)) {
     knots <- quantile(x,1/(df-int-degree+1)*1:((df-int)-degree),na.rm=TRUE)
   }
 	# IF NOT INTERCEPT-ONLY, CREATE THE BASIS, OTHERWISE A COLUMN OF 1'S
   if(df>=(1+int)) {
-    basis <- as.matrix(bs(x,df=df,degree=degree,knots=knots,
-      Boundary.knots=bound,intercept=int)[,])
-    if(cen ) basis <- sweep(basis,2,bs(cen,df=df,degree=degree,knots=knots,
+    basis <- matrix(bs(x,df=df,degree=degree,knots=knots,
+      Boundary.knots=bound,intercept=int)[,],ncol=df)
+    if(cen) basis <- sweep(basis,2,bs(cen,df=df,degree=degree,knots=knots,
       Boundary.knots=bound,intercept=int)[,],"-")
   } else basis <- as.matrix(rep(1,length(x)))
   if(cen==0) cen <- FALSE
@@ -98,10 +94,10 @@ if(type=="strata")	{
   }
   # CREATE A DESIGN MATRIX WITH DUMMY VARIABLES
   x <- cut(x,c(range[1],knots,range[2]+0.1),right=FALSE)
-  basis <- as.matrix(outer(x,levels(x),"==")+0)
+  basis <- matrix(outer(x,levels(x),"==")+0,ncol=length(levels(x)))
   # IF WITH INTERCEPT AND MORE THAN 1 COLUMN, ELIMINATE THE FIRST COLUMN
-  if(int==FALSE & !is.null(knots)) {
-  basis <- as.matrix(basis[,-1])
+  if(int==FALSE && !is.null(knots)) {
+  basis <- basis[,-1,drop=FALSE]
   }
   if(!is.null(knots)) df <- length(knots)+int
   bound <- NULL

@@ -1,7 +1,7 @@
 `crossbasis` <-
 function(x, lag=c(0,0), argvar=list(), arglag=list(), group=NULL, ...) {         
 
-# LAG MUST BE A POSITIVE INTEGER VECTOR, WITH 
+#  lag MUST BE A POSITIVE INTEGER VECTOR, WITH 
 if(!is.numeric(lag)||length(lag)>2||any(lag<0)) {
   stop("'lag' must a positive integer vector or scalar")
 }
@@ -56,6 +56,18 @@ The users are strongly suggested to adopt the new usage: see '?crossbasis'")
 # CREATE THE BASIS FOR THE PREDICTOR SPACE
 #############
 
+# x MUST BE A VECTOR OR MATRIX WITH NUMBER OF COLUMNS COMPATIBLE WITH lag
+# IF A VECTOR, x  IS TREATED AS A TIME SERIES
+# OTHERWISE, x IS TREATED AS A MATRIX OF LAGGED OCCURRENCES
+dim <- dim(as.matrix(x))
+if(!dim[2]%in%c(1L,diff(lag)+1L)) {
+  stop("ncol(x) must be equal to 1 (if x is a time series vector),
+otherwise to the lag period (for x as a matrix of lagged occurrences)")
+}
+
+# THE BASIS TRANSFORMATION CREATES DIFFERENT MATRICES DEPENDING THE DATA :
+#   IF TIME SERIES, EACH COLUMN CONTAINS THE UNLAGGED TRANSFORMATION
+#   IF NOT, EACH COLUMN CONTAINS THE TRANFORMATION FOR ALL THE LAGGED 
 basisvar <- do.call("onebasis",modifyList(argvar,list(x=x)))
 
 ############################################################################
@@ -89,24 +101,28 @@ basislag <- do.call("onebasis",modifyList(arglag,list(x=.seq(lag),cen=FALSE)))
 # CROSSBASIS COMPUTATION
 #############
 
-# RECOMPUTE ARGUMENTS FOR BASES, THEY MIGHT HAVE BEEN CHANGED BY onebasis
+# REDEFINE ARGUMENTS FOR BASES, THEY MIGHT HAVE BEEN CHANGED BY onebasis
 argvar <- attributes(basisvar)[names(attributes(basisvar))%in%
   c("type","df","degree","knots","bound","int","cen")]
 arglag <- attributes(basislag)[names(attributes(basislag))%in%
   c("type","df","degree","knots","bound","int","cen")]
 
-# COMPUTE CROSS-BASIS
-crossbasis <- matrix(0,nrow=length(x),ncol=argvar$df*arglag$df)
+# COMPUTE CROSS-BASIS:
+#   FOR TIME SERIES DATA, COMPUTE THE MATRIX OF LAGGED OCCURRENCES FIRST
+#   IF x WAS ALREADY A MATRIX, JUST RECOMPUTE THE APPROPRIATE DIMENSIONS
+crossbasis <- matrix(0,nrow=dim[1],ncol=argvar$df*arglag$df)
 for(v in seq(length=argvar$df)) {
-  mat <- as.matrix(Lag(basisvar[, v],.seq(lag)))
+  if(dim[2]==1L) {
+    mat <- as.matrix(Lag(basisvar[, v],.seq(lag)))
+  } else mat <- matrix(basisvar[,v],ncol=diff(lag)+1)
   for(l in seq(length=arglag$df)) {
     crossbasis[,argvar$df*(l-1)+v] <- mat%*%(basislag[,l])
-	}
+  }
 }
 
 # NAMES TO THE NEW CROSS-VARIABLES
-colnames(crossbasis) <- outer(paste("v",seq(length=argvar$df),sep=""),
-  paste("l",seq(length=arglag$df),sep=""), function(x,y) paste(x,y,sep="."))
+colnames(crossbasis) <- as.vector(outer(paste("v",seq(length=argvar$df),sep=""),
+  paste("l",seq(length=arglag$df),sep=""),paste,sep="."))
 
 ############################################################################
 # GROUP
@@ -114,6 +130,7 @@ colnames(crossbasis) <- outer(paste("v",seq(length=argvar$df),sep=""),
 
 # IF GROUP, JUST SET TO NA ALL THE FIRST  
 if(!is.null(group)) {
+  if(dim[2]>1L) stop("'group' allowed only for time series data")
   # FORCE GROUP TO FACTOR, ELIMINATE UNUSED LEVELS
   group <- factor(group)
   # FIRST COHERENCE CHECKS
