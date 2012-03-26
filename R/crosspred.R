@@ -97,6 +97,7 @@ if(all(model.class %in% c("lm"))) {
 # PREDVAR
 
 # SET PREDVAR FROM AT, FROM/TO/BY OR AUTOMATICALLY
+# IF at IS A MATRIX, PREDVAR IS ITS ROWNAMES (IF ANY) OR DEFAULT
 if(is.null(at)) {
   if(is.null(from)) from <- attr$range[1]
   if(is.null(to)) to <- attr$range[2]
@@ -105,46 +106,51 @@ if(is.null(at)) {
   if(is.null(by)) {
     predvar <- pretty
   } else predvar <- seq(from=min(pretty),to=max(pretty),by=by)
+} else if(is.matrix(at)) {
+  if(dim(at)[2]!=diff(attr$lag)+1L) stop("matrix in 'at' must have ncol=diff(lag)+1")
+  if(!is.null(rownames(at))||is.numeric(rownames(at))) {
+    predvar <- rownames(at)
+  } else predvar <- seq(nrow(at))
 } else predvar <- sort(unique(at))
-
-if(length(predvar)<attr$argvar$df+attr$argvar$int) {
-  stop("number of predicted values must be >= df+int in 'var'")
-}
 
 ##########################################################################
 # PREDICTION
 #############
 
-predvarbasis <- do.call("onebasis",c(list(x=predvar),attr$argvar))
-lagbasis <- do.call("onebasis",c(list(x=.seq(attr$lag)),attr$arglag))
+# EXPAND predlag IF A VECTOR HAS BEEN PROVIDED
+if(is.matrix(at)) {
+  matlag <- at
+} else matlag <- t(rep(1,diff(attr$lag)+1))%x%predvar 
+# CREATE THE BASIS FOR VAR AND LAG
+basisvar <- do.call("onebasis",c(list(x=matlag),attr$argvar))
+basislag <- do.call("onebasis",c(list(x=.seq(attr$lag)),attr$arglag))
 
-# CREATE THE MATRIX OF LAG-SPECIFIC EFFECTS AND SE
+# CREATE OVERAL, LAG-SPECIFIC AND (OPTIONAL) CUMULATIVE EFFECTS AND SE
 matfit <- matse <- matrix(0,length(predvar),diff(attr$lag)+1)
-for (i in 1:(diff(attr$lag)+1)) {
-  ZM <- predvarbasis %*% (lagbasis[i,,drop=FALSE] %x% diag(attr$argvar$df))
-  matfit[, i] <- ZM %*% coef
-  matse[, i] <- sqrt(diag(ZM %*% vcov %*% t(ZM)))
+ZMall <- 0
+if(cumul) {
+  cumfit <- cumse <- matrix(0,length(predvar),diff(attr$lag)+1)
+  ZMcum <- 0
 }
+for (i in 1:(diff(attr$lag)+1)) {
+  ind <- seq(length(predvar))+length(predvar)*(i-1)
+  ZM <- basislag[i,,drop=FALSE] %x% basisvar[ind,,drop=FALSE]
+  matfit[,i] <- ZM %*% coef
+  matse[,i] <- sqrt(diag(ZM %*% vcov %*% t(ZM)))
+  ZMall <- ZM+ZMall
+  if(cumul) {
+    cumfit[, i] <- ZMall %*% coef
+    cumse[, i] <- sqrt(diag(ZMall %*% vcov %*% t(ZMall)))
+  }
+}
+allfit <- as.vector(ZMall %*% coef)
+allse <- sqrt(diag(ZMall %*% vcov %*% t(ZMall)))
+
+# NAMES
 rownames(matfit) <- rownames(matse) <- predvar
 colnames(matfit) <- colnames(matse) <- outer("lag",.seq(attr$lag),paste,sep="")
-
-# CREATE THE VECTOR OF OVERALL EFFECTS AND SE
-ZM <- predvarbasis %*% (rep(1,diff(attr$lag)+1) %*% lagbasis %x% 
-  diag(attr$argvar$df))
-allfit <- as.vector(ZM %*% coef)
-allse <- sqrt(diag(ZM %*% vcov %*% t(ZM)))
 names(allfit) <- names(allse) <- predvar
-
-# MATRICES AND VECTORS FOR CUMULATIVE EFFECTS AND SE
-if(cumul==TRUE) {
-  cumfit <- cumse <- matrix(0,length(predvar),diff(attr$lag)+1)
-  for (i in 1:(diff(attr$lag)+1)) {
-    # THIS WAY, OTHERWISE ARRAY LOSES DIM IF 1 COL
-    ZM <- predvarbasis %*% (rep(1,i) %*% lagbasis[1:i,,drop=FALSE] %x%
-      diag(attr$argvar$df))
-    cumfit[, i] <- ZM %*% coef
-    cumse[, i] <- sqrt(diag(ZM %*% vcov %*% t(ZM)))
-  }
+if(cumul) {
   rownames(cumfit) <- rownames(cumse) <- predvar
   colnames(cumfit) <- colnames(cumse) <- outer("lag",.seq(attr$lag),paste,sep="")
 }
@@ -159,7 +165,7 @@ list$matfit <- matfit
 list$matse <- matse
 list$allfit <- allfit
 list$allse <- allse
-if(cumul==TRUE) {
+if(cumul) {
   list$cumfit <- cumfit
   list$cumse <- cumse
 }
@@ -175,7 +181,7 @@ if(model.link %in% c("log","logit")) {
   names(list$allRRlow) <- names(allfit)
   list$allRRhigh <- exp(allfit+z*allse)
   names(list$allRRhigh) <- names(allfit)
-  if(cumul==TRUE) {
+  if(cumul) {
     list$cumRRfit <- exp(cumfit)
     list$cumRRlow <- exp(cumfit-z*cumse)
     list$cumRRhigh <- exp(cumfit+z*cumse)

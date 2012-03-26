@@ -1,11 +1,30 @@
 ==============================================================================
+Changes in dlnm 1.6.0 (26 Mar 2012)
+===================================
+
+Major changes
+-------------
+
+    o crossbasis() and crosspred() now accept as 'x' argument also a matrix of    
+    exposure histories. The package now works also with non-time series data,
+    for example cohort or case-control data. The documentation will be changed
+    accordingly as soon as the methodological paper will be published.
+
+Minor changes
+-------------
+
+    o onebasis() now accepts vectors/matrices for less than df+int observations.
+      crosspred() and crossreduce() changed accordingly.
+
+
+==============================================================================
 Changes in dlnm 1.5.3 (21 Feb 2012)
 ===================================
 
 Minor changes
 -------------
 
-    o added as.vector(x) to constraint the type of first argument in 'onebasis'.
+    o added as.vector(x) to constraint the type of first argument in onebasis().
 
     o Change in colnames(crossbasis).
 
@@ -21,35 +40,35 @@ See also: file.show(system.file("Changesince151",package="dlnm"))
 Major changes
 -------------
 
-    o New function 'onebasis' to create the 1-dimensional basis matrices. The 
-      function is made available and documented. This replace 'mkbasis' and
-      'mklagbasis', which are kept only for compatibility. The functions returns
+    o New function onebasis() to create the 1-dimensional basis matrices. The 
+      function is made available and documented. This replace mkbasis() and
+      mklagbasis(), which are kept only for compatibility. The functions returns
       a matrix with attributes.
 
-    o The usage of 'crossbasis' has been extensively revised. Now the function
+    o The usage of crossbasis() has been extensively revised. Now the function
       has 2 arguments var and lag with a list of arguments for each space. Also,
       maxlag has been replaced by lag, defining the lag range (min and max). Old
       usage has been kept (with a warning) for compatibility reasons. 
 
-    o New function 'crossreduce' to reduce the fit to one of the 2 dimensions. 
+    o New function crossreduce() to reduce the fit to one of the 2 dimensions. 
       Methods functions (summary, plot, points, lines) are also included.
       
-    o	'crosspred' changed accordingly: now prediction also from simple basis,
-      and computation based on faster new method in 'crossreduce'.
+    o	crosspred() changed accordingly: now prediction also from simple basis,
+      and computation based on faster new method in crossreduce().
 
-    o Argument cenvalue eliminated from 'basis'-crossbasis': centering now
+    o Argument cenvalue eliminated from basis()-crossbasis(): centering now
       entirily determined by cen, which can be logical or numeric.
 	
 Minor changes
 -------------
 
-    o Bug fixed in 'onebasis' (previously 'mkbasis') for type hthr-lthr.
+    o Bug fixed in onebasis() (previously mkbasis()) for type hthr-lthr.
 
-    o Internal functions included: '.onAttach' and '.fci'.
+    o Internal functions included: .onAttach() and .fci().
 
-    o coef and vcov methods for 'crosspred' and 'crossreduce'.
+    o coef and vcov methods for crosspred() and crossreduce().
 
-    o	In 'onebasis'-'crossbasis': bound and cen argument now with no default.
+    o	In onebasis()-crossbasis(): bound and cen argument now with no default.
       degree=3 returned now for type='ns', similarly to the original function.
 
     o In plot functions: changed default of ptype, added default titles.

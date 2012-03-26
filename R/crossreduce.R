@@ -106,10 +106,6 @@ if(is.null(at)) {
   } else predvar <- seq(from=min(pretty),to=max(pretty),by=by)
 } else predvar <- sort(unique(at))
 
-if(length(predvar)<attr$argvar$df+attr$argvar$int) {
-  stop("number of predicted values must be >= df+int in 'var'")
-}
-
 ##########################################################################
 # REDUCTION
 
