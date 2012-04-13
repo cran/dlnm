@@ -10,7 +10,7 @@ Generate predictions from a distributed lag non-linear model (DLNM) for a set of
 
 \usage{
 crosspred(basis, model=NULL, coef=NULL, vcov=NULL, model.link=NULL,
-  at=NULL, from=NULL, to=NULL, by=NULL,  ci.level=0.95, cumul=FALSE)
+  at=NULL, from=NULL, to=NULL, by=NULL, bylag=1, ci.level=0.95, cumul=FALSE)
 
 \method{summary}{crosspred}(object, ...)
 }
@@ -20,7 +20,8 @@ crosspred(basis, model=NULL, coef=NULL, vcov=NULL, model.link=NULL,
   \item{model }{ a model object for which the prediction is desired. See Details below.}
   \item{coef, vcov, model.link }{ user-provided coefficients, (co)variance matrix and model link for the prediction. See Details below.}
   \item{at }{ vector of values used for prediction.}
-  \item{from, to, by }{ range of values and increment of the sequence used for prediction.}
+  \item{from, to}{ range of predictor values used for prediction.}
+  \item{by, bylag}{ increment of the sequences of predictor and lag values used for prediction.}
   \item{ci.level }{ confidence level for the computation of confidence intervals.}
   \item{cumul }{ logical. If \code{TRUE}, cumulative effects are predicted. See Details.}
   \item{object }{ an object of class \code{"crosspred"}.}
@@ -30,7 +31,7 @@ crosspred(basis, model=NULL, coef=NULL, vcov=NULL, model.link=NULL,
 \details{
 \code{model} is the model object including \code{basis}. It must include methods for \code{\link{coef}} and \code{\link{vcov}}, applied to extract the parameters. For \code{model} classes without these methods, the user can manually extract the related parameters and include them in \code{coef}-\code{vcov}, also specifying \code{model.link}. In this case, the dimensions and order of the first two must match the variables included in \code{basis}.
 
-The object \code{basis} must be the same containing the basis or cross-basis matrix included in \code{model}, preserving its attributes and class. The set of values for which predictions must be computed can be specified by \code{at} or alternatively  by \code{from}/\code{to}/\code{by}. If specified by \code{at}, the values are automatically ordered and made unique. If \code{at} and \code{by} are not provided, approximately 50 equally-spaced rounded values are returned using \code{\link{pretty}}.
+The object \code{basis} must be the same containing the basis or cross-basis matrix included in \code{model}, preserving its attributes and class. The set of values for which predictions must be computed can be specified by \code{at} or alternatively  by \code{from}/\code{to}/\code{by}. If specified by \code{at}, the values are automatically ordered and made unique. If \code{at} and \code{by} are not provided, approximately 50 equally-spaced rounded values are returned using \code{\link{pretty}}. \code{bylag} determines the lag step (forced to 1 for cumulative effects).
 
 The function can be used to compute predictions for models with simple basis functions not including lag, computed with \code{\link{onebasis}}. In this case, only unlagged predicted effects are returned.
 
@@ -45,6 +46,7 @@ For a detailed illustration of the use of the functions, see:
 A list object of class \code{"crosspred"} with the following (optional) components:
   \item{predvar }{ vector of observations used for prediction.}
   \item{lag }{ integer vector defining the lag range.}
+  \item{bylag }{ increment of the sequence of lag values.}
   \item{coef, vcov }{ coefficients and their variance-covariance matrix.}
   \item{matfit, matse }{ matrices of predicted effects and related standard errors for each value of \code{predvar} and lag.}
   \item{allfit, allse }{ vectors of overall predicted effects and related standard errors for each value of \code{predvar}.}

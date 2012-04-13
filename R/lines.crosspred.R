@@ -27,7 +27,7 @@ if(!is.null(lag)&&!is.numeric(lag)&&length(lag)>1&&ptype=="slices") {
 if(!is.null(var)&&!var%in%x$predvar&&(ptype=="slices")) {
   stop("'var' must match values used for prediction")
 }
-if(!is.null(lag)&&!lag%in%.seq(x$lag)&&(ptype=="slices")) {
+if(!is.null(lag)&&!lag%in%.seq(x$lag,x$bylag)&&(ptype=="slices")) {
   stop("'lag' must match values used for prediction")
 }
 if(!ci%in%c("area","bars","lines","n")) {
@@ -39,9 +39,13 @@ if(missing(ci.arg)) {
 if(!is.numeric(ci.level)||ci.level>=1||ci.level<=0) {
   stop("'ci.level' must be numeric and between 0 and 1")
 }
-if(cumul==TRUE&&is.null(x$cumfit)) {
-  stop("Cumulative outcomes can be plotted if predicted in the 'crosspred'
-  object. Set the argument 'cumul=TRUE' in the function crosspred()")
+if(cumul==TRUE) {
+  # SET THE LAG STEP EQUAL TO 1
+  x$bylag <- 1
+  if(is.null(x$cumfit)) {
+    stop("Cumulative outcomes can be plotted if predicted in the 'crosspred'
+object. Set the argument 'cumul=TRUE' in the function crosspred()")
+  }
 }
 if(!is.null(exp)&&!is.logical(exp)) stop("'exp' must be logical")
 
@@ -108,9 +112,9 @@ if(ptype=="slices") {
     plot.arg <- modifyList(plot.arg,list(...))		
 
     # PLOT CONFIDENCE INTERVALS (IF ANY)
-    .fci(ci=ci,x=.seq(x$lag),high=x$mathigh[xvar,],
+    .fci(ci=ci,x=.seq(x$lag,x$bylag),high=x$mathigh[xvar,],
       low=x$matlow[xvar,],ci.arg,plot.arg)
-    plot.arg <- modifyList(plot.arg,c(list(x=.seq(x$lag),
+    plot.arg <- modifyList(plot.arg,c(list(x=.seq(x$lag,x$bylag),
       y=x$matfit[xvar,])))
     do.call("lines",plot.arg)
   }

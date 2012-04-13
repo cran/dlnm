@@ -38,7 +38,7 @@ if((is.null(exp)&&x$model.link%in%c("log","logit"))||
 # GRAPH
 
 if(x$type=="var") {
-  xvar <- .seq(x$lag)
+  xvar <- .seq(x$lag,x$bylag)
 } else {
   xvar <- x$predvar
 }

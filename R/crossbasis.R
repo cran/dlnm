@@ -5,9 +5,8 @@ function(x, lag=c(0,0), argvar=list(), arglag=list(), group=NULL, ...) {
 if(!is.numeric(lag)||length(lag)>2||any(lag<0)) {
   stop("'lag' must a positive integer vector or scalar")
 }
-if(length(lag)==1L) {
-  lag <- c(0L,lag)
-} else if(diff(lag)<0L) stop("lag[1] must be <= lag[2]")
+if(length(lag)==1L) lag <- c(0L,lag)
+if(diff(lag)<0L) stop("lag[1] must be <= lag[2]")
 lag <- round(lag[1L:2L])
   
 if(!is.list(argvar)) stop("'var' must be a list")

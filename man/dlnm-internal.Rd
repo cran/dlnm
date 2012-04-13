@@ -10,7 +10,7 @@ These functions are called internally by other functions and are not meant to be
 \usage{
 .fci(ci, x, high, low, ci.arg, plot.arg, noeff=NULL)
 
-.seq(lag)
+.seq(lag, by=1)
 }
 
 \arguments{
@@ -20,7 +20,8 @@ These functions are called internally by other functions and are not meant to be
   \item{ci.arg }{ list of arguments to draw the confidence intervals.}
   \item{plot.arg }{ list of arguments of the main plot.}
   \item{noeff }{ reference value of the null effect.}
-  \item{lag }{ a numeric vector of length 2 specifying the lag period.}
+  \item{lag }{ a numeric vector of length 2 specifying the range of sequence.}
+  \item{by }{ increment of the sequence.}
 }
 
 \details{
