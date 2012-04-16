@@ -93,7 +93,7 @@ if(type=="strata")	{
     knots <- quantile(x,1/(df+1-int)*1:(df-int),na.rm=TRUE)
   }
   # CREATE A DESIGN MATRIX WITH DUMMY VARIABLES
-  x <- cut(x,c(range[1],knots,range[2]+0.1),right=FALSE)
+  x <- cut(x,c(range[1],knots,range[2]+0.0001),right=FALSE)
   basis <- matrix(outer(x,levels(x),"==")+0,ncol=length(levels(x)))
   # IF WITH INTERCEPT AND MORE THAN 1 COLUMN, ELIMINATE THE FIRST COLUMN
   if(int==FALSE && !is.null(knots)) {

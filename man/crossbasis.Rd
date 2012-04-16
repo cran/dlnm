@@ -89,7 +89,7 @@ summary(cb1.temp)
 library(splines)
 model1 <- glm(death ~ cb1.pm + cb1.temp + ns(time, 7*14) + dow,
 	family=quasipoisson(), chicagoNMMAPS)
-pred1.pm <- crosspred(cb1.pm, model1, at=0:20, cumul=TRUE)
+pred1.pm <- crosspred(cb1.pm, model1, at=0:20, bylag=0.2, cumul=TRUE)
 
 # PLOT THE LINEAR ASSOCIATION OF PM10 ALONG LAGS
 plot(pred1.pm, "slices", var=10, col=3, ylab="RR", ci.arg=list(density=15,lwd=2),

@@ -1,4 +1,21 @@
 ==============================================================================
+Changes in dlnm 1.6.1 (13 Apr 2012)
+===================================
+
+Major changes
+-------------
+
+    o Argument 'bylag' included in crosspred() and crossreduce() to define the
+      sequence of lag values used for prediction. It does not apply to
+      cumulative effects.
+
+Minor changes
+-------------
+
+    o Documentation changed accordingly.
+
+
+==============================================================================
 Changes in dlnm 1.6.0 (26 Mar 2012)
 ===================================
 
@@ -24,7 +41,7 @@ Changes in dlnm 1.5.3 (21 Feb 2012)
 Minor changes
 -------------
 
-    o added as.vector(x) to constraint the type of first argument in onebasis().
+    o Added as.vector(x) to constraint the type of first argument in onebasis().
 
     o Change in colnames(crossbasis).
 
@@ -75,7 +92,7 @@ Minor changes
 
     o In plots and documentation: effects changed to outcome-association.
 
-    o Documentation and examples changed accondingly with changed above.
+    o Documentation and examples changed accondingly with changes above.
 
 
 ==============================================================================

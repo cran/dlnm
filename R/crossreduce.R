@@ -1,6 +1,6 @@
 `crossreduce` <-
 function(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
-  model.link=NULL, at=NULL, from=NULL, to=NULL, by=NULL,	ci.level=0.95) {
+  model.link=NULL, at=NULL, from=NULL, to=NULL, by=NULL, bylag=1, ci.level=0.95) {
 
 list <- vector("list",0)
 name <- deparse(substitute(basis))
@@ -31,6 +31,9 @@ if(type!="overall") {
   if(is.null(value)) stop("'value' must be provided for type 'var' or 'lag'")
   else if(!is.numeric(value)||length(value)>1) {
     stop("'value' must be a numeric scalar")
+  }
+  if(type=="lag" && (any(value<attr$lag[1]) ||any(value>attr$lag[2]))) {
+    stop("'value' of lag-specific effects must be within the lag range")
   }
 } else value <- NULL
 
@@ -109,25 +112,19 @@ if(is.null(at)) {
 ##########################################################################
 # REDUCTION
 
-if(type=="var") predvar <- sort(unique(c(predvar,value)))
-if(type=="lag" && !value%in%.seq(attr$lag)) {
-  stop("'value' must match lag values used for estimation")
-}
-
-# CREATE VARBASIS AND LAGBASIS
-predvarbasis <- do.call("onebasis",c(list(x=predvar),attr$argvar))
-lagbasis <- do.call("onebasis",c(list(x=.seq(attr$lag)),attr$arglag))
-
 # CREATE TRANSFORMATION MATRIX AND BASIS
 if(type=="overall") {
+  lagbasis <- do.call("onebasis",c(list(x=.seq(attr$lag)),attr$arglag))
   M <- (t(rep(1,diff(attr$lag)+1)) %*% lagbasis) %x% diag(attr$argvar$df)
-  newbasis <- predvarbasis
+  newbasis <- do.call("onebasis",c(list(x=predvar),attr$argvar))
 }else if(type=="lag") {
-  M <- lagbasis[(.seq(attr$lag))%in%value,,drop=FALSE] %x% diag(attr$argvar$df)
-  newbasis <- predvarbasis
+  lagbasis <- do.call("onebasis",c(list(x=value),attr$arglag))
+  M <- lagbasis %x% diag(attr$argvar$df)
+  newbasis <- do.call("onebasis",c(list(x=predvar),attr$argvar))
 } else if(type=="var") {
-  M <- diag(attr$arglag$df) %x% predvarbasis[predvar%in%value,,drop=FALSE]
-  newbasis <- lagbasis
+  varbasis <- do.call("onebasis",c(list(x=value),attr$argvar))
+  M <- diag(attr$arglag$df) %x% varbasis
+  newbasis <- do.call("onebasis",c(list(x=.seq(attr$lag,bylag)),attr$arglag))
 }
 
 # CREATE NEW SET OF COEF AND VCOV
@@ -154,6 +151,7 @@ list$type <- type
 list$value <- value
 if(type!="var") list$predvar <- predvar
 list$lag <- attr$lag
+list$bylag <- bylag
 list$fit <- fit
 list$se <- se
 

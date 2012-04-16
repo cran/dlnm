@@ -36,4 +36,4 @@ function(ci, x, high, low, ci.arg, plot.arg, noeff=NULL) {
 }
 
 `.seq` <-
-function(lag) lag[1]:lag[2]
+function(lag,by=1) seq(from=lag[1],to=lag[2],by=by)

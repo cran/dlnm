@@ -19,7 +19,7 @@ function(object, ...) {
   if(!is.null(attr$argvar$bound)) cat("boundary knots at",attr$argvar$bound,"\n")
   if(attr$argvar$cen==FALSE) {
     cat("not centered","\n")
-  } else cat("centered on",attr$argvar$cen,"\n")
+  } else cat("centered at",attr$argvar$cen,"\n")
   cat(ifelse(attr$argvar$int==TRUE,"with","without"),"intercept\n")
   
   cat("\nBASIS FOR LAG:\n")

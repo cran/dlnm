@@ -1,6 +1,11 @@
 `crossplot` <-
 function(crosspred, type="3d", cumul=FALSE, ci="area",
   var=NULL, lag=NULL, ylim=NULL, title=NULL, label="var") {
+  
+  
+warning("The function 'crossplot' has been replaced by method functions for class
+'crosspred' since version 1.3.0, and kept only for compatibility reasons.
+The users are strongly suggested to use the new functions\n")
 
 if(!type%in%c("slices","3d","contour","overall")) {
   stop("type must be one of 'slices','3d','contour','overall'")
@@ -222,10 +227,6 @@ if(type=="3d") {
     ltheta=290,shade=0.75,r=sqrt(3),d=5)
   par(mar=mar.old)
 }
-
-warning("The function 'crossplot' has been replaced by method functions for class
-'crosspred' since version 1.3.0, and kept only for compatibility reasons.
-The users are strongly suggested to use the new functions\n")
 
 }
 

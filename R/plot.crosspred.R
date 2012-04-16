@@ -32,7 +32,7 @@ if((!is.null(var)&!is.null(lag))&&length(var)!=length(lag)&&ptype=="slices") {
 if(!is.null(var)&&sum(var%in%x$predvar)!=length(var)&&(ptype=="slices")) {
   stop("'var' must match values used for prediction")
 }
-if(!is.null(lag)&&sum(lag%in%.seq(x$lag))!=length(lag)&&(ptype=="slices")) {
+if(!is.null(lag)&&sum(lag%in%.seq(x$lag,x$bylag))!=length(lag)&&(ptype=="slices")) {
   stop("'lag' must match values used for prediction")
 }
 if(!ci%in%c("area","bars","lines","n")) {
@@ -44,9 +44,13 @@ if(missing(ci.arg)) {
 if(!is.numeric(ci.level)||ci.level>=1||ci.level<=0) {
   stop("'ci.level' must be numeric and between 0 and 1")
 }
-if(cumul==TRUE&&is.null(x$cumfit)) {
-  stop("Cumulative outcomes can be plotted if predicted in the 'crosspred'
+if(cumul==TRUE) {
+  # SET THE LAG STEP EQUAL TO 1
+  x$bylag <- 1
+  if(is.null(x$cumfit)) {
+    stop("Cumulative outcomes can be plotted if predicted in the 'crosspred'
 object. Set the argument 'cumul=TRUE' in the function crosspred()")
+  }
 }
 if(!is.null(exp)&&!is.logical(exp)) stop("'exp' must be logical")
 
@@ -143,11 +147,11 @@ if(ptype=="slices") {
       plot.arg <- modifyList(plot.arg,list(...))		
 
       # SET CONFIDENCE INTERVALS
-      ci.list <- list(panel.first=call(".fci",ci=ci,x=.seq(x$lag),
+      ci.list <- list(panel.first=call(".fci",ci=ci,x=.seq(x$lag,x$bylag),
         high=x$mathigh[xvar[i],],low=x$matlow[xvar[i],],ci.arg,plot.arg,
         noeff=noeff))
       plot.arg <- modifyList(plot.arg,c(ci.list,
-        list(x=.seq(x$lag),y=x$matfit[xvar[i],])))
+        list(x=.seq(x$lag,x$bylag),y=x$matfit[xvar[i],])))
       if(length(lag)+length(var)>1) {
         plot.arg$main <- ""
         plot.arg$xlab <- "Lag"
@@ -195,7 +199,7 @@ if(ptype=="contour") {
   col2 <- colorRampPalette(c("white","red"))
   col <- c(col1(sum(levels<noeff)),col2(sum(levels>noeff)))
 
-  filled.contour(x=x$predvar,y=.seq(x$lag),z=x$matfit,col=col,
+  filled.contour(x=x$predvar,y=.seq(x$lag,x$bylag),z=x$matfit,col=col,
     levels=levels,...)
 }
 
@@ -211,7 +215,8 @@ if(ptype=="3d") {
     ylab="Lag",	zlab="Outcome",col="lightskyblue",
     zlim=c(min(x$matfit),max(x$matfit)),ltheta=290,shade=0.75,r=sqrt(3),d=5)
   plot.arg <- modifyList(plot.arg,list(...))
-  plot.arg <- modifyList(plot.arg,list(x=x$predvar,y=.seq(x$lag),z=x$matfit))
+  plot.arg <- modifyList(plot.arg,list(x=x$predvar,y=.seq(x$lag,x$bylag),
+    z=x$matfit))
 
   # PLOT
   do.call("persp",plot.arg)

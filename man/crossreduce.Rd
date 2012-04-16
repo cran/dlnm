@@ -10,7 +10,7 @@ Reduce the fit of a bi-dimensional DLNM to summaries defined in the the dimensio
 
 \usage{
 crossreduce(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
-  model.link=NULL, at=NULL, from=NULL, to=NULL, by=NULL,  ci.level=0.95)
+  model.link=NULL, at=NULL, from=NULL, to=NULL, by=NULL, bylag=1, ci.level=0.95)
   
 \method{summary}{crossreduce}(object, ...)
 }
@@ -19,10 +19,11 @@ crossreduce(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
   \item{basis }{ an object of class \code{"crossbasis"}.}
   \item{model }{ a model object for which the reduction and prediction are desired. See Details below.}
   \item{coef, vcov, model.link }{ user-provided coefficients, (co)variance matrix and model link for the reduction and then prediction. See Details below.}
-  \item{type }{ type of reduction. Possible options are \code{"overall"} (default) or \code{"lag"} for reduction to the predictor space of overall or lag-specific effects, or \code{"var"} fror reduction to the lag space. See Details below.}
+  \item{type }{ type of reduction. Possible options are \code{"overall"} (default) or \code{"lag"} for reduction to the predictor space of overall or lag-specific effects, or \code{"var"} for reduction to the lag space of predictor-specific effects. See Details below.}
   \item{value }{ the single value of predictor or lag for which predictor-specific or lag-specific functions must be defined, respectively. See Details below.}
   \item{at }{ vector of values used for prediction in the dimension of predictor.}
-  \item{from, to, by }{ range of values and increment of the sequence used for prediction in the dimension of predictor.}
+  \item{from, to}{ range of predictor values used for prediction.}
+  \item{by, bylag}{ increment of the sequences of predictor and lag values used for prediction.}
   \item{ci.level }{ confidence level for the computation of confidence intervals.}
   \item{object }{  an object of class \code{"crossreduce"}.}
   \item{\dots }{ additional arguments to be passed to \code{summary}.}
@@ -33,7 +34,7 @@ crossreduce(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
 
 The dimension to which the fit is reduced is chosen by \code{type}, computing summaries for overall or lag-specific effects in the predictor dimension, or predictor-specific effects in the lag dimension. For specific effects, the value at which the reduction is computed is chosen by \code{value}. The function then re-express the original fit of the model, defined by the parameters of the bi-dimensional cross-basis functions, in summaries defined by the one-dimensional basis for the related space and a (usually smaller) set of modified parameters.
 
-Similarly to \code{\link{crosspred}}, the object \code{basis} must be the same containing the cross-basis matrix included in \code{object}, including its attributes and class. The optional arguments \code{at} and \code{from}/\code{to}/\code{by} provides the values for predicted effects when the reduction is in the dimension of predictor, and exponentiated outcomes and confidence intervals are also optionally returned (see \code{\link{crosspred}}).
+Similarly to \code{\link{crosspred}}, the object \code{basis} must be the same containing the cross-basis matrix included in \code{object}, including its attributes and class. The optional arguments \code{at} and \code{from}/\code{to}/\code{by} provides the values for predicted effects when the reduction is in the dimension of predictor. \code{bylag} determines istead the increment of the sequence of lag values. Exponentiated outcomes and confidence intervals are also optionally returned. See \code{\link{crosspred}} for details.
 
 For a detailed illustration of the use of the functions, see:
 
@@ -47,6 +48,7 @@ A list object of class \code{"crossreduce"} with the following (optional) compon
   \item{type, value }{ type of reduction and (optional) value, as arguments above.}
   \item{predvar }{ vector of observations used for prediction, if the reduction is in the dimension of predictor.}
   \item{lag }{ integer vector defining the lag range.}
+  \item{bylag }{ increment of the sequence of lag values.}
   \item{fit, se }{ vectors of predicted effects and related standard errors.}
   \item{RRfit }{ vector of exponentiated predicted effects from \code{fit}.}
   \item{RRlow, RRhigh }{ vectors with low and high confidence intervals for \code{RRfit}.}
