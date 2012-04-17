@@ -1,4 +1,21 @@
 ==============================================================================
+Changes in dlnm 1.6.2 (17 Apr 2012)
+===================================
+
+Major changes
+-------------
+
+    o Bug fixed in onebasis() regarding the argument 'cen'. Now cen=0 and 
+      cen=FALSE do not return the same value, and in the former the centering
+      is acknowledged by summary(). Thanks to Yasushi Honda.
+
+Minor changes
+-------------
+
+    o Documentation changed accordingly.
+
+
+==============================================================================
 Changes in dlnm 1.6.1 (13 Apr 2012)
 ===================================
 

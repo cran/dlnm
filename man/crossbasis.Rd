@@ -24,7 +24,7 @@ crossbasis(x, lag=c(0,0), argvar=list(), arglag=list(), group=NULL, ...)
 }
 
 \details{
-Until version 1.5.0, the function adopted a completely different usage, with different arguments. The compatibility of the old code is retained by the additional arguments passed through \code{...}. The users are however suggested to adopt the current usage.
+Until version 1.5.0, the function adopted a completely different usage, with different arguments. The compatibility of the old code is retained by the additional arguments passed through \code{...}. Users are however suggested to adopt the current usage.
 
 The arguments in \code{argvar} and \code{arglag} (optionally including \code{type}, \code{df}, \code{degree}, \code{knots}, \code{bound}, \code{int}, \code{cen}) define two set of basis functions for each dimension. The function \code{\link{onebasis}} is called internally, to build the related basis matrices. The \code{argvar} list is applied to \code{x}, in order to generate the matrix for the space of the predictor. The \code{arglag} list is applied to a new vector given by the sequence obtained by \code{lag}, in order to generate the matrix for the space of lags. Then, the two set of basis matrices are combined in order to create the related cross-basis matrix. See \code{\link{onebasis}} for additional information on how to specify each basis.
 
@@ -78,8 +78,8 @@ See \code{\link{dlnm-package}} for an overview of the package and type \code{'vi
 ### lag function: strata intervals at lag 0 and 1-3 for temperature
 
 # CREATE THE CROSS-BASIS FOR EACH PREDICTOR AND CHECK WITH SUMMARY
-cb1.pm <- crossbasis(chicagoNMMAPS$pm10, lag=15, argvar=list(type="lin",
-  cen=FALSE), arglag=list(type="poly",degree=4))
+cb1.pm <- crossbasis(chicagoNMMAPS$pm10, lag=15, argvar=list(type="lin",cen=0),
+  arglag=list(type="poly",degree=4))
 cb1.temp <- crossbasis(chicagoNMMAPS$temp, lag=3, argvar=list(df=5,cen=21),
   arglag=list(type="strata",knots=1))
 summary(cb1.pm)

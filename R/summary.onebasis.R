@@ -12,9 +12,9 @@ function(object, ...) {
     cat("df:",attr$df,", knots at:",attr$knots,"\n")
   } else cat("df:",attr$df,"\n")
   if(!is.null(attr$bound)) cat("boundary knots at",attr$bound,"\n")
-  if(attr$cen==FALSE) {
+  if(is.logical(attr$cen)&&!attr$cen) {
     cat("not centered","\n")
-  } else cat("centered on",attr$cen,"\n")
+  } else cat("centered at",attr$cen,"\n")
   cat(ifelse(attr$int==TRUE,"with","without"),"intercept\n")
 }
 
