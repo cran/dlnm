@@ -302,13 +302,13 @@ In this first example, we specify a simple DLM, assessing the effect of \PM{} on
 First, we run \Rfun{crossbasis} to build the two cross-basis matrices, saving them in two objects. The names of the two objects must be different in order to predict the effects separately for each of them (see Section~\ref{sec:crosspred}). This is the code:
 
 <<example1crossbasis>>=
-cb1.pm <- crossbasis(chicagoNMMAPS$pm10, lag=15, argvar=list(type="lin",
-  cen=FALSE), arglag=list(type="poly",degree=4))
+cb1.pm <- crossbasis(chicagoNMMAPS$pm10, lag=15, argvar=list(type="lin",cen=0),
+  arglag=list(type="poly",degree=4))
 cb1.temp <- crossbasis(chicagoNMMAPS$temp, lag=3, argvar=list(df=5,cen=21),
   arglag=list(type="strata",knots=1))
 @
 
-The function calls \Rfun{onebasis} and passes the arguments in \Rarg{argvar} and \Rarg{arglag} to build the basis for predictor and lags, respectively. In this case, we assume that the effect of \PM{} is linear (\Rarg{type="lin"}), while we model the relationship with temperature through a natural cubic spline with 5 degrees of freedom (\Rarg{type="ns"}, chosen by default). In this space, the internal knots (if not provided) are placed by default at equally spaced quantiles, while the boundary knots are located at the range of the observed values, so we need to specify only \Rarg{df}. We did not center \PM{}, in order to compute the predicted effects versus a reference value of 0 \microg{} (the same results could be obtained setting \Rarg{cen=0}). The reference value for temperature is set to 21\Ctemp{}.
+The function calls \Rfun{onebasis} and passes the arguments in \Rarg{argvar} and \Rarg{arglag} to build the basis for predictor and lags, respectively. In this case, we assume that the effect of \PM{} is linear (\Rarg{type="lin"}), while we model the relationship with temperature through a natural cubic spline with 5 degrees of freedom (\Rarg{type="ns"}, chosen by default). In this space, the internal knots (if not provided) are placed by default at equally spaced quantiles, while the boundary knots are located at the range of the observed values, so we need to specify only \Rarg{df}. We center \PM{} and temperature to 0 \microg{} and 21\Ctemp{}, respectively, in order to compute the predicted effects versus these reference values.
 
 Regarding the bases for the space of the lags, we specify the lagged effect of PM\textsubscript{10} up to 15 days of lag (minimum lag equal to 0 by default), with a 4\textsuperscript{th} degree polynomial function (setting \texttt{degree=4}). The delayed effect of temperature are defined by two lag strata (0 and 1-3), assuming the effects as constant within each stratum. The argument \Rarg{knots=1} defines the lower boundary of the second interval.
 
@@ -446,8 +446,8 @@ In this example we specify a more complex DLNM, where the effects are estimated 
 These are the cross-basis matrices:
 
 <<example3crossbasis>>=
-cb3.pm <- crossbasis(chicagoNMMAPS$pm10, lag=1, argvar=list(type="lin",
-  cen=FALSE), arglag=list(type="strata"))
+cb3.pm <- crossbasis(chicagoNMMAPS$pm10, lag=1, argvar=list(type="lin",cen=0),
+  arglag=list(type="strata"))
 cb3.temp <- crossbasis(chicagoNMMAPS$temp, lag=30, argvar=list(type="bs",
   df=5,degree=2,cen=21), arglag=list(df=5))
 @
@@ -599,7 +599,7 @@ The DLNM's framework introduced here is developed for time series design. The ge
 
 This work is supported by the Medical Research Council (UK), Research Grants RES-G0701030 and RES-G1002296.
 
-We gratefully acknowledge the valuable suggestions of Fabio Frascati regarding the procedures to build and document this package. Other package vignettes were used as examples (in particular \Rpkg{gnm} by Heather Turner and David Firth). The data used in the package was collected and made freely available by the NMMAPS researchers, and reproduced with their permission. We are thankful to the colleagues who tested beta-versions of this package and suggested some important improvements included in the current version (in particular Marie-France Valois, Adrian Barnett and Michela Leone).
+We gratefully acknowledge the valuable suggestions of Fabio Frascati regarding the procedures to build and document this package. Other package vignettes were used as examples (in particular \Rpkg{gnm} by Heather Turner and David Firth). The data used in the package was collected and made freely available by the NMMAPS researchers, and reproduced with their permission. We are thankful to the colleagues who have tested and continue to test this package, suggesting improvements or identifying bugs (in particular Marie-France Valois, Adrian Barnett, Michela Leone, Yasushi Honda).
 
 Finally, we express our gratitude to all the people working to develop and maintain the \R{} Project.
 

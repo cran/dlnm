@@ -39,7 +39,7 @@ if(!is.null(knots)) {
 }
 
 # CENTERING VALUE
-if(is.logical(cen)) cen <- ifelse(cen,mean(x,na.rm=TRUE),0)
+if(is.logical(cen)&&cen) cen <- mean(x,na.rm=TRUE)
 
 ###########################################################################
 
@@ -55,11 +55,10 @@ if(type=="ns")	{
   if(df>=(1+int)) {
     basis <- matrix(ns(x,df=df,knots=knots,Boundary.knots=bound,
       intercept=int)[,],ncol=df)
-    if(cen) basis <- sweep(basis,2,ns(cen,df=df,knots=knots,
+    if(!is.logical(cen)) basis <- sweep(basis,2,ns(cen,df=df,knots=knots,
       Boundary.knots=bound,intercept=int)[,],"-")
   } else basis <- as.matrix(rep(1,length(x)))
   degree <- 3
-  if(cen==0) cen <- FALSE
 }
 
 #######
@@ -75,10 +74,9 @@ if(type=="bs")	{
   if(df>=(1+int)) {
     basis <- matrix(bs(x,df=df,degree=degree,knots=knots,
       Boundary.knots=bound,intercept=int)[,],ncol=df)
-    if(cen) basis <- sweep(basis,2,bs(cen,df=df,degree=degree,knots=knots,
-      Boundary.knots=bound,intercept=int)[,],"-")
+    if(!is.logical(cen)) basis <- sweep(basis,2,bs(cen,df=df,degree=degree,
+      knots=knots,Boundary.knots=bound,intercept=int)[,],"-")
   } else basis <- as.matrix(rep(1,length(x)))
-  if(cen==0) cen <- FALSE
 }
 
 ##########
@@ -110,10 +108,9 @@ if(type=="strata")	{
 ########
 # THE NUMBER OF KNOTS CAN BE USED TO SPECIFY THE DF (NKNOTS+1+INT)
 if(type=="poly")	{
-  basis <- outer(x-(cen),(1-int):(df-int),"^")
+  basis <- outer(x-cen,(1-int):(df-int),"^")
   knots <- NULL
   bound <- NULL
-  if(cen==0) cen <- FALSE
 }
 
 ###########
@@ -195,7 +192,6 @@ if(type=="lin")	{
   knots <- NULL
   bound <- NULL
   degree <- NULL
-  if(cen==0) cen <- FALSE
 }
 
 ##########################################################################

@@ -24,7 +24,7 @@ onebasis(x, type="ns", df=1, degree=1, knots=NULL, bound, int=FALSE, cen)
   \item{knots }{ knots location for the basis function. They specify the position of the internal knots for \code{"ns"} and \code{"bs"}, the cut-off points for \code{"strata"} (defining right-open intervals) and the threshold(s)/cut-off points for \code{"lthr"}, \code{"hthr"} and \code{"dthr"}. If provided, are automatically ordered and made unique, determining the value of \code{df}. If only \code{df} is provided, \code{knots} are placed at equally spaced quantiles.}
   \item{bound }{ boundary knots (sometimes called external knots). Used only for \code{type} equal to \code{"ns"} and \code{"bs"}. Default to the range of the variable.}
   \item{int }{ logical. If \code{TRUE}, an 'intercept' is included in the basis matrix, with different meanings depending on \code{type} above: see Details below.}
-  \item{cen }{ logical or a numeric scalar. It specifies the value the basis functions for the space of predictor are centered to, then used as a reference for predictions. See Note below.}
+  \item{cen }{ logical or a numeric scalar. It specifies the value the basis functions for the space of predictor are centered at, then used as a reference for predictions. See Note below.}
   \item{object }{ a object of class \code{"onebasis"}.}
   \item{\dots }{ additional arguments to be passed to \code{summary}.}
 }

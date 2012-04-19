@@ -87,8 +87,8 @@ See \code{\link{dlnm-package}} for an overview of the package and type \code{'vi
 ### lag function: single strata at lag 0-1 for PM10
 
 # CREATE THE CROSS-BASIS FOR EACH PREDICTOR AND CHECK WITH SUMMARY
-cb3.pm <- crossbasis(chicagoNMMAPS$pm10, lag=1, argvar=list(type="lin",
-  cen=FALSE), arglag=list(type="strata"))
+cb3.pm <- crossbasis(chicagoNMMAPS$pm10, lag=1, argvar=list(type="lin",cen=0),
+  arglag=list(type="strata"))
 cb3.temp <- crossbasis(chicagoNMMAPS$temp, lag=30, argvar=list(type="bs",
   df=5,degree=2,cen=21), arglag=list(df=5))
 summary(cb3.pm)

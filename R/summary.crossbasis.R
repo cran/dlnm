@@ -17,7 +17,7 @@ function(object, ...) {
     cat("df:",attr$argvar$df,", knots at:",attr$argvar$knots,"\n")
   } else cat("df:",attr$argvar$df,"\n")
   if(!is.null(attr$argvar$bound)) cat("boundary knots at",attr$argvar$bound,"\n")
-  if(attr$argvar$cen==FALSE) {
+  if(is.logical(attr$argvar$cen)&&!attr$argvar$cen) {
     cat("not centered","\n")
   } else cat("centered at",attr$argvar$cen,"\n")
   cat(ifelse(attr$argvar$int==TRUE,"with","without"),"intercept\n")
