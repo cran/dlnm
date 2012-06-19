@@ -1,6 +1,7 @@
 `crossreduce` <-
 function(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
-  model.link=NULL, at=NULL, from=NULL, to=NULL, by=NULL, bylag=1, ci.level=0.95) {
+  model.link=NULL, at=NULL, from=NULL, to=NULL, by=NULL, lag, bylag=1,
+  ci.level=0.95) {
 
 list <- vector("list",0)
 name <- deparse(substitute(basis))
@@ -36,6 +37,21 @@ if(type!="overall") {
     stop("'value' of lag-specific effects must be within the lag range")
   }
 } else value <- NULL
+
+#  lag MUST BE A POSITIVE INTEGER VECTOR, BY DEFAULT THAT USED FOR ESTIMATION
+if(missing(lag)) {
+  lag <- attr$lag
+} else {
+  if(lag!=attr$lag && attr$arglag$type=="integer") {
+    stop("prediction for lag sub-period not allowed for type 'integer'")
+  }
+  if(!is.numeric(lag)||length(lag)>2||any(lag<0)) {
+    stop("'lag' must a positive integer vector or scalar")
+  }
+  if(length(lag)==1L) lag <- c(0L,lag)
+  if(diff(lag)<0L) stop("lag[1] must be <= lag[2]")
+  lag <- round(lag[1L:2L])
+}
 
 if(!is.null(at)&&!is.numeric(at)) stop("'at' must be numeric")
 if(!is.null(from)&&!is.numeric(from)) stop("'from' must be numeric")
@@ -114,7 +130,7 @@ if(is.null(at)) {
 
 # CREATE TRANSFORMATION MATRIX AND BASIS
 if(type=="overall") {
-  lagbasis <- do.call("onebasis",c(list(x=.seq(attr$lag)),attr$arglag))
+  lagbasis <- do.call("onebasis",c(list(x=.seq(lag)),attr$arglag))
   M <- (t(rep(1,diff(attr$lag)+1)) %*% lagbasis) %x% diag(attr$argvar$df)
   newbasis <- do.call("onebasis",c(list(x=predvar),attr$argvar))
 }else if(type=="lag") {
@@ -124,7 +140,7 @@ if(type=="overall") {
 } else if(type=="var") {
   varbasis <- do.call("onebasis",c(list(x=value),attr$argvar))
   M <- diag(attr$arglag$df) %x% varbasis
-  newbasis <- do.call("onebasis",c(list(x=.seq(attr$lag,bylag)),attr$arglag))
+  newbasis <- do.call("onebasis",c(list(x=.seq(lag,bylag)),attr$arglag))
 }
 
 # CREATE NEW SET OF COEF AND VCOV
@@ -139,7 +155,7 @@ dimnames(newvcov) <- list(colnames(newbasis),colnames(newbasis))
 fit <- as.vector(newbasis%*%newcoef)
 se <- sqrt(diag(newbasis%*%newvcov%*%t(newbasis)))
 if(type=="var") {
-  names(fit) <- names(se) <- outer("lag",.seq(attr$lag),paste,sep="")
+  names(fit) <- names(se) <- outer("lag",.seq(lag,bylag),paste,sep="")
 }else names(fit) <- names(se) <- predvar
 
 ###########################################################################
@@ -150,7 +166,7 @@ list$newbasis <- newbasis
 list$type <- type
 list$value <- value
 if(type!="var") list$predvar <- predvar
-list$lag <- attr$lag
+list$lag <- lag
 list$bylag <- bylag
 list$fit <- fit
 list$se <- se

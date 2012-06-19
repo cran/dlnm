@@ -5,7 +5,7 @@
 \title{ Generate a Cross-Basis Matrix for a DLNM }
 
 \description{
-Generate the basis matrices for the two dimensions of predictor and lags, choosing among a set of possible basis functions. Then, these functions are combined in order to create the related cross-basis matrix, which can be included in a model formula to fit a distributed lag non-linear model (DLNM).
+The function generates the basis matrices for the two dimensions of predictor and lags, choosing among a set of possible basis functions. Then, these functions are combined in order to create the related cross-basis matrix, which can be included in a model formula to fit a distributed lag non-linear model (DLNM).
 }
 
 \usage{
@@ -93,11 +93,11 @@ pred1.pm <- crosspred(cb1.pm, model1, at=0:20, bylag=0.2, cumul=TRUE)
 
 # PLOT THE LINEAR ASSOCIATION OF PM10 ALONG LAGS
 plot(pred1.pm, "slices", var=10, col=3, ylab="RR", ci.arg=list(density=15,lwd=2),
-	main="Effects of a 10-unit increase in PM10 along lags")
+	main="Association with a 10-unit increase in PM10")
 plot(pred1.pm, "slices", var=10, cumul=TRUE, ylab="Cumulative RR",
-	main="Cumulative effects of a 10-unit increase in PM10 along lags")
+	main="Cumulative association with a 10-unit increase in PM10")
 
-# GET THE FIGURES FOR THE OVERALL EFFECTS, WITH CI
+# GET THE FIGURES FOR THE OVERALL CUMULATIVE ASSOCIATION, WITH CI
 pred1.pm$allRRfit["10"]
 cbind(pred1.pm$allRRlow, pred1.pm$allRRhigh)["10",]
 

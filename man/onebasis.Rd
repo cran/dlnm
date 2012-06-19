@@ -7,7 +7,7 @@
 \title{ Generate a Basis Matrix for Different Functions }
 
 \description{
-Generate the basis matrix for a predictor vector, choosing among a set of possible basis functions. Specifically, different types of splines, polynomials, strata and linear threshold functions.
+The function generates the basis matrix for a predictor vector, choosing among a set of possible basis functions. Specifically, different types of splines, polynomials, strata and linear threshold functions.
 }
 
 \usage{
@@ -21,8 +21,8 @@ onebasis(x, type="ns", df=1, degree=1, knots=NULL, bound, int=FALSE, cen)
   \item{type }{ type of basis. See Details below for the list of possible choices.}
   \item{df }{ dimension of the basis, equivalent to number of degrees of freedom. They depend on \code{knots} if provided, or on \code{degree} for \code{type="poly"}.}
   \item{degree }{ degree of polynomial. Used only for \code{type} equal to \code{"bs"} (degree of the piecewise polynomial for the B-spline) or \code{"poly"} (degree of the polynomial).}
-  \item{knots }{ knots location for the basis function. They specify the position of the internal knots for \code{"ns"} and \code{"bs"}, the cut-off points for \code{"strata"} (defining right-open intervals) and the threshold(s)/cut-off points for \code{"lthr"}, \code{"hthr"} and \code{"dthr"}. If provided, are automatically ordered and made unique, determining the value of \code{df}. If only \code{df} is provided, \code{knots} are placed at equally spaced quantiles.}
-  \item{bound }{ boundary knots (sometimes called external knots). Used only for \code{type} equal to \code{"ns"} and \code{"bs"}. Default to the range of the variable.}
+  \item{knots }{ knots location for the basis function. They specify the position of the internal knots for \code{"ns"} and \code{"bs"}, the internal cut-off points for \code{"strata"} (defining right-open intervals) and the threshold(s)/cut-off points for \code{"lthr"}, \code{"hthr"} and \code{"dthr"}. If provided, are automatically ordered and made unique, determining the value of \code{df}. If only \code{df} is provided, \code{knots} are placed at equally spaced quantiles.}
+  \item{bound }{ boundary knots (sometimes called external knots) for \code{type} equal to \code{"ns"} and \code{"bs"}, or external boundaries for \code{type} equal \code{"strata"}. Default to the range of the variable.}
   \item{int }{ logical. If \code{TRUE}, an 'intercept' is included in the basis matrix, with different meanings depending on \code{type} above: see Details below.}
   \item{cen }{ logical or a numeric scalar. It specifies the value the basis functions for the space of predictor are centered at, then used as a reference for predictions. See Note below.}
   \item{object }{ a object of class \code{"onebasis"}.}
@@ -36,11 +36,11 @@ The value in \code{type} defines the basis function. It must  be one of:
 
 \bold{\code{"bs"}}: B-splines characterized by \code{degree} (degree of the piecewise polynomial). Specified by \code{knots} (internal knots) and \code{bound} (boundary or external knots). If \code{knots} is provided, the dimension \code{df} is set to \code{length(knots)+degree+int}; if not, \code{df} must be higher than \code{degree+int}. An intercept is included if \code{int=T} (corresponding to a vector of 1's if \code{df=1}, involving a more complex parameterization for \code{df>1}). See the functions \code{\link[splines]{bs}} for additional information. The transformed variables can be centered by \code{cen}.
 
-\bold{\code{"strata"}}: strata variables (dummy parameterization) determined by internal cut-off values specified in \code{knots}, which represent the lower boundaries for the right-open intervals. Intervals containing no observation are automatically discarded. If \code{knots} is provided, the dimension \code{df} is set to \code{length(knots)+int}. A dummy variable for the reference stratum (the first one by default) is included if \code{int=T}, generating a full rank basis. Never centered.
+\bold{\code{"strata"}}: strata variables (dummy parameterization) determined by cut-off values specified in \code{knots} and \code{bound}, which represent the boundaries for right-open intervals. If \code{knots} is provided, the dimension \code{df} is set to \code{length(knots)+int}. A dummy variable for the reference stratum (the first one by default) is included if \code{int=T}. Never centered.
 
 \bold{\code{"poly"}}: polynomial with power specified by \code{degree}. The dimension \code{df} is set to to \code{degree+int}. An intercept, corresponding to a vector of 1's (the power 0 of the polynomial) is included if \code{int=T}. The transformed variables can be centered by \code{cen}.
 
-\bold{\code{"integer"}}: strata variables (dummy parameterization) for each integer values, expressly created to specify an unconstrained function in the space of lags. \code{df} is set automatically to the number of integer values minus 1 plus \code{int}. A dummy variable for the reference stratum (the first one by default) is included if \code{int=T}, generating a full rank basis. Never centered.
+\bold{\code{"integer"}}: strata variables (dummy parameterization) for each integer values, expressly created to specify an unconstrained function in the space of lags. \code{df} is set automatically to the number of integer values minus 1 plus \code{int}. A dummy variable for the reference stratum (the first one by default) is included if \code{int=T}. Never centered.
 
 \bold{\code{"hthr"}}, \bold{\code{"lthr"}}: high and low threshold parameterization, with a linear relationship above or below the threshold, respectively, and flat otherwise. The threshold is chosen by \code{knots}: if more than one is provided, a piecewise linear relationship is applied above the first knot or below the last one, respectively, with the slope changing at each further knot. \code{df} is automatically set to \code{length(knots)+int}. An intercept (corresponding to a vector of 1's) is included if \code{int=T}. Never centered.
 
@@ -83,7 +83,7 @@ See \code{\link{dlnm-package}} for an overview of the package and type \code{'vi
 }
 
 \examples{
-### relationship between PM10 and mortality: strata
+### relationship between PM10 and mortality estimated by a step function
 b <- onebasis(chicagoNMMAPS$pm10, "strata", knots=c(20,40))
 summary(b)
 model <- glm(death ~ b, family=quasipoisson(), chicagoNMMAPS)

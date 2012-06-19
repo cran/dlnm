@@ -22,12 +22,12 @@ High and low-level method functions for graphs of predictions from reduced distr
   \item{ci }{ type of confidence intervals representation: one of \code{"area"}, \code{"bars"}, \code{"lines"} or \code{"n"}. Default to \code{"area"} in high level functions, \code{"n"} for low-level functions.}
   \item{ci.arg }{ list of arguments to be passed to low-level plotting functions to draw the confidence intervals. See Details.}
   \item{ci.level }{ confidence level for the computation of confidence intervals.}
-  \item{exp }{ logical. It forces the choice about the exponentiation of effects. See Details.}
+  \item{exp }{ logical. It forces the choice about the exponentiation. See Details.}
   \item{\dots }{ optional graphical arguments. See Details.}
 }
 
 \details{
-Differently than for plotting functions for \code{crosspred} objects (see \code{\link{plot.crosspred}}), the type of the plot is automatically chosen by the dimension and values over which the model has been reduced. Namely, the overall or lag-specific effects along chosen values of the predictor, or predictor-specific effects along lags.
+Differently than for plotting functions for \code{crosspred} objects (see \code{\link{plot.crosspred}}), the type of the plot is automatically chosen by the dimension and value at which the model has been reduced. Namely, the lag-specific association at the chosen lag value, the predictor-specific association at the chosen predictor value, or the overall cumulative association.
 
 These methods allow a great flexibility in the choice of graphical parameters, specified through arguments of the original plotting functions. See \code{\link[graphics]{plot.default}}, \code{\link[graphics]{lines}} and \code{\link[graphics]{points}} for information on additional graphical arguments. Some arguments, if not specified, are set to different default values than the original functions.
 
@@ -45,7 +45,7 @@ Gasparrini A., Armstrong, B., Kenward M. G. Reducing and meta-analyzing estimate
 \author{Antonio Gasparrini, \email{antonio.gasparrini@lshtm.ac.uk}}
 
 \note{
-All the predictions are plotted using a reference value corresponding to the centering point for continuous functions or to the default values for the other options (see \code{\link{onebasis}} and \code{\link{crossbasis}}). Exponentiated predicted outcomes are returned by default if \code{x$model.link} is equal to \code{log} or \code{logit}.
+All the predictions are plotted using a reference value corresponding to the centering point for continuous functions or to the default values for the other options (see \code{\link{onebasis}} and \code{\link{crossbasis}}). Exponentiated predictions are returned by default if \code{x$model.link} is equal to \code{log} or \code{logit}.
 }
 
 \seealso{
@@ -65,7 +65,7 @@ model4 <- glm(death ~  cb4 + ns(time, 7*14) + dow,
   family=quasipoisson(), chicagoNMMAPS)
 pred4 <- crosspred(cb4, model4, by=1)
 
-# REDUCE TO OVERALL ASSOCIATION
+# REDUCE TO OVERALL CUMULATIVE ASSOCIATION
 redall <- crossreduce(cb4, model4)
 summary(redall)
 # REDUCE TO LAG-SPECIFIC ASSOCIATION FOR LAG 5
@@ -75,14 +75,14 @@ redvar <- crossreduce(cb4, model4, type="var", value=33)
 
 # NUMBER OF PARAMETERS OF THE ORIGINAL MODEL
 length(coef(pred4))
-# REDUCED NUMBER OF PARAMETERS FOR OVERALL AND LAG-SPECIFIC ASSOCIATIONS
+# NUMBER OF PARAMETERS FOR OVERALL CUMULATIVE AND LAG-SPECIFIC SUMMARIES
 length(coef(redall)) ; length(coef(redlag))
-# REDUCED NUMBER OF PARAMETERS FOR PREDICTOR-SPECIFIC ASSOCIATIONS
+# NUMBER OF PARAMETERS FOR PREDICTOR-SPECIFIC SUMMARY
 length(coef(redvar))
 
 # TEST: IDENTICAL FIT BETWEEN ORIGINAL AND REDUCED FIT
 plot(pred4, "overall", xlab="Temperature", ylab="RR",
-  ylim=c(0.8,1.6), main="Overall effects")
+  ylim=c(0.8,1.6), main="Overall cumulative association")
 lines(redall, ci="lines",col=4,lty=2)
 legend("top",c("Original","Reduced"),col=c(2,4),lty=1:2,ins=0.1)
 
@@ -92,7 +92,7 @@ pred4b <- crosspred(b4,coef=coef(redvar),vcov=vcov(redvar),model.link="log",by=1
 
 # TEST: IDENTICAL FIT BETWEEN ORIGINAL, REDUCED AND RE-CONSTRUCTED
 plot(pred4, "slices", var=33, ylab="RR", ylim=c(0.9,1.2),
-  main="Predictor-specific effects at 33C")
+  main="Predictor-specific association at 33C")
 lines(redvar, ci="lines", col=4, lty=2)
 points(pred4b, col=1, pch=19, cex=0.6)
 legend("top",c("Original","Reduced","Reconstructed"),col=c(2,4,1),lty=c(1:2,NA),

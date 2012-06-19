@@ -1,4 +1,30 @@
 ==============================================================================
+Changes in dlnm 1.6.3 (19 June 2012)
+===================================
+
+Major changes
+-------------
+
+    o Argument 'lag' included in crosspred() and crossreduce(), to define
+      sub-periods of lag on which predict. Useful for computing overall
+      cumulative effects on different portions of the lag period.
+
+    o Second example in vignette about seasonal analysis has been corrected. Now
+      the model includes also a term for trend, forgotten so far.
+
+    o Terminology in documentation largely revised.
+
+Minor changes
+-------------
+
+    o In onebasis(), now strata defined by 'bound', not range, and reported.
+
+    o Bug fixed in names assignment to objects in crossreduce().
+
+    o Bug fixed in crosspred() for argument 'bylag'.
+
+
+==============================================================================
 Changes in dlnm 1.6.2 (17 Apr 2012)
 ===================================
 
@@ -40,9 +66,9 @@ Major changes
 -------------
 
     o crossbasis() and crosspred() now accept as 'x' argument also a matrix of    
-    exposure histories. The package now works also with non-time series data,
-    for example cohort or case-control data. The documentation will be changed
-    accordingly as soon as the methodological paper will be published.
+      exposure histories. The package now works also with non-time series data,
+      for example cohort or case-control data. The documentation will be changed
+      accordingly as soon as the methodological paper will be published.
 
 Minor changes
 -------------
@@ -140,14 +166,14 @@ Major changes
 -------------
 
     o	Argument 'ci.arg' added to plotting functions. Now it is possible to 
-	(almost) completely specify the confidence intervals display.
+	    (almost) completely specify the confidence intervals display.
 
     o	onAttach function added, to display a message when the package is
-	attached.
+	    attached.
 
     o	Dependencies revised: splines excluded from Depends, and accordingly
-	library(splines) included in examples and vignette. Also excluded 
-	graphics and stats, already imported.
+	    library(splines) included in examples and vignette. Also excluded 
+	    graphics and stats, already imported.
 	
 Minor changes
 -------------
@@ -163,7 +189,7 @@ Minor changes
 -------------
 
     o	Argument 'group' of crossbasis() forced to define consecutive
-	series. Documentation changed accordingly.
+	    series. Documentation changed accordingly.
 
 
 ==============================================================================
@@ -174,25 +200,25 @@ Major changes
 -------------
 
     o	Function crossplot() replaced by method functions plot(), lines()
-	and points() for class ‘crosspred’. The user can now flexibly 
-	choose all the arguments through '...' to modify axes, colours,
-	labels etc.
+    	and points() for class ‘crosspred’. The user can now flexibly 
+	    choose all the arguments through '...' to modify axes, colours,
+	     labels etc.
 
     o	Arguments 'coef', 'vcov' and 'model.link' added to crosspred(), to
-	provide the user a way to manually include the parameters for 
-	models without methods for coef() and vcov().
+	    provide the user a way to manually include the parameters for 
+	    models without methods for coef() and vcov().
 
     o	Improved routine for automatic selection of rounded values used for
-	prediction in crosspred() with 'at'-'from'-'to'-'by'.
+	    prediction in crosspred() with 'at'-'from'-'to'-'by'.
 	
 Minor changes
 -------------
 
     o	Included 'ci.level' in crosspred() and plot() method and 'ci="n"'
-	in plot() method for no confidence intervals.
+	    in plot() method for no confidence intervals.
 
     o	Improved model parameters extraction method in crosspred() through
-	regular expressions.
+	    regular expressions.
 
     o	Added class "matrix" to crossbasis objects.
 
@@ -215,7 +241,7 @@ Major changes
 -------------
 
     o	mkbasis substantially revised: now 'int' unrelated to df,
-	then relation 'type'-'df'-'int' more logical.
+    	then relation 'type'-'df'-'int' more logical.
 
 
 ==============================================================================
@@ -260,18 +286,18 @@ Major changes
 -------------
 
     o	New argument 'group' in crossbasis() to generate functions for
-	each sub-group defined by the factor.
+    	each sub-group defined by the factor.
 
     o	crosspred() now works also with lm, gam (mgcv), gee (geepack),
-	clogit and coxph (survival).
+    	clogit and coxph (survival).
 
     o	change in mkbasis: now knots also outside range, but for types
-	"strata" and "-thr" there's the chance to generate collinear
-	variables: included a warning in help for crossbasis().
+    	"strata" and "-thr" there's the chance to generate collinear
+    	variables: included a warning in help for crossbasis().
 
     o	Vignette 'dlnmOverview" rearranged with new examples, one of 
-	them on seasonal analysis. Reference to new paper Gasparrini
-	2010 Stat Med.
+    	them on seasonal analysis. Reference to new paper Gasparrini
+    	2010 Stat Med.
 
 Minor changes
 -------------
@@ -297,12 +323,12 @@ Major changes
 -------------
 
     o	The estimate of the cumulative effects along lags has been
-	included in crosspred() and can be plotted with crossplot()
-	setting 'cumul=T'.
+    	included in crosspred() and can be plotted with crossplot()
+    	setting 'cumul=T'.
 
     o	The confidence intervals for 'type' equal to "slices" or
-	"overall" can be now represented both by "area" (default),
-	"bars" or "lines", by the argument 'ci' in crossplot().
+    	"overall" can be now represented both by "area" (default),
+    	"bars" or "lines", by the argument 'ci' in crossplot().
 
 Minor changes
 -------------
@@ -328,20 +354,20 @@ Major changes
 -------------
 
     o	The dataset chicagoNMMAPS has been added, relaxing the dependence
-	on the package NMMAPSlite. Now the examples can be run using
-	these data and without an internet connection.
+    	on the package NMMAPSlite. Now the examples can be run using
+    	these data and without an internet connection.
 
     o	The function crosspred() has been improved: now there is no
-	constraint on the range of the predicted values. Moreover, the
-	values 'model.class' and 'model.link' have been added. The
-	command now works also when the estimation is carried out by
-	'clogit()'.
+    	constraint on the range of the predicted values. Moreover, the
+    	values 'model.class' and 'model.link' have been added. The
+    	command now works also when the estimation is carried out by
+    	'clogit()'.
 
 Minor changes
 -------------
 
     o	The section 'Functions' in the vignette 'dlnmOverview' has been
-	reduced: a reference to the functions help pages has been added.
+    	reduced: a reference to the functions help pages has been added.
 
     o	Help pages, examples and vignette changed accordingly.
 
@@ -354,12 +380,12 @@ Major changes
 -------------
 
     o	The argument 'degree' included in mkbasis()-crossbasis(),
-	defining the degree of the unconstrained B-spline ('type' equal 
-	to 'bs') or the maximum power of the polynomial ('type' equal to 
-	'poly').
+    	defining the degree of the unconstrained B-spline ('type' equal 
+    	to 'bs') or the maximum power of the polynomial ('type' equal to 
+    	'poly').
 
     o	Linear piecewise function above a threshold included for
- 	type='hthr'/'lthr'; added an example in help pages and vignette.
+    	type='hthr'/'lthr'; added an example in help pages and vignette.
 
 Improvements
 ------------
@@ -367,7 +393,7 @@ Improvements
     o	Automatic knot selection also for thr-type functions
 
     o	New example related to the changes above in the help pages and
- 	in the vignette
+     	in the vignette
 
     o	Improved error messages in mkbasis() and mklagbasis()
 
@@ -380,16 +406,16 @@ Minor changes
 -------------
 
     o	Double threshold type changed from 'thr' to 'dthr'; added an
- 	error message in mkbasis() to explain the change.
+     	error message in mkbasis() to explain the change.
 
     o	For type='dthr', knots choice when more than 2 changed from first
- 	two to first and last ones. 
+     	two to first and last ones. 
 
     o	Basis choices changed in example3 in order to show a quadratic
- 	spline.
+     	spline.
 
     o	Examples for mkbasis()-mklagbasis() expanded in help pages and
- 	vignette.
+     	vignette.
 
     o	Help pages, examples and vignette changed accordingly.
 
@@ -404,8 +430,8 @@ Major changes
     o	A contour/level plot has been added to crossplot().
 
     o	The option 'bs' has been added to the argument 'type' of
-	mkbasis()-crossbasis(), to specify a cubic spline without
-	natural constraints.
+    	mkbasis()-crossbasis(), to specify a cubic spline without
+    	natural constraints.
 
 Improvements
 ------------
@@ -425,7 +451,7 @@ Corrections
 -----------
 
     o	Original series of pollutants in NNMAPS data given by *tmean
-	and *mtrend, not *mean and *trend. Corrected
+    	and *mtrend, not *mean and *trend. Corrected
 
 
 ==============================================================================
@@ -455,18 +481,18 @@ Improvements
     o	Intercept added to type equal to 'thr', 'hthr', 'lhr', and 'lin'
 
     o	The vector 'predvar' of predictor values for which the prediction
- 	must be performed, included in crosspred(), is now automatically
-	ordered and made unique.
+     	must be performed, included in crosspred(), is now automatically
+    	ordered and made unique.
 
 Fixed bugs
 ----------
 
     o	Two links to mkbasis() and mklagbasis() added to the help of
-	crossbasis() in order to let the internal functions help page
-	available
+    	crossbasis() in order to let the internal functions help page
+    	available
 
     o	par(par.old) included in 'type="slices"' for crossplot() in order
- 	to redifine a single plot after the command
+     	to redifine a single plot after the command
 
     o	Error messages added to mkbasis() if argument types are wrong
 
@@ -474,12 +500,12 @@ Minor changes
 -------------
 
     o	Default value for argument 'lagbound' of crossbasis() changed
- 	from	c(-1,maxlag) to c(0,maxlag).
+     	from	c(-1,maxlag) to c(0,maxlag).
 
     o	Help pages changed accordingly with the new features.
 
     o	The example 2 (in crosspred()) the threshold has been set to
- 	40.3, in order to show the ordering functionality.
+     	40.3, in order to show the ordering functionality.
 
 
 ==============================================================================
