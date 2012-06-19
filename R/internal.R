@@ -1,9 +1,9 @@
 `.onAttach` <- function(lib, pkg) {
   meta <- packageDescription("dlnm")
-  #attachmsg <- paste("This is dlnm ",meta$Version,
-  # ". For details: help(dlnm) and vignette('dlnmOverview').",sep="")
-  attachmsg <- paste("Important changes since version 1.5.1\nSee:",
-    "'file.show(system.file('Changesince151',package='dlnm'))'")
+  attachmsg <- paste("This is dlnm ",meta$Version,
+    ". For details: help(dlnm) and vignette('dlnmOverview').",sep="")
+  #attachmsg <- paste("Important changes since version 1.5.1\nSee:",
+  # "'file.show(system.file('Changesince151',package='dlnm'))'")
   packageStartupMessage(attachmsg, domain = NULL, appendLF = TRUE)
 }
 

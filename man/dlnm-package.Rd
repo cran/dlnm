@@ -20,7 +20,7 @@ Method functions are available for both objects \code{"crosspred"} and \code{"cr
 
 The DLNM framework is developed for time series data: the data are assumed to be an equally-spaced, complete and ordered series of observations, where the interval defines the lag unit. The estimation can be carried out with the default regression functions, such as \code{\link{lm}}, \code{\link{glm}} or \code{gam} (package \pkg{mgcv}). The function \code{\link{crosspred}} extracts the relevant parameters directly from the model object if methods for \code{\link{coef}} and \code{\link{vcov}} are available for that model class. Alternatively, the user must extract the parameters manually.
 
-Potential applications to other study desing and data structures are currently under evaluation. Preliminary results for matched case-control and cohort data are promising, and the functions included in the package already works with \code{clogit} and \code{coxph} (package \pkg{survival}).
+Potential applications to other study desing and data structures are currently under evaluation. Preliminary results for matched case-control and cohort data are promising, and the functions included in the package already work with \code{clogit} and \code{coxph} (package \pkg{survival}).
 
 Additonal information on the package \pkg{dlnm} are available in the vignette included in the installation. This document offers a detailed description of the capabilities of the package, and some examples of application to real data, with an extensive illustration of the use of the functions. The vignette is available by typing:
 
@@ -44,7 +44,7 @@ Gasparrini A. Distributed lag linear and non-linear models in R: the package dln
   
 Gasparrini A., Armstrong, B.,Kenward M. G. Distributed lag non-linear models. \emph{Statistics in Medicine}. 2010; \bold{29}(21):2224-2234. [freely available \href{http://www.ncbi.nlm.nih.gov/pubmed/20812303}{here}]
 
-Armstrong, B. Models for the relationship between ambient temperature and daily mortality. \emph{Epidemiology}. 2006, \bold{17}(6):624-31.
+Armstrong, B. Models for the relationship between ambient temperature and daily mortality. \emph{Epidemiology}. 2006, \bold{17}(6):624-31. [available \href{http://www.ncbi.nlm.nih.gov/pubmed/17028505}{here}]
 }
 
 \keyword{package}

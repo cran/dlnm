@@ -1,7 +1,7 @@
 `crossbasis` <-
 function(x, lag=c(0,0), argvar=list(), arglag=list(), group=NULL, ...) {         
 
-#  lag MUST BE A POSITIVE INTEGER VECTOR, WITH 
+#  lag MUST BE A POSITIVE INTEGER VECTOR 
 if(!is.numeric(lag)||length(lag)>2||any(lag<0)) {
   stop("'lag' must a positive integer vector or scalar")
 }
