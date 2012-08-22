@@ -3,7 +3,7 @@ citHeader("To cite the R package 'dlnm' in publications use:")
 citEntry(
   entry = "Article",
   title ="Distributed lag linear and non-linear models in {R}: the package {dlnm}",
-  author = personList(as.person("Gasparrini A.")),
+  author = personList(as.person("A. Gasparrini")),
   journal = "Journal of Statistical Software",
   year = "2011",
   volume = "43",
@@ -19,28 +19,28 @@ citEntry(
 
 citEntry(
 	entry="Article",
- 	author = personList(as.person("Gasparrini A."),as.person("Armstrong B."),as.person("Kenward M. G.")),
+ 	author = personList(as.person("A. Gasparrini"),as.person("B. Armstrong"),as.person("M. G. Kenward")),
 	title= "Distributed lag non-linear models",
  	journal="Statistics in Medicine",
 	volume= "29",
 	number="21",
 	pages="2224--2234",
 	year="2010",
-	textVersion=paste("Gasparrini A., Armstrong, B., Kenward M. G.",
+	textVersion=paste("Gasparrini A., Armstrong, B., Kenward M.G.",
     "Distributed lag non-linear models.",
     "Statistics in Medicine. 2010; 29(21):2224-2234")
 )
 
 citEntry(
 	entry="Article",
-	author = personList(as.person("Armstrong B.")),
+	author = personList(as.person("B. Armstrong")),
 	title= "Models for the relationship between ambient temperature and daily mortality",
 	journal="Epidemiology",
 	volume= "17",
 	number="6",
 	pages="624--631",
 	year="2006",
-	textVersion=paste("Armstrong B.",
+	textVersion=paste("B. Armstrong",
   "Models for the relationship between ambient temperature and daily mortality.",
   "Epidemiology. 2010, 17(6):624-631.")
 )

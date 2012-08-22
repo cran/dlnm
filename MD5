@@ -1,4 +1,4 @@
-214fd109b01daa8307b5d8c759cf7f2d *DESCRIPTION
+80232b95823a8a6dc7b5b48b4087017a *DESCRIPTION
 f793562712b9d87f265b877b40528cfe *NAMESPACE
 64c6d1314854c56e45f9e32a0b7c4ff2 *R/coef.crosspred.R
 e5451575ccb5141563974f7397f7d4d4 *R/coef.crossreduce.R
@@ -23,12 +23,13 @@ a0c342ae7ff5428453c6f2f665fa856a *R/summary.crossreduce.R
 4f122cc6f66dfc7777f8b8eaca64e872 *R/vcov.crosspred.R
 01296f98f338bd52cfe6ddd26f9bb9d8 *R/vcov.crossreduce.R
 792bf189497a463eca4352a91b753049 *data/chicagoNMMAPS.rda
-1c882ebc02fd42dac1f652745e252fee *inst/CITATION
-666cb7b97108b4770f287b3cd58a228c *inst/ChangeLog
+1255a85082f5189de0765f2a0edfc5cd *inst/CITATION
+d9f473eb6ec9d661ca5872fb777d6cd2 *inst/ChangeLog
 1aab4e9b2569ab0e05097ed1c6549b56 *inst/Changesince151
+15478b340a8362bb79fd2a6ea0dde1a0 *inst/desktop.ini
 7c6e52a55efec81fde034f641a00d39e *inst/doc/biblioVignette.bib
 4f6bb59f749f8aacd458d7c46e3dbdaf *inst/doc/dlnmOverview.Rnw
-59e3e759dbaecae64c41f5e1ba298f8f *inst/doc/dlnmOverview.pdf
+1a5680647d3f610b731b668da282c01e *inst/doc/dlnmOverview.pdf
 d26b3046aee51f30812ca769bdc25997 *man/chicagoNMMAPS.Rd
 6b08ee357a14f3df9a10f13c197ae3df *man/coef.crosspred.Rd
 b608215adb48a05935972a09893dd322 *man/crossbasis.Rd
