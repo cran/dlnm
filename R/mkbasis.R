@@ -1,10 +1,17 @@
+###
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2013
+#
 `mkbasis` <-
 function(x, type="ns", df=1, degree=1, knots=NULL, bound=range(x),
   int=FALSE, cen=TRUE, cenvalue=mean(x)) {
-  
+#
+################################################################################
+#
 warning("the functions 'mkbasis' and 'mklagbasis' has been replaced since version
 1.5.0 by the new function 'onebasis', and only kept for compatibility reasons.
 The users are strongly suggested to apply the new function: see '?onebasis'")
+  
+
 
 # CREATE AN EMPTY LIST
 list <- vector("list",0)

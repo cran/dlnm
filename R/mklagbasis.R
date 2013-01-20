@@ -1,7 +1,12 @@
+###
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2013
+#
 `mklagbasis` <-
 function(maxlag=0, type="ns", df=1, degree=1, knots=NULL,
   bound=c(0,maxlag), int=TRUE) {
-
+#
+################################################################################
+#
 # MAXLAG MUST BE >=0
 if(!is.numeric(maxlag)||maxlag<0) {
   stop("maxlag must be numeric and >= 0")

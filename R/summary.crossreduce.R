@@ -1,14 +1,19 @@
+###
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2013
+#
 `summary.crossreduce` <-
 function(object, ...) {
-
+#
+################################################################################
+#
   cat("REDUCED FIT\n")
   cat("dimension:",ifelse(is.null(object$var),"predictor","lag"),"\n")
   if(object$type!="overall") cat("value:",ifelse(is.null(object$var),
     paste("lag",object$lag),paste("var",object$var)),"\n")
   cat("reduced df:",length(coef(object)),"\n")
-
+#
   cat("\nBASIS:\n")
-  attr <- attributes(object$newbasis)
+  attr <- attributes(object$basis)
   cat("type:",attr$type)
   if(!is.null(attr$degree)) cat(" with degree",attr$degree)
   cat("\n")
@@ -18,7 +23,7 @@ function(object, ...) {
   if(!is.null(attr$bound)) cat("boundary knots at",attr$bound,"\n")
   if(!is.null(attr$cen)&&attr$cen==TRUE) cat("centered on",attr$cen,"\n")
   if(attr$int==TRUE) cat("with intercept\n")
-  
+#  
   cat("\nPREDICTIONS:\n")
   if(object$type!="var") cat("values:",length(object$predvar),"\n")
   if(object$type!="var") cat("range:",min(object$predvar),",",
@@ -27,4 +32,3 @@ function(object, ...) {
   cat("exponentiated:",ifelse(!is.null(object$RRfit),"yes","no"),"\n")
   cat("\n")
 }
-

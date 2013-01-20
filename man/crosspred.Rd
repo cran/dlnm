@@ -48,7 +48,7 @@ A list object of class \code{"crosspred"} with the following (optional) componen
   \item{predvar }{ vector of observations used for prediction.}
   \item{lag }{ integer vector defining the lag range used for prediction.}
   \item{bylag }{ increment of the sequence of lag values.}
-  \item{coef, vcov }{ coefficients and their variance-covariance matrix.}
+  \item{coefficients, vcov }{ coefficients and their variance-covariance matrix.}
   \item{matfit, matse }{ matrices of specific predicted associations and related standard errors at each value of \code{predvar} and lag.}
   \item{allfit, allse }{ vectors of the overall cumulative predicted association and related standard errors at each value of \code{predvar} in the chosen lag period.}
   \item{cumfit, cumse }{ matrices of incremental cumulative predicted associations along lags and related standard errors at each value of \code{predvar} and lag. Computed if \code{cumul=TRUE}.}
@@ -65,9 +65,9 @@ The function \code{\link{summary.crosspred}} returns a summary of the list.
 }
 
 \references{
-Gasparrini A. Distributed lag linear and non-linear models in R: the package dlnm. \emph{Journal of Statistical Software}. 2011; \bold{43}(8):1-20. [freely available \href{http://www.jstatsoft.org/v43/i08/}{here}].
+Gasparrini A. Distributed lag linear and non-linear models in R: the package dlnm. \emph{Journal of Statistical Software}. 2011; \bold{43}(8):1-20. [freely available \href{http://www.ag-myresearch.com/jss2011.html}{here}].
   
-Gasparrini A., Armstrong, B.,Kenward M. G. Distributed lag non-linear models. \emph{Statistics in Medicine}. 2010; \bold{29}(21):2224-2234. [freely available \href{http://www.ncbi.nlm.nih.gov/pubmed/20812303}{here}]
+Gasparrini A., Armstrong, B.,Kenward M. G. Distributed lag non-linear models. \emph{Statistics in Medicine}. 2010; \bold{29}(21):2224-2234. [freely available \href{http://www.ag-myresearch.com/statmed2010}{here}]
 }
 
 \author{Antonio Gasparrini, \email{antonio.gasparrini@lshtm.ac.uk}}

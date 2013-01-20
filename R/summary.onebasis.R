@@ -1,6 +1,11 @@
+###
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2013
+#
 `summary.onebasis` <-
 function(object, ...) {
-
+#
+################################################################################
+#
   attr <- attributes(object)
   cat("BASIS FUNCTION\n")
   cat("observations:",nrow(object),"\n")
@@ -17,4 +22,3 @@ function(object, ...) {
   } else cat("centered at",attr$cen,"\n")
   cat(ifelse(attr$int==TRUE,"with","without"),"intercept\n")
 }
-
