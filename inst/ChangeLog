@@ -1,4 +1,19 @@
 ==============================================================================
+Changes in dlnm 1.6.5 (20 Jan 2013)
+===================================
+
+Minor changes
+-------------
+
+    o URL link added in Description file. Copyright statement added in each
+      function.
+
+    o Updated citations.
+
+    o Documentation changed accordingly.
+
+
+==============================================================================
 Changes in dlnm 1.6.4 (22 Aug 2012)
 ===================================
 
@@ -210,7 +225,7 @@ Major changes
 -------------
 
     o	Function crossplot() replaced by method functions plot(), lines()
-    	and points() for class ‘crosspred’. The user can now flexibly 
+    	and points() for class ?crosspred?. The user can now flexibly 
 	    choose all the arguments through '...' to modify axes, colours,
 	     labels etc.
 

@@ -45,8 +45,8 @@ For a detailed illustration of the use of the functions, see:
 
 \value{
 A list object of class \code{"crossreduce"} with the following (optional) components:
-  \item{newcoef, newvcov }{ reduced parameters of the original fitted model for the chosen dimension.}
-  \item{newbasis }{ basis matrix computed at \code{predvar} or for the sequence of lags defined by \code{lag}, depending on the chosen dimension.}
+  \item{coefficients, vcov }{ reduced parameters of the original fitted model for the chosen dimension.}
+  \item{basis }{ basis matrix computed at \code{predvar} or for the sequence of lags defined by \code{lag}, depending on the chosen dimension.}
   \item{type, value }{ type of reduction and (optional) value, as arguments above.}
   \item{predvar }{ vector of observations used for prediction, if the reduction is in the dimension of predictor.}
   \item{lag }{ integer vector defining the lag range.}
@@ -60,7 +60,11 @@ A list object of class \code{"crossreduce"} with the following (optional) compon
 }
 
 \references{
-Gasparrini A., Armstrong, B., Kenward M. G. Reducing and meta-analyzing estimates from distributed lag non-linear models. 2012; (Submitted).
+Gasparrini A., Armstrong, B., Kenward M. G. Reducing and meta-analyzing estimates from distributed lag non-linear models.\emph{BMC Medical Research Methodology}. 2013; \bold{13}(1):1. [freely available \href{http://www.ag-myresearch.com/bmcmrm2013}{here}].
+
+Gasparrini A. Distributed lag linear and non-linear models in R: the package dlnm. \emph{Journal of Statistical Software}. 2011; \bold{43}(8):1-20. [freely available \href{http://www.ag-myresearch.com/jss2011}{here}].
+  
+Gasparrini A., Armstrong, B.,Kenward M. G. Distributed lag non-linear models. \emph{Statistics in Medicine}. 2010; \bold{29}(21):2224-2234. [freely available \href{http://www.ag-myresearch.com/statmed2010}{here}]
 }
 
 \author{Antonio Gasparrini, \email{antonio.gasparrini@lshtm.ac.uk}}

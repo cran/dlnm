@@ -1,4 +1,11 @@
-`.onAttach` <- function(lib, pkg) {
+###
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2013
+#
+`.onAttach` <- 
+function(lib, pkg) {
+#
+################################################################################
+#
   meta <- packageDescription("dlnm")
   attachmsg <- paste("This is dlnm ",meta$Version,
     ". For details: help(dlnm) and vignette('dlnmOverview').",sep="")
@@ -6,10 +13,14 @@
   # "'file.show(system.file('Changesince151',package='dlnm'))'")
   packageStartupMessage(attachmsg, domain = NULL, appendLF = TRUE)
 }
-
-
+###
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2013
+#
 `.fci` <-
 function(ci, x, high, low, ci.arg, plot.arg, noeff=NULL) {
+#
+################################################################################
+#
   if(ci=="area") {
     polygon.arg <- modifyList(list(col=grey(0.9),border=NA),ci.arg)
     polygon.arg <- modifyList(polygon.arg,
@@ -34,6 +45,11 @@ function(ci, x, high, low, ci.arg, plot.arg, noeff=NULL) {
   }
   if(!is.null(noeff)) abline(h=noeff)
 }
-
+###
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2013
+#
 `.seq` <-
 function(lag,by=1) seq(from=lag[1],to=lag[2],by=by)
+#
+################################################################################
+#

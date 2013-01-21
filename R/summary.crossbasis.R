@@ -1,6 +1,11 @@
+###
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2013
+#
 `summary.crossbasis` <-
 function(object, ...) {
-
+#
+################################################################################
+#
   attr <- attributes(object)
   cat("CROSSBASIS FUNCTIONS\n")
   cat("observations:",nrow(object),"\n")
@@ -8,7 +13,7 @@ function(object, ...) {
   cat("range:",attr$range[1],",",attr$range[2],"\n")
   cat("total df:",attr$argvar$df*attr$arglag$df,"\n")
   cat("lag range:",attr$lag,"\n")
-
+#
   cat("\nBASIS FOR VAR:\n")
   cat("type:",attr$argvar$type)
   if(!is.null(attr$argvar$degree)) cat(" with degree",attr$argvar$degree)
@@ -21,7 +26,7 @@ function(object, ...) {
     cat("not centered","\n")
   } else cat("centered at",attr$argvar$cen,"\n")
   cat(ifelse(attr$argvar$int==TRUE,"with","without"),"intercept\n")
-  
+#  
   cat("\nBASIS FOR LAG:\n")
   cat("type:",attr$arglag$type)
   if(!is.null(attr$arglag$degree)) cat(" with degree",attr$arglag$degree)

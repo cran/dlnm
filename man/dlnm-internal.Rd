@@ -1,5 +1,6 @@
 \name{dlnm-internal}
 \alias{.fci}
+\alias{.seq}
 
 \title{ Internal Functions for Package dlnm }
 
