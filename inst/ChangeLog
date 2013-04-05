@@ -1,4 +1,15 @@
 ==============================================================================
+Changes in dlnm 1.6.6 (05 Apr 2013)
+===================================
+
+Minor changes
+-------------
+
+    o Import from tsModel removed. An internal function .Lag has been created,
+      using the code from the same function in tsModel written by Roger Peng.
+
+
+==============================================================================
 Changes in dlnm 1.6.5 (20 Jan 2013)
 ===================================
 
