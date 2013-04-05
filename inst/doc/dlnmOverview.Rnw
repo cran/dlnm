@@ -82,7 +82,7 @@ Type \Rcomm{citation("dlnm")} in \R{} to cite the \Rpkg{dlnm} package after inst
 file.show(system.file("ChangeLog", package="dlnm"))
 @
 
-General information on the development and applications of the DLNM modelling framework, together with an updated version of the \R{} scripts for running the examples in published papers, can be found at \url{www.ag-myresearch.com}.
+General information on the development and applications of the DLNM modelling framework, together with an updated version of the \R{} scripts for running the examples in published papers, can be found at \href{http://www.ag-myresearch.com}{www.ag-myresearch.com}.
 
 Please send comments or suggestions and report bugs to \href{mailto:antonio.gasparrini@lshtm.ac.uk}{\texttt{antonio.gasparrini@lshtm.ac.uk}}.
 
@@ -96,13 +96,13 @@ Please send comments or suggestions and report bugs to \href{mailto:antonio.gasp
 
 The \Rpkg{dlnm} package is installed in the standard way for CRAN packages from \R{} version 2.9.0 onwards, for example typing \Rcomm{install.packages("dlnm")} or directly through the \R{} menu in Windows, clicking on \emph{Packages} and then on \emph{Install package(s)...}. The package can be alternatively installed using the .zip file containing the binaries, via \emph{Packages} and then \emph{Install package(s) from local zip files...}. 
 
-The functionalities of \Rpkg{dlnm} depend on other packages whose commands are called to specify the \Rpkg{dlnm} functions. This hierarchy is ruled by the field \emph{Imports} of the file \texttt{description} included in the package. The functions are imported from the packages \Rpkg{splines} (functions \Rfun{ns} and \Rfun{bs}) and \Rpkg{tsModel} (function \Rfun{Lag}). The former must be independently installed if a .zip file is used.
+The functionalities of \Rpkg{dlnm} depend on other packages whose commands are called to specify the \Rpkg{dlnm} functions. This hierarchy is ruled by the field \emph{Imports} of the file \texttt{description} included in the package. In this version, the only functions imported are \Rfun{ns} and \Rfun{bs} from \Rpkg{splines}, one of the recommended packages included in the main distribution of \R{}.
 
 %-------------------------%%-------------------------%
 \subsection{Data}
 \label{sec:data}
 
-Until the version 0.4.1, the package \Rpkg{dlnm} did not contain any data, and used the datasets stored in the package \Rpkg{NMMAPSlite}. In this version the package contains its own dataset \Rdata{chicagoNMMAPS}, with daily mortality (all causes, CVD, respiratory), weather (temperature, dew point temperature, relative humidity) and pollution data (PM10 and ozone) for Chicago in the period 1987-2000. The data were assembled from publicly available data sources as part of the National Morbidity, Mortality, and Air Pollution Study (NMMAPS) sponsored by the Health Effects Institute \citep{samet2000b,samet2000a}. They are downloadable from the Internet-based Health and Air Pollution Surveillance System (iHAPSS) website (\url{http://www.ihapss.jhsph.edu}) or through the packages \Rpkg{NMMAPSdata} or \Rpkg{NMMAPSlite}. See \Rcomm{?chicagoNMMAPS} for additional information on the variables included.
+Until the version 0.4.1, the package \Rpkg{dlnm} did not contain any data, and used the datasets stored in the package \Rpkg{NMMAPSlite}. In this version the package contains its own dataset \Rdata{chicagoNMMAPS}, with daily mortality (all causes, CVD, respiratory), weather (temperature, dew point temperature, relative humidity) and pollution data (PM10 and ozone) for Chicago in the period 1987-2000. The data were assembled from publicly available data sources as part of the National Morbidity, Mortality, and Air Pollution Study (NMMAPS) sponsored by the Health Effects Institute \citep{samet2000b,samet2000a}. They are downloadable from the Internet-based Health and Air Pollution Surveillance System (iHAPSS) website (\href{http://www.ihapss.jhsph.edu}{www.ihapss.jhsph.edu}) or through the packages \Rpkg{NMMAPSdata} or \Rpkg{NMMAPSlite}. See \Rcomm{?chicagoNMMAPS} for additional information on the variables included.
 
 %-------------------------%%-------------------------%%-------------------------%
 \section{Distributed lag non-linear models (DLNM's)}

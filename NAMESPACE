@@ -34,7 +34,7 @@ import(stats,graphics,grDevices)
 importFrom(utils,packageDescription)
 importFrom(splines,ns)
 importFrom(splines,bs)
-importFrom(tsModel,Lag)
+#importFrom(tsModel,Lag)
 #
 #################
 # METHODS

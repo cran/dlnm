@@ -117,7 +117,7 @@
   crossbasis <- matrix(0,nrow=dim[1],ncol=argvar$df*arglag$df)
   for(v in seq(length=argvar$df)) {
     if(dim[2]==1L) {
-      mat <- as.matrix(Lag(basisvar[, v],.seq(lag)))
+      mat <- as.matrix(.Lag(basisvar[, v],.seq(lag)))
     } else mat <- matrix(basisvar[,v],ncol=diff(lag)+1)
     for(l in seq(length=arglag$df)) {
       crossbasis[,argvar$df*(l-1)+v] <- mat%*%(basislag[,l])

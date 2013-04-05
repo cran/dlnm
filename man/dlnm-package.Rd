@@ -32,7 +32,7 @@ A list of changes included in the current and previous versions can be found by 
 
 \code{file.show(system.file("ChangeLog",package="dlnm"))}
 
-General information on the development and applications of the DLNM modelling framework, together with an updated version of the \R{} scripts for running the examples in published papers, can be found at \bold{\url{www.ag-myresearch.com}}.
+General information on the development and applications of the DLNM modelling framework, together with an updated version of the \R{} scripts for running the examples in published papers, can be found at \bold{\href{http://www.ag-myresearch.com}{www.ag-myresearch.com}}.
 }
 
 \author{
