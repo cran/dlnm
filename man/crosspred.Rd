@@ -84,7 +84,7 @@ The name of the object \code{basis}  will be used to extract the related estimat
 
 \seealso{
 \code{\link{onebasis}} to generate one-dimensional basis matrices. \code{\link{crossbasis}} to generate cross-basis matrices. \code{\link{crossreduce}} to reduce the fit to one dimension. 
-\code{\link{plot.crosspred}} to plot several type of graphs.
+The method function \code{\link[=plot.crosspred]{plot}} to plot several type of graphs.
 
 See \code{\link{dlnm-package}} for an overview of the package and type \code{'vignette(dlnmOverview)'} for a detailed description.
 }

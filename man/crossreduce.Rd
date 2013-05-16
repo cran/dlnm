@@ -80,8 +80,7 @@ The name of the object \code{basis}  will be used to extract the related estimat
 }
 
 \seealso{
-\code{\link{crossbasis}} to generate cross-basis matrices. \code{\link{crosspred}} to obtain predictions after model fitting. 
-\code{\link{plot.crossreduce}} to plot several the graphs.
+\code{\link{crossbasis}} to generate cross-basis matrices. \code{\link{crosspred}} to obtain predictions after model fitting. The method function \code{\link[=plot.crossreduce]{plot}} to plot the association.
 
 See \code{\link{dlnm-package}} for an overview of the package and type \code{'vignette(dlnmOverview)'} for a detailed description.
 }

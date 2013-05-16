@@ -7,6 +7,7 @@ function(object, ...) {
 ################################################################################
 #
   cat("REDUCED FIT\n")
+  cat("type:",object$type,"\n")
   cat("dimension:",ifelse(is.null(object$var),"predictor","lag"),"\n")
   if(object$type!="overall") cat("value:",ifelse(is.null(object$var),
     paste("lag",object$lag),paste("var",object$var)),"\n")
