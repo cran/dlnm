@@ -64,8 +64,7 @@ It is strongly recommended to avoid the inclusion of an intercept in the basis f
 }
 
 \seealso{
-\code{\link{onebasis}} to generate one-dimensional basis matrices. \code{\link{crosspred}} to obtain predictions after model fitting. 
-\code{\link{plot.crosspred}} to plot several type of graphs.
+\code{\link{onebasis}} to generate one-dimensional basis matrices. \code{\link{crosspred}} to obtain predictions after model fitting. The method function \code{\link[=plot.crosspred]{plot}} to plot several type of graphs.
 
 See \code{\link{dlnm-package}} for an overview of the package and type \code{'vignette(dlnmOverview)'} for a detailed description.
 }

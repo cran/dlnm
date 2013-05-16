@@ -56,7 +56,7 @@ Armstrong, B. Models for the relationship between ambient temperature and daily 
 \seealso{
 \code{\link{onebasis}} to generate simple basis matrices.
 \code{\link{crossbasis}} to generate cross-basis matrices. \code{\link{crosspred}} to obtain predictions after model fitting. \code{\link{crossreduce}} to reduce the fit to one dimension.
-\code{\link{plot.crosspred}} and \code{\link{plot.crossreduce}} to plot several type of graphs.
+The methods \code{\link{plot.crosspred}} and \code{\link{plot.crossreduce}} to plot several type of graphs.
 
 Type \code{'vignette(dlnmOverview)'} for a detailed description.
 }

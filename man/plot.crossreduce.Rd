@@ -27,7 +27,7 @@ High and low-level method functions for graphs of predictions from reduced distr
 }
 
 \details{
-Differently than for plotting functions for \code{crosspred} objects (see \code{\link{plot.crosspred}}), the type of the plot is automatically chosen by the dimension and value at which the model has been reduced. Namely, the lag-specific association at the chosen lag value, the predictor-specific association at the chosen predictor value, or the overall cumulative association.
+Differently than for plotting functions for \code{crosspred} objects (see the method function \code{\link[=plot.crosspred]{plot}} for objects of class \code{"crosspred"}), the type of the plot is automatically chosen by the dimension and value at which the model has been reduced. Namely, the lag-specific association at the chosen lag value, the predictor-specific association at the chosen predictor value, or the overall cumulative association.
 
 These methods allow a great flexibility in the choice of graphical parameters, specified through arguments of the original plotting functions. See \code{\link[graphics]{plot.default}}, \code{\link[graphics]{lines}} and \code{\link[graphics]{points}} for information on additional graphical arguments. Some arguments, if not specified, are set to different default values than the original functions.
 

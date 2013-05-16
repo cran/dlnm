@@ -133,7 +133,7 @@ the argumetns 'coef' and 'vcov'")
   # CREATE TRANSFORMATION MATRIX AND BASIS
   if(type=="overall") {
     lagbasis <- do.call("onebasis",c(list(x=.seq(lag)),attr$arglag))
-    M <- (t(rep(1,diff(attr$lag)+1)) %*% lagbasis) %x% diag(attr$argvar$df)
+    M <- (t(rep(1,diff(lag)+1)) %*% lagbasis) %x% diag(attr$argvar$df)
     newbasis <- do.call("onebasis",c(list(x=predvar),attr$argvar))
   }else if(type=="lag") {
     lagbasis <- do.call("onebasis",c(list(x=value),attr$arglag))

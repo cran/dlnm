@@ -76,8 +76,7 @@ Meaningless combinations of arguments (for example the inclusion of knots lying 
 }
 
 \seealso{
-\code{\link{crossbasis}} to generate cross-basis matrices. \code{\link{crosspred}} to obtain predictions after model fitting. 
-\code{\link{plot.crosspred}} to plot several type of graphs.
+\code{\link{crossbasis}} to generate cross-basis matrices. \code{\link{crosspred}} to obtain predictions after model fitting. The method function \code{\link[=plot.crosspred]{plot}} to plot several type of graphs.
 
 See \code{\link{dlnm-package}} for an overview of the package and type \code{'vignette(dlnmOverview)'} for a detailed description.
 }

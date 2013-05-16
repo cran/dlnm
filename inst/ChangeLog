@@ -1,4 +1,16 @@
 ==============================================================================
+Changes in dlnm 1.6.8 (16 May 2013)
+===================================
+
+Minor changes
+-------------
+
+    o Resolved the dependency with package NMMAPSlite, now archived.
+
+    o Bug fixed in crosspred() when specifying the 'lag' argument (thanks to
+      Joseph Ogutu).
+
+==============================================================================
 Changes in dlnm 1.6.6 (05 Apr 2013)
 ===================================
 
