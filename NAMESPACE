@@ -7,24 +7,28 @@ export(plot.crosspred,lines.crosspred,points.crosspred)
 export(plot.crossreduce,lines.crossreduce,points.crossreduce)
 export(summary.onebasis,summary.crossbasis,summary.crosspred,summary.crossreduce)
 export(coef.crosspred,vcov.crosspred,coef.crossreduce,vcov.crossreduce)
+export(logknots)
+export(exphist)
 #
-# old functions kept for compatibility, exported
-export(crossplot)
-export(mkbasis,mklagbasis)
 #
 #################
 # NOT EXPORTED
 #################
 #
+# poly,thr,strata,lin,integer
+#
+# crossplot,mkbasis,mklagbasis
+#
+#
 #################
 # INTERNAL
 #################
 #
-# DOCUMENTED:
-# .fci,.seq,
+# DOCUMENTED
+# .mklag,.fci,.seq,.Lag,.getcoef,.getvcov,.getlink
 #
 # NOT DOCUMENTED:
-#.onAttach
+#.onAttach,.checkgroup,.oldonebasis,.oldcrossbasis
 #
 #################
 # IMPORTED
@@ -34,6 +38,7 @@ import(stats,graphics,grDevices)
 importFrom(utils,packageDescription)
 importFrom(splines,ns)
 importFrom(splines,bs)
+importFrom(nlme,fixef)
 #importFrom(tsModel,Lag)
 #
 #################

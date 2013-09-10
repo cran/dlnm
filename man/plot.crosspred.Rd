@@ -56,7 +56,9 @@ For a detailed illustration of the use of the functions, see:
 }
 
 \references{
-Gasparrini A. Distributed lag linear and non-linear models in R: the package dlnm. \emph{Journal of Statistical Software}. 2011; \bold{43}(8):1-20. [freely available \href{http://www.ag-myresearch.com/jss2011.html}{here}].
+Gasparrini A. Distributed lag linear and non-linear models in R: the package dlnm. \emph{Journal of Statistical Software}. 2011; \bold{43}(8):1-20. [freely available \href{http://www.ag-myresearch.com/jss2011}{here}].
+
+Gasparrini A. Modeling exposure-lag-response associations with distributed lag non-linear models. 2013; accepted for publication. [freely available \href{http://www.ag-myresearch.com/statmed2013}{here}]
   
 Gasparrini A., Armstrong, B.,Kenward M. G. Distributed lag non-linear models. \emph{Statistics in Medicine}. 2010; \bold{29}(21):2224-2234. [freely available \href{http://www.ag-myresearch.com/statmed2010}{here}]
 }
@@ -64,57 +66,83 @@ Gasparrini A., Armstrong, B.,Kenward M. G. Distributed lag non-linear models. \e
 \author{Antonio Gasparrini, \email{antonio.gasparrini@lshtm.ac.uk}}
 
 \note{
-These methods for class \code{"crosspred"} have replaced the old function \code{crossplot} since version 1.3.0. The old function has been kept in the namespace of the package, but its use is discouraged.
-
 All the predictions are plotted using a reference value corresponding to the centering point for continuous functions or to the default values for the other options (see \code{\link{onebasis}} and \code{\link{crossbasis}}). Exponentiated predictions are returned by default if \code{x$model.link} is equal to \code{log} or \code{logit}.
+
+These methods for class \code{"crosspred"} have replaced the old function \code{crossplot} since version 1.3.0. The old function has been kept in the namespace of the package, but its use is discouraged.
 }
 
 \section{Warnings}{
-The values in \code{var} must match those specified in the object \code{crosspred} (see \code{\link{crosspred}}), while the values in \code{lag} must be included in the lag period specified by \code{\link{crossbasis}}.
+The values in \code{var} and \code{lag} must match those specified in the object \code{crosspred} (see \code{\link{crosspred}}).
 }
 
 \seealso{
 \code{\link{crossbasis}} to generate cross-basis matrices. \code{\link{crosspred}} to obtain predictions after model fitting.
 
-See \code{\link{dlnm-package}} for an overview of the package and type \code{'vignette(dlnmOverview)'} for a detailed description.
+See \code{\link{dlnm-package}} for an introduction to the package and for links to package vignettes providing more detailed information.
 }
 
 \examples{
-### complex DLNM
-### space of predictor: 5df quadratic spline for temperature
-### space of predictor: linear effect for PM10
-### lag function: 5df natural cubic spline for temperature up to lag30
-### lag function: single strata at lag 0-1 for PM10
+### example of application in time series analysis - see vignette("dlnmTS")
 
-# CREATE THE CROSS-BASIS FOR EACH PREDICTOR AND CHECK WITH SUMMARY
-cb3.pm <- crossbasis(chicagoNMMAPS$pm10, lag=1, argvar=list(type="lin",cen=0),
-  arglag=list(type="strata"))
-cb3.temp <- crossbasis(chicagoNMMAPS$temp, lag=30, argvar=list(type="bs",
-  df=5,degree=2,cen=21), arglag=list(df=5))
+# create the crossbasis object for pm10
+cb3.pm <- crossbasis(chicagoNMMAPS$pm10, lag=1, argvar=list(fun="lin",cen=0),
+  arglag=list(fun="strata"))
+  
+# create the crossbasis object for temperature
+# define knots at equally-spaced log values for lag (not the default any more)
+lagknots <- logknots(30, 3)
+cb3.temp <- crossbasis(chicagoNMMAPS$temp, lag=30, argvar=list(fun="bs",
+  df=5,degree=2,cen=21), arglag=list(knots=lagknots))
+  
+# summarize
 summary(cb3.pm)
 summary(cb3.temp)
 
-# RUN THE MODEL AND GET THE PREDICTION FOR TEMPERATURE
+# run the model and get the predictions for temperature
 library(splines)
 model3 <- glm(death ~  cb3.pm + cb3.temp + ns(time, 7*14) + dow,
   family=quasipoisson(), chicagoNMMAPS)
 pred3.temp <- crosspred(cb3.temp, model3, by=1)
 
-# 3-D AND CONTOUR PLOTS
+# 3-D and contour plots
 plot(pred3.temp, xlab="Temperature", col="red", zlab="RR", shade=0.6,
   main="3D graph of temperature effect")
 plot(pred3.temp, "contour", xlab="Temperature", key.title=title("RR"),
-	plot.title=title("Contour plot",xlab="Temperature",ylab="Lag"))
+  plot.title=title("Contour plot",xlab="Temperature",ylab="Lag"))
 
-# MULTIPLE SLICES
+# lag-response curves specific to different temperature values
 plot(pred3.temp, "slices", var=-20, ci="n", col=1, ylim=c(0.95,1.15), lwd=1.5,
-	main="Lag-specific associations at different temperature, ref. 21C")
+  main="Lag-response associations at different temperatures, ref. 21C")
 for(i in 1:3) lines(pred3.temp, "slices", var=c(0,27,33)[i], col=i+1, lwd=1.5)
 legend("topright",paste("Temperature =",c(-20,0,27,33)), col=1:4, lwd=1.5)
+
+# in one plot
 plot(pred3.temp, "slices", var=c(-20,0,27,33), lag=c(0,5,15,28), col=4,
 	ci.arg=list(density=40,col=grey(0.7)))
 
-### See the vignette 'dlnmOverview' for a detailed explanation of this example
+### example of application beyond time series - see vignette("dlnmExtended")
+
+# generate the matrix of exposure histories from the 5-year periods
+Qnest <- t(sapply(seq(nrow(nested)), 
+  function(i) exphist(rep(c(0,0,0,as.numeric(nested[i,5:14])),each=5),
+    nested$age[i],lag=c(3,40))))
+
+# define the cross-basis
+cbnest <- crossbasis(Qnest, lag=c(3,40), argvar=list("bs",degree=2,
+  df=3,cen=0), arglag=list(fun="ns",knots=c(10,30),int=FALSE))
+summary(cbnest)
+
+# run the model and predict
+library(survival)
+mnest <- clogit(case~cbnest+strata(riskset), nested)
+pnest <- crosspred(cbnest,mnest, at=0:20*5)
+
+# bi-dimensional exposure-lag-response association
+plot(pnest, zlab="OR", xlab="Exposure", ylab="Lag (years)")
+# lag-response curve for dose 60
+plot(pnest, var=50, ylab="OR for exposure 50", xlab="Lag (years)", xlim=c(0,40))
+# exposure-response curve for lag 10
+plot(pnest, lag=5, ylab="OR at lag 5", xlab="Exposure", ylim=c(0.95,1.15))
 }
 
 \keyword{hplot}

@@ -1,4 +1,74 @@
 ==============================================================================
+Changes in dlnm 2.0.3 (10 Sept 2013)
+===================================
+
+See also: file.show(system.file("Changesince200",package="dlnm"))
+
+Major changes
+-------------
+
+    o The usage of functions crossbasis() and onebasis() has been extensively
+      revised, as detailed below. The old usage is maintained with a warning for
+      compatibility reasons. However, the old usage can return now different 
+      results if compared to previous versions. See the file Changesince200
+      using the link above.
+
+    o The functions in dlnm can now be used also for data other than time
+      series. The only difference is the inclusion of a matrix of lagged
+      occurrences as the 'x' argument of crossbasis, instead than the usual 
+      vector of time series data. The extension is detailed in the article
+      Gasparrini Stat Med 2013 and in the new vignette 'dlnmExtended'.
+
+    o The functions onebasis() now calls existing functions for generating the
+      basis matrix. The functions poly(), strata(), thr(), integer() and lin()
+      have been added, although not exported in the namespace. User-defined
+      functions with attributes reporting the arguments exactly defining the
+      transformation can be added as well.
+
+    o Given the change above, the arguments of onebasis() and the list of
+      arguments composing the arguments 'argvar' and 'arglag' in crossbasis()
+      are now those of the called functions. In particular, the old usage is not
+      guaranteed to work any more, and if it does a warning is reported.
+
+    o The default knots placements for ns and bs functions for the lag dimension
+      in crossbasis() is not at equally-spaced log-values as before, but at
+      equally-spaced percentiles, consistently with the predictor space. The old
+      default can be reproduced with the new function logknots().
+
+    o Two new data sets included in the package, 'nested' and 'drug'. They are
+      composed of simulated data on nested case-control and randomized
+      controlled trial designs respectively.
+
+    o The new function exphist() can be used to build matrices of exposure
+      histories to be used in crosspred() to obtain specific predictions given
+      an exposure profile.
+
+    o The documentation of the package has beed extensively revised. The
+      vignette 'dlnmOverview now provides a general introduction to the
+      methodology and functions, while the two new vignettes 'dlnmTS' and
+      'dlnmExtended' describes specific applications in time series design
+      and in other study designs, respectively.
+
+Minor changes
+-------------
+
+    o Basis matrices now keep names from original vector/matrix.
+
+    o Argument 'lag' in crossbasis() now given default value depending on the
+      format of the argument 'x'.
+
+    o Summary method functions have been changed accordingly.
+
+    o Internal functions .getcoef(), .getvcov() and .getlink() added within
+      crosspred(0 tro extract coef, vcov and model link.
+
+    o Internal functions .checkgroup(), .oldonebasis and .oldcrossbasis() for
+      checks in onebasis() and crossbasis().
+
+    o Print of summary.crossreduce() fixed.
+
+
+==============================================================================
 Changes in dlnm 1.6.8 (16 May 2013)
 ===================================
 
@@ -9,6 +79,7 @@ Minor changes
 
     o Bug fixed in crosspred() when specifying the 'lag' argument (thanks to
       Joseph Ogutu).
+
 
 ==============================================================================
 Changes in dlnm 1.6.6 (05 Apr 2013)

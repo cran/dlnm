@@ -8,28 +8,28 @@ function(object, ...) {
 #
   cat("REDUCED FIT\n")
   cat("type:",object$type,"\n")
-  cat("dimension:",ifelse(is.null(object$var),"predictor","lag"),"\n")
-  if(object$type!="overall") cat("value:",ifelse(is.null(object$var),
-    paste("lag",object$lag),paste("var",object$var)),"\n")
+  cat("dimension:",ifelse(object$type!="var","predictor","lag"),"\n")
+  if(object$type!="overall") cat("value:",ifelse(object$type=="lag",
+    paste("lag",object$value),object$value),"\n")
   cat("reduced df:",length(coef(object)),"\n")
 #
   cat("\nBASIS:\n")
   attr <- attributes(object$basis)
-  cat("type:",attr$type)
-  if(!is.null(attr$degree)) cat(" with degree",attr$degree)
-  cat("\n")
-  if(!is.null(attr$knots)) {
-    cat("df:",attr$df,", knots at:",attr$knots,"\n")
-  } else cat("df:",attr$df,"\n")
-  if(!is.null(attr$bound)) cat("boundary knots at",attr$bound,"\n")
-  if(!is.null(attr$cen)&&attr$cen==TRUE) cat("centered on",attr$cen,"\n")
-  if(attr$int==TRUE) cat("with intercept\n")
+  ind <- match(names(formals(attr$fun)),names(attr),nomatch=0)
+  args <- c(list(fun=attr$fun),attr[ind])
+  for(i in seq(args)) {
+    cat(names(args[i]),": ",sep="")
+    cat(args[[i]],"\n",sep=" ")
+  }
+#
+  if(attr$cen) cat("centered at",attr$cen,"\n") else cat("not centered","\n")
 #  
   cat("\nPREDICTIONS:\n")
-  if(object$type!="var") cat("values:",length(object$predvar),"\n")
-  if(object$type!="var") cat("range:",min(object$predvar),",",
+  if(object$type!="var") cat("range:",min(object$predvar),"to",
     max(object$predvar),"\n")
-  if(object$type=="var") cat("lag:",object$lag,"\n")
+  if(object$type=="var") cat("lag period:",object$lag,"\n")
+  if(object$type!="var") cat("values:",length(object$predvar),"\n")
+  if(object$type=="var") cat("by:",length(object$bylag),"\n")
   cat("exponentiated:",ifelse(!is.null(object$RRfit),"yes","no"),"\n")
   cat("\n")
 }

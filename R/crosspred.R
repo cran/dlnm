@@ -16,50 +16,28 @@ function(basis, model=NULL, coef=NULL, vcov=NULL, model.link=NULL, at=NULL,
   # IF SIMPLE BASIS, THEN RE-CREATE ATTRIBUTES
   attr <- attributes(basis)
   if(any(class(basis)=="onebasis")) {
-    attr <- list(range=attr$range,lag=c(0,0),argvar=list(type=attr$type,
-      df=attr$df,degree=attr$degree,knots=attr$knots,bound=attr$bound,
-      int=attr$int,cen=attr$cen),arglag=list(type="strata",df=1,int=FALSE))
+    ind <- match(names(formals(attr$fun)),names(attr),nomatch=0)
+    attr <- list(range=attr$range,lag=c(0,0),argvar=c(attr[c("fun","cen")],
+      attr[ind]),arglag=list(fun="strata",df=1,int=TRUE))
     cond <- paste(name,"[[:print:]]*b[0-9]{1,2}",sep="")
-  } else {
-    cond <- paste(name,"[[:print:]]*v[0-9]{1,2}\\.l[0-9]{1,2}",sep="")
-  }
+  } else cond <- paste(name,"[[:print:]]*v[0-9]{1,2}\\.l[0-9]{1,2}",sep="")
   if(ncol(basis)==1) cond <- name
 #
-  if(!any(class(basis)%in%c("crossbasis","onebasis"))) {
+  if(!any(class(basis)%in%c("crossbasis","onebasis")))
     stop("the first argument must be an object of class 'crossbasis' or 'onebasis'")
-  }
 #
 ###########################################################################
 # OTHER COHERENCE CHECKS
 #
-  if(is.null(model)&&(is.null(coef)||is.null(vcov))) {
+  if(is.null(model)&&(is.null(coef)||is.null(vcov)))
     stop("At least 'model' or 'coef'-'vcov' must be provided")
-  }
-  if(!is.null(vcov)&&!is.numeric(vcov)) stop("'vcov' must be numeric")
-  if(!is.null(coef)&&!is.numeric(coef)) stop("'coef' must be numeric")
-#
-  if(!is.null(at)&&!is.numeric(at)) stop("'at' must be numeric")
-  if(!is.null(from)&&!is.numeric(from)) stop("'from' must be numeric")
-  if(!is.null(to)&&!is.numeric(to)) stop("'to' must be numeric")
-  if(!is.null(by)&&!is.numeric(by)) stop("'by' must be numeric")
-  if(!is.numeric(ci.level)||ci.level>=1||ci.level<=0) {
+  if(!is.numeric(ci.level)||ci.level>=1||ci.level<=0)
     stop("'ci.level' must be numeric and between 0 and 1")
-  }
 #
   #  lag MUST BE A POSITIVE INTEGER VECTOR, BY DEFAULT THAT USED FOR ESTIMATION
-  if(missing(lag)) {
-    lag <- attr$lag
-  } else {
-    if(lag!=attr$lag && attr$arglag$type=="integer") {
+  lag <- if(missing(lag)) attr$lag else .mklag(lag)
+  if(lag!=attr$lag && attr$arglag$fun=="integer")
       stop("prediction for lag sub-period not allowed for type 'integer'")
-    }
-    if(!is.numeric(lag)||length(lag)>2||any(lag<0)) {
-      stop("'lag' must a positive integer vector or scalar")
-    }
-    if(length(lag)==1L) lag <- c(0L,lag)
-    if(diff(lag)<0L) stop("lag[1] must be <= lag[2]")
-    lag <- round(lag[1L:2L])
-  }
 #
   # CUMULATIVE EFFECTS ONLY WITH LAGGED EFFECTS AND lag[1]==0
   if(cumul==TRUE && (diff(lag)==0L || lag[1]!=0L)) {
@@ -68,51 +46,27 @@ function(basis, model=NULL, coef=NULL, vcov=NULL, model.link=NULL, at=NULL,
   }
 #
 ###########################################################################
-# SET COEF, VCOV AND LINK FOR EVERY TYPE OF MODELS
+# SET COEF, VCOV CLASS AND LINK FOR EVERY TYPE OF MODELS
 #
   # IF MODEL PROVIDED, EXTRACT FROM HERE, OTHERWISE DIRECTLY FROM COEF AND VCOV
-  model.class <- NA
   if(!is.null(model)) {
-    # EXTRACT COEF AND VCOV FROM THE MODEL, IF METHODS EXIST
     model.class <- class(model)
-    modelcoef <- tryCatch(coef(model),error=function(w) "error")
-    modelvcov <- tryCatch(vcov(model),error=function(w) "error")
-  	if(identical(modelcoef,"error")||identical(modelvcov,"error")) {
-      stop("methods for coef() and vcov() must exist for the class
-of object 'model'. If not, extract them manually and use 
-the argumetns 'coef' and 'vcov'")
-    }
-    # SELECT COEF-VCOV
-    indcoef <- grep(cond,names(modelcoef))
-    coef <- modelcoef[indcoef]
-    indvcov <- grep(cond,dimnames(modelvcov)[[1]])
-    vcov <- modelvcov[indvcov,indvcov,drop=FALSE]
-  }
+    coef <- .getcoef(model,model.class,cond)
+    vcov <- .getvcov(model,model.class,cond)
+    model.link <- .getlink(model,model.class)
+  } else model.class <- NA
 #
   # CHECK COEF AND VCOV
-  if(length(coef)!=attr$argvar$df*attr$arglag$df || length(coef)!=dim(vcov)[1] ||
+  if(length(coef)!=ncol(basis) || length(coef)!=dim(vcov)[1] ||
     any(is.na(coef))|| any(is.na(vcov))) {
     stop("number of estimated parameters does not match number of cross-functions.
   Possible reasons:
   1) 'model' and 'basis' objects do not match
-  2) wrong 'coef' or 'vcov' arguments
+  2) wrong 'coef' or 'vcov' arguments or methods
   3) model dropped some cross-functions because of collinearity (set to NA)
   4) name of basis matrix matches other parameters in the model formula
   Unlikely, but in this case change the name of the onebasis-crossbasis object")
   }
-#
-###########################################################################
-# MODEL LINK
-#
-  if(all(model.class %in% c("lm"))) {
-    model.link <- "identity"
-  } else if(any(model.class %in% c("clogit"))) {
-    model.link <- "logit"
-  } else if(all(model.class %in% c("coxph"))) {
-    model.link <- "log"
-  } else if(any(model.class %in% c("glm"))) {
-    model.link <- model$family$link
-  } else if(is.null(model.link)) model.link <- NA
 #
 ##########################################################################
 # PREDVAR
@@ -122,15 +76,14 @@ the argumetns 'coef' and 'vcov'")
   if(is.null(at)) {
     if(is.null(from)) from <- attr$range[1]
     if(is.null(to)) to <- attr$range[2]
-    pretty <- pretty(c(from,to),n=50,min.n=30)
+    nobs <- ifelse(is.null(by),50,max(1,diff(attr$range)/by))
+    pretty <- pretty(c(from,to),n=nobs)
     pretty <- pretty[pretty>=from&pretty<=to]	
-    if(is.null(by)) {
-      predvar <- pretty
-    } else predvar <- seq(from=min(pretty),to=max(pretty),by=by)
+    predvar <- if(is.null(by)) pretty else seq(from=min(pretty),
+      to=to,by=by)
   } else if(is.matrix(at)) {
-    if(dim(at)[2]!=diff(lag)+1L) {
+    if(dim(at)[2]!=diff(lag)+1L)
       stop("matrix in 'at' must have ncol=diff(lag)+1")
-    }
     if(!is.null(rownames(at))) {
       predvar <- as.numeric(rownames(at))
       if(any(is.na(predvar))) stop("rownames(at) must represent numurical values")
@@ -220,7 +173,7 @@ the argumetns 'coef' and 'vcov'")
 #
   # MATRICES AND VECTORS WITH EXPONENTIATED EFFECTS AND CONFIDENCE INTERVALS
   z <- qnorm(1-(1-ci.level)/2)
-  if(model.link %in% c("log","logit")) {
+  if(!is.null(model.link) && model.link %in% c("log","logit")) {
     list$matRRfit <- exp(matfit)
     list$matRRlow <- exp(matfit-z*matse)
     list$matRRhigh <- exp(matfit+z*matse)
@@ -233,6 +186,17 @@ the argumetns 'coef' and 'vcov'")
       list$cumRRfit <- exp(cumfit)
       list$cumRRlow <- exp(cumfit-z*cumse)
       list$cumRRhigh <- exp(cumfit+z*cumse)
+    }
+  } else {
+    list$matlow <- matfit-z*matse
+    list$mathigh <- matfit+z*matse
+    list$alllow <- allfit-z*allse
+    names(list$alllow) <- names(allfit)
+    list$allhigh <- allfit+z*allse
+    names(list$allhigh) <- names(allfit)
+    if(cumul) {
+      list$cumlow <- cumfit-z*cumse
+      list$cumhigh <- cumfit+z*cumse
     }
   }
 #

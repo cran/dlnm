@@ -30,7 +30,7 @@ These changes have been included in order to simplify the syntax and to allow
 for future changes.
 
 The authors apologize for the inconvenience.
-Please address any issue about the new version to:
+Please report any issue with the new version to:
 antonio.gasparrini@lshtm.ac.uk
 
-For general details on the package, type help(dlnm) and vignette('dlnmOverview')
+For general info on the package, type help(dlnm) and vignette('dlnmOverview')
