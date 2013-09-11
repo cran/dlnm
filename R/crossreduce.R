@@ -27,12 +27,7 @@ function(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
   if(is.null(model)&&(is.null(coef)||is.null(vcov))) {
     stop("At least 'model' or 'coef'-'vcov' must be provided")
   }
-  if(!is.null(vcov)&&!is.numeric(vcov)) stop("'vcov' must be numeric")
-  if(!is.null(coef)&&!is.numeric(coef)) stop("'coef' must be numeric")
-  
-  if(!type%in%c("overall","var","lag")) {
-    stop("'type' must be one of 'overall', 'var' or lag'")
-  }
+  type <- match.arg(type,c("overall","var","lag"))
   if(type!="overall") {
     if(is.null(value)) stop("'value' must be provided for type 'var' or 'lag'")
     else if(!is.numeric(value)||length(value)>1) {
@@ -44,74 +39,39 @@ function(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
   } else value <- NULL
 #
   #  lag MUST BE A POSITIVE INTEGER VECTOR, BY DEFAULT THAT USED FOR ESTIMATION
-  if(missing(lag)) {
-    lag <- attr$lag
-  } else {
-    if(lag!=attr$lag && attr$arglag$type=="integer") {
+  lag <- if(missing(lag)) attr$lag else .mklag(lag)
+  if(lag!=attr$lag && attr$arglag$fun=="integer")
       stop("prediction for lag sub-period not allowed for type 'integer'")
-    }
-    if(!is.numeric(lag)||length(lag)>2||any(lag<0)) {
-      stop("'lag' must a positive integer vector or scalar")
-    }
-    if(length(lag)==1L) lag <- c(0L,lag)
-    if(diff(lag)<0L) stop("lag[1] must be <= lag[2]")
-    lag <- round(lag[1L:2L])
-  }
 #
-  if(!is.null(at)&&!is.numeric(at)) stop("'at' must be numeric")
-  if(!is.null(from)&&!is.numeric(from)) stop("'from' must be numeric")
-  if(!is.null(to)&&!is.numeric(to)) stop("'to' must be numeric")
-  if(!is.null(by)&&!is.numeric(by)) stop("'by' must be numeric")
   if(!is.numeric(ci.level)||ci.level>=1||ci.level<=0) {
     stop("'ci.level' must be numeric and between 0 and 1")
   }
 #
 ###########################################################################
-# EXTRACT ORIGINAL PARAMETERS FROM FITTED MODEL
+# SET COEF, VCOV CLASS AND LINK FOR EVERY TYPE OF MODELS
 #
   # IF MODEL PROVIDED, EXTRACT FROM HERE, OTHERWISE DIRECTLY FROM COEF AND VCOV
-  model.class <- NA
   if(!is.null(model)) {
-    # EXTRACT COEF AND VCOV FROM THE MODEL, IF METHODS EXIST
     model.class <- class(model)
-    modelcoef <- tryCatch(coef(model),error=function(w) "error")
-    modelvcov <- tryCatch(vcov(model),error=function(w) "error")
-    if(identical(modelcoef,"error")||identical(modelvcov,"error")) {
-      stop("methods for coef() and vcov() must exist for the class
-of object 'model'. If not, extract them manually and use 
-the argumetns 'coef' and 'vcov'")
-    }
-    # SELECT COEF-VCOV
-    indcoef <- grep(cond,names(modelcoef))
-    coef <- modelcoef[indcoef]
-    indvcov <- grep(cond,dimnames(modelvcov)[[1]])
-    vcov <- modelvcov[indvcov,indvcov,drop=FALSE]
+    coef <- .getcoef(model,model.class,cond)
+    vcov <- .getvcov(model,model.class,cond)
+    model.link <- .getlink(model,model.class)
+  } else {
+    model.class <- NA
+    model.link <- NA
   }
 #
   # CHECK COEF AND VCOV
-  if(length(coef)!=attr$argvar$df*attr$arglag$df || length(coef)!=dim(vcov)[1] ||
+  if(length(coef)!=ncol(basis) || length(coef)!=dim(vcov)[1] ||
     any(is.na(coef))|| any(is.na(vcov))) {
     stop("number of estimated parameters does not match number of cross-functions.
   Possible reasons:
   1) 'model' and 'basis' objects do not match
-  2) wrong 'coef' or 'vcov' arguments
+  2) wrong 'coef' or 'vcov' arguments or methods
   3) model dropped some cross-functions because of collinearity (set to NA)
-  4) name of crossbasis matrix matches other parameters in the model formula
-  Unlikely, but in this case change the name of the crossbasis object")
+  4) name of basis matrix matches other parameters in the model formula
+  Unlikely, but in this case change the name of the onebasis-crossbasis object")
   }
-#
-###########################################################################
-# MODEL LINK
-#
-  if(all(model.class %in% c("lm"))) {
-    model.link <- "identity"
-  } else if(any(model.class %in% c("clogit"))) {
-    model.link <- "logit"
-  } else if(all(model.class %in% c("coxph"))) {
-    model.link <- "log"
-  } else if(any(model.class %in% c("glm"))) {
-    model.link <- model$family$link
-  } else if(is.null(model.link)) model.link <- NA
 #
 ##########################################################################
 # PREDVAR
@@ -133,15 +93,16 @@ the argumetns 'coef' and 'vcov'")
   # CREATE TRANSFORMATION MATRIX AND BASIS
   if(type=="overall") {
     lagbasis <- do.call("onebasis",c(list(x=.seq(lag)),attr$arglag))
-    M <- (t(rep(1,diff(lag)+1)) %*% lagbasis) %x% diag(attr$argvar$df)
+    M <- (t(rep(1,diff(lag)+1)) %*% lagbasis) %x% 
+      diag(ncol(basis)/ncol(lagbasis))
     newbasis <- do.call("onebasis",c(list(x=predvar),attr$argvar))
   }else if(type=="lag") {
     lagbasis <- do.call("onebasis",c(list(x=value),attr$arglag))
-    M <- lagbasis %x% diag(attr$argvar$df)
+    M <- lagbasis %x% diag(ncol(basis)/ncol(lagbasis))
     newbasis <- do.call("onebasis",c(list(x=predvar),attr$argvar))
   } else if(type=="var") {
     varbasis <- do.call("onebasis",c(list(x=value),attr$argvar))
-    M <- diag(attr$arglag$df) %x% varbasis
+    M <- diag(ncol(basis)/ncol(varbasis)) %x% varbasis
     newbasis <- do.call("onebasis",c(list(x=.seq(lag,bylag)),attr$arglag))
   }
 #
@@ -181,6 +142,11 @@ the argumetns 'coef' and 'vcov'")
     names(list$RRlow) <- names(fit)
     list$RRhigh <- exp(fit+z*se)
     names(list$RRhigh) <- names(fit)
+  } else {
+    list$low <- fit-z*se
+    names(list$low) <- names(fit)
+    list$high <- fit+z*se
+    names(list$high) <- names(fit)
   }
 #
   list$ci.level <- ci.level

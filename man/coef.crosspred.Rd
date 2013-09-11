@@ -29,7 +29,7 @@ These method functions extract the estimated model coefficients and their (co)va
 \author{Antonio Gasparrini, \email{antonio.gasparrini@lshtm.ac.uk}}
 
 \seealso{
-See \code{\link{dlnm-package}} for an overview of the package and type \code{'vignette(dlnmOverview)'} for a detailed description.
+See \code{\link{dlnm-package}} for an introduction to the package and for links to package vignettes providing more detailed information.
 }
 
 \keyword{methods}
