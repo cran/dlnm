@@ -131,9 +131,10 @@ cbind(pred2.o3$allRRlow, pred2.o3$allRRhigh)["50.3",]
 ###################################################
 cb3.pm <- crossbasis(chicagoNMMAPS$pm10, lag=1, argvar=list(fun="lin",cen=0),
   arglag=list(fun="strata"))
+varknots <- equalknots(chicagoNMMAPS$temp,fun="bs",df=5,degree=2)
 lagknots <- logknots(30, 3)
 cb3.temp <- crossbasis(chicagoNMMAPS$temp, lag=30, argvar=list(fun="bs",
-  df=5,degree=2,cen=21), arglag=list(knots=lagknots))
+  knots=varknots,cen=21), arglag=list(knots=lagknots))
 
 
 ###################################################
@@ -168,7 +169,7 @@ plot(pred3.temp, "contour", xlab="Temperature", key.title=title("RR"),
 ###################################################
 ### code chunk number 22: example3noeval2 (eval = FALSE)
 ###################################################
-## plot(pred3.temp, "slices", var=-20, ci="n", col=1, ylim=c(0.95,1.15), lwd=1.5,
+## plot(pred3.temp, "slices", var=-20, ci="n", col=1, ylim=c(0.95,1.25), lwd=1.5,
 ##   main="Lag-response curves for different temperatures, ref. 21C")
 ## for(i in 1:3) lines(pred3.temp, "slices", var=c(0,27,33)[i], col=i+1, lwd=1.5)
 ## legend("topright",paste("Temperature =",c(-20,0,27,33)), col=1:4, lwd=1.5)
@@ -179,7 +180,7 @@ plot(pred3.temp, "contour", xlab="Temperature", key.title=title("RR"),
 ###################################################
 ### code chunk number 23: example3slices
 ###################################################
-plot(pred3.temp, "slices", var=-20, ci="n", col=1, ylim=c(0.95,1.15), lwd=1.5,
+plot(pred3.temp, "slices", var=-20, ci="n", col=1, ylim=c(0.95,1.25), lwd=1.5,
   main="Lag-response curves for different temperatures, ref. 21C")
 for(i in 1:3) lines(pred3.temp, "slices", var=c(0,27,33)[i], col=i+1, lwd=1.5)
 legend("topright",paste("Temperature =",c(-20,0,27,33)), col=1:4, lwd=1.5)

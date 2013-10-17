@@ -30,9 +30,9 @@ Qdrug[1:3,1:14]
 ###################################################
 ### code chunk number 5: Qnest
 ###################################################
-Qnest <- t(sapply(seq(nrow(nested)), 
-  function(i) exphist(rep(c(0,0,0,as.numeric(nested[i,5:14])),each=5),
-    nested$age[i],lag=c(3,40))))
+Qnest <- t(apply(nested, 1, function(sub) exphist(rep(c(0,0,0,sub[5:14]), 
+  each=5), sub["age"], lag=c(3,40))))
+colnames(Qnest) <- paste("lag", 3:40, sep="")
 Qnest[1:3,1:11]
 
 
@@ -40,7 +40,7 @@ Qnest[1:3,1:11]
 ### code chunk number 6: cbdrug
 ###################################################
 cbdrug <- crossbasis(Qdrug, lag=27, argvar=list("lin",cen=0),
-  arglag=list(fun="ns",knots=9,18))
+  arglag=list(fun="ns",knots=c(9,18)))
 
 
 ###################################################

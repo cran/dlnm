@@ -42,7 +42,7 @@ A matrix object of class \code{"crossbasis"} which can be included in a model fo
 \references{
 Gasparrini A. Distributed lag linear and non-linear models in R: the package dlnm. \emph{Journal of Statistical Software}. 2011; \bold{43}(8):1-20. [freely available \href{http://www.ag-myresearch.com/jss2011}{here}].
 
-Gasparrini A. Modeling exposure-lag-response associations with distributed lag non-linear models. 2013; accepted for publication. [freely available \href{http://www.ag-myresearch.com/statmed2013}{here}]
+Gasparrini A. Modeling exposure-lag-response associations with distributed lag non-linear models. 2013; Epub ahead of print. DOI: 10.1002/sim.5963. [freely available \href{http://www.ag-myresearch.com/statmed2013}{here}]
   
 Gasparrini A., Armstrong, B.,Kenward M. G. Distributed lag non-linear models. \emph{Statistics in Medicine}. 2010; \bold{29}(21):2224-2234. [freely available \href{http://www.ag-myresearch.com/statmed2010}{here}]
 }
@@ -95,9 +95,8 @@ plot(pred1.pm, "slices", var=10, cumul=TRUE, ylab="Cumulative RR",
 ### example of application beyond time series - see vignette("dlnmExtended")
 
 # generate the matrix of exposure histories from the 5-year periods
-Qnest <- t(sapply(seq(nrow(nested)), 
-  function(i) exphist(rep(c(0,0,0,as.numeric(nested[i,5:14])),each=5),
-    nested$age[i],lag=c(3,40))))
+Qnest <- t(apply(nested, 1, function(sub) exphist(rep(c(0,0,0,sub[5:14]), 
+  each=5), sub["age"], lag=c(3,40))))
 
 # define the cross-basis
 cbnest <- crossbasis(Qnest, lag=c(3,40), argvar=list("bs",degree=2,

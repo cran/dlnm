@@ -37,13 +37,13 @@ A numeric vector of knot or cut-off values, to be used in the \code{arglag} list
 \author{Antonio Gasparrini, \email{antonio.gasparrini@lshtm.ac.uk}}
 
 \seealso{
-\code{\link{crossbasis}} to generate cross-basis matrices.
+\code{\link{equalknots}} for placing the knots at equally-spaced values. \code{\link{crossbasis}} to generate cross-basis matrices.
 
 See \code{\link{dlnm-package}} for an introduction to the package and for links to package vignettes providing more detailed information.
 }
 
 \examples{
-### computing 3 knots for lag 0-20
+### setting 3 knots for lag 0-20
 logknots(20, 3)
 logknots(c(0,20), 3)
 

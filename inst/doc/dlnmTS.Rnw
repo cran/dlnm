@@ -270,12 +270,13 @@ First, I define the cross-basis matrices. In particular, the cross-basis for tem
 <<example3crossbasis>>=
 cb3.pm <- crossbasis(chicagoNMMAPS$pm10, lag=1, argvar=list(fun="lin",cen=0),
   arglag=list(fun="strata"))
+varknots <- equalknots(chicagoNMMAPS$temp,fun="bs",df=5,degree=2)
 lagknots <- logknots(30, 3)
 cb3.temp <- crossbasis(chicagoNMMAPS$temp, lag=30, argvar=list(fun="bs",
-  df=5,degree=2,cen=21), arglag=list(knots=lagknots))
+  knots=varknots,cen=21), arglag=list(knots=lagknots))
 @
 
-The chosen basis functions for the space of the predictor are a linear function for the effect of \PM{} and a quadratic B-spline (\Rarg{fun="bs"}) with 5 degrees of freedom for temperature, with \Rarg{knots} placed by default at equally spaced quantiles in the space of the predictor. The basis for temperature is centered at 21\Ctemp{}, which will represent the reference point for the predicted associations. Regarding the space of lags, I assume a simple lag 0-1 parameterization for \PM{} (i.e. a single strata up to lag 1, with minimum lag equal to 0 by default, keeping the default values of \Rarg{df=1}), while I define another cubic spline, this time with the natural constraint (\Rarg{fun="ns"} by default) for the lag dimension of temperature. The knots for the spline for lags are placed at equally-spaced values in the log scale of lags, using the function \Rfun{logknots}. This used to be the default values in versions of the package earlier than 2.0.0.
+The chosen basis functions for the space of the predictor are a linear function for the effect of \PM{} and a quadratic B-spline (\Rarg{fun="bs"}) with 5 degrees of freedom for temperature, with \Rarg{knots} placed by default at equally spaced value in the space of the predictor, selected through the function \Rfun{equalknots}. The basis for temperature is centered at 21\Ctemp{}, which will represent the reference point for the predicted associations. Regarding the space of lags, I assume a simple lag 0-1 parameterization for \PM{} (i.e. a single strata up to lag 1, with minimum lag equal to 0 by default, keeping the default values of \Rarg{df=1}), while I define another cubic spline, this time with the natural constraint (\Rarg{fun="ns"} by default) for the lag dimension of temperature. The knots for the spline for lags are placed at equally-spaced values in the log scale of lags, using the function \Rfun{logknots}. This used to be the default values in versions of the package earlier than 2.0.0.
 
 The estimation, prediction and plotting of the association between temperature and mortality are performed by:
 
@@ -324,7 +325,7 @@ Note that prediction values are chosen only with the argument \Rcode{by=1} in \R
 Plots in Figures~\ref{fig:example3plot3d}--\ref{fig:example3plotcontour} offer a comprehensive summary of the bi-dimensional exposure-lag-response association, but are limited in their ability to inform on associations at specific values of predictor or lags. In addition, they are also limited for inferential purposes, as the uncertainty of the estimated association is not reported in 3-D and contour plots. A more detailed analysis is provided by plotting "slices" of the effect surface for specific predictor and lag values. The code is:
 
 <<example3noeval2,eval=F>>=
-plot(pred3.temp, "slices", var=-20, ci="n", col=1, ylim=c(0.95,1.15), lwd=1.5,
+plot(pred3.temp, "slices", var=-20, ci="n", col=1, ylim=c(0.95,1.25), lwd=1.5,
   main="Lag-response curves for different temperatures, ref. 21C")
 for(i in 1:3) lines(pred3.temp, "slices", var=c(0,27,33)[i], col=i+1, lwd=1.5)
 legend("topright",paste("Temperature =",c(-20,0,27,33)), col=1:4, lwd=1.5)
@@ -333,7 +334,7 @@ plot(pred3.temp, "slices", var=c(-20,33), lag=c(0,5), col=4,
 @
 
 <<example3slices,fig=T,echo=F>>=
-plot(pred3.temp, "slices", var=-20, ci="n", col=1, ylim=c(0.95,1.15), lwd=1.5,
+plot(pred3.temp, "slices", var=-20, ci="n", col=1, ylim=c(0.95,1.25), lwd=1.5,
   main="Lag-response curves for different temperatures, ref. 21C")
 for(i in 1:3) lines(pred3.temp, "slices", var=c(0,27,33)[i], col=i+1, lwd=1.5)
 legend("topright",paste("Temperature =",c(-20,0,27,33)), col=1:4, lwd=1.5)

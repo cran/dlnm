@@ -7,7 +7,7 @@ export(plot.crosspred,lines.crosspred,points.crosspred)
 export(plot.crossreduce,lines.crossreduce,points.crossreduce)
 export(summary.onebasis,summary.crossbasis,summary.crosspred,summary.crossreduce)
 export(coef.crosspred,vcov.crosspred,coef.crossreduce,vcov.crossreduce)
-export(logknots)
+export(logknots,equalknots)
 export(exphist)
 #
 #
