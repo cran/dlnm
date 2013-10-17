@@ -58,7 +58,7 @@ For a detailed illustration of the use of the functions, see:
 \references{
 Gasparrini A. Distributed lag linear and non-linear models in R: the package dlnm. \emph{Journal of Statistical Software}. 2011; \bold{43}(8):1-20. [freely available \href{http://www.ag-myresearch.com/jss2011}{here}].
 
-Gasparrini A. Modeling exposure-lag-response associations with distributed lag non-linear models. 2013; accepted for publication. [freely available \href{http://www.ag-myresearch.com/statmed2013}{here}]
+Gasparrini A. Modeling exposure-lag-response associations with distributed lag non-linear models. 2013; Epub ahead of print. DOI: 10.1002/sim.5963. [freely available \href{http://www.ag-myresearch.com/statmed2013}{here}]
   
 Gasparrini A., Armstrong, B.,Kenward M. G. Distributed lag non-linear models. \emph{Statistics in Medicine}. 2010; \bold{29}(21):2224-2234. [freely available \href{http://www.ag-myresearch.com/statmed2010}{here}]
 }
@@ -89,10 +89,10 @@ cb3.pm <- crossbasis(chicagoNMMAPS$pm10, lag=1, argvar=list(fun="lin",cen=0),
   arglag=list(fun="strata"))
   
 # create the crossbasis object for temperature
-# define knots at equally-spaced log values for lag (not the default any more)
+varknots <- equalknots(chicagoNMMAPS$temp,fun="bs",df=5,degree=2)
 lagknots <- logknots(30, 3)
 cb3.temp <- crossbasis(chicagoNMMAPS$temp, lag=30, argvar=list(fun="bs",
-  df=5,degree=2,cen=21), arglag=list(knots=lagknots))
+  knots=varknots,cen=21), arglag=list(knots=lagknots))
   
 # summarize
 summary(cb3.pm)
@@ -111,7 +111,7 @@ plot(pred3.temp, "contour", xlab="Temperature", key.title=title("RR"),
   plot.title=title("Contour plot",xlab="Temperature",ylab="Lag"))
 
 # lag-response curves specific to different temperature values
-plot(pred3.temp, "slices", var=-20, ci="n", col=1, ylim=c(0.95,1.15), lwd=1.5,
+plot(pred3.temp, "slices", var=-20, ci="n", col=1, ylim=c(0.95,1.25), lwd=1.5,
   main="Lag-response associations at different temperatures, ref. 21C")
 for(i in 1:3) lines(pred3.temp, "slices", var=c(0,27,33)[i], col=i+1, lwd=1.5)
 legend("topright",paste("Temperature =",c(-20,0,27,33)), col=1:4, lwd=1.5)
@@ -123,9 +123,8 @@ plot(pred3.temp, "slices", var=c(-20,0,27,33), lag=c(0,5,15,28), col=4,
 ### example of application beyond time series - see vignette("dlnmExtended")
 
 # generate the matrix of exposure histories from the 5-year periods
-Qnest <- t(sapply(seq(nrow(nested)), 
-  function(i) exphist(rep(c(0,0,0,as.numeric(nested[i,5:14])),each=5),
-    nested$age[i],lag=c(3,40))))
+Qnest <- t(apply(nested, 1, function(sub) exphist(rep(c(0,0,0,sub[5:14]), 
+  each=5), sub["age"], lag=c(3,40))))
 
 # define the cross-basis
 cbnest <- crossbasis(Qnest, lag=c(3,40), argvar=list("bs",degree=2,

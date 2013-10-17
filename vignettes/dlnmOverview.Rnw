@@ -430,6 +430,8 @@ All the predictions are reported versus a reference value. For continuous functi
 \subsection{Other functions}
 \label{sec:otherfun}
 
+The two functions \Rfun{equalknots} and \Rfun{logknots} are used to select knots or cut-off values for spline or strata functions at equally-spaced values and log-values, respectively. In particular, the latter is used to select knots for lag-response spline functions following the default used up to version 2.0.0 of \Rpkg{dlnm}, based on equally-spaced log values of lags.
+
 The package \Rpkg{dlnm} also contains a set of functions which are called internally by the other functions illustrated above, in particular \Rfun{onebasis}, \Rfun{crossbasis} and \Rfun{crosspred}. Following the usual \R{} style, these functions have names starting with a dot. Some of this functions are documented, and help pages are opened with the usual call (results not shown):
 
 <<internal1,eval=F>>=

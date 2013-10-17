@@ -21,7 +21,7 @@ function(basis, model=NULL, coef=NULL, vcov=NULL, model.link=NULL, at=NULL,
       attr[ind]),arglag=list(fun="strata",df=1,int=TRUE))
     cond <- paste(name,"[[:print:]]*b[0-9]{1,2}",sep="")
   } else cond <- paste(name,"[[:print:]]*v[0-9]{1,2}\\.l[0-9]{1,2}",sep="")
-  if(ncol(basis)==1) cond <- name
+  if(ncol(basis)==1L) cond <- name
 #
   if(!any(class(basis)%in%c("crossbasis","onebasis")))
     stop("the first argument must be an object of class 'crossbasis' or 'onebasis'")
@@ -99,7 +99,7 @@ function(basis, model=NULL, coef=NULL, vcov=NULL, model.link=NULL, at=NULL,
   # EXPAND at IF A VECTOR HAS BEEN PROVIDED
   if(is.matrix(at)) {
     matlag <- at
-  } else matlag <- t(rep(1,length(predlag)))%x%predvar 
+  } else matlag <- matrix(rep(predvar,length(predlag)),nrow=length(predvar))
   # CREATE THE BASIS FOR VAR AND LAG
   basisvar <- do.call("onebasis",c(list(x=matlag),attr$argvar))
   basislag <- do.call("onebasis",c(list(x=predlag),attr$arglag))

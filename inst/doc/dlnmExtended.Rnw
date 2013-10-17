@@ -123,13 +123,13 @@ The exposure histories for lag 0--13 are reported above for the first three subj
 In a second example, I reconstruct the matrix of exposure histories for the data frame \Robj{nested} using the exposure profiles stored in 5-year intervals. These data are expanded to a matrix of exposure histories over lag 3--40, with lag unit equal to a year. However, in this case the computation is more complex, as each subject is sampled at a different age. Specifically, the exposure history is computed backward along the exposure profile starting from the age of the subject. This step requires some additional computation and data manipulation. The function \Rfun{exphist}, which derives an exposure history at a given time of an exposure profile, may be of help:
 
 <<Qnest>>=
-Qnest <- t(sapply(seq(nrow(nested)), 
-  function(i) exphist(rep(c(0,0,0,as.numeric(nested[i,5:14])),each=5),
-    nested$age[i],lag=c(3,40))))
+Qnest <- t(apply(nested, 1, function(sub) exphist(rep(c(0,0,0,sub[5:14]), 
+  each=5), sub["age"], lag=c(3,40))))
+colnames(Qnest) <- paste("lag", 3:40, sep="")
 Qnest[1:3,1:11]
 @
 
-The exposure histories for lag 0--10 are reported above for the first three subject. The first subject, sampled at the age of 81, is assumed to experience the exposure at lag 0 between 80 and 81, the exposure at lag 1 between 79 and 80, and so on. As his/her last exposure is at age 65, the exposure history up to lag 10 is set to 0. The second subject, sampled at the age of 69, has the exposure history set to 0 for lag 0--3, and then to 10 for lags 4--8 and 16 for lags 9--10, corresponding to exposure experienced at age periods 60--65 and 55--60, respectively. These exposure histories are consistent with the exposure profiles and age shown in Section~\ref{sec:data}.
+The exposure histories for lag 0--10 are reported above for the first three subject. The first subject, sampled at the age of 81, is assumed to experience the exposure at lag 0 between 80 and 81, the exposure at lag 1 between 79 and 80, and so on. As his/her last exposure is at age 65, the exposure history up to lag 10 is set to 0. The second subject, sampled at the age of 69, has the exposure history set to 0 for lag 3, corresponding to the exposure event at 66, and then to 10 for lags 4--8 and 16 for lags 9--10, corresponding to exposure experienced at age periods 60--65 and 55--60, respectively. These exposure histories are consistent with the exposure profiles and age shown in Section~\ref{sec:data}.
 
 An example of computation of the matrix of exposure histories for time-to-event analysis using cohort data is illustrated in the code provided as supplementary material in \citet{gasparrini2013statmed}. In that case, multiple exposure histories are computed for each subject at the times he/she contributed to different risk sets, using the same exposure profile.
 
@@ -146,7 +146,7 @@ The first step is the definition of a cross-basis function and the derivation of
 
 <<cbdrug>>=
 cbdrug <- crossbasis(Qdrug, lag=27, argvar=list("lin",cen=0),
-  arglag=list(fun="ns",knots=9,18))
+  arglag=list(fun="ns",knots=c(9,18)))
 @
 
 The results is stored in the object \Robj{cbdrug}, namely a matrix of transformed variables with special attributes. The first unnamed argument \Rarg{x}, differently from the original applications in time series described in the vignette \textbf{\textsf{dlnmTS}}, is the matrix of exposure histories. However, the rest of the syntax is identical. The argument \Rarg{lag} specifies the lag period, with minimum lag placed by default at 0. The lag period must be consistent with the dimension (\emph{i.e.} number of columns) of the matrix \Robj{Qdrug}. The arguments \Rarg{argvar} and \Rarg{arglag} define the exposure-response and lag-response functions, respectively, chosen here as a simple linear function centered at 0 and a natural cubic spline with knots at lag 9 and 18. An intercept is included by default in the lag-response function if not otherwise stated. Given the linearity assumption, this can be technically defined as a DLM. See \Rcomm{?crossbasis} for a complete list of options and additional details.

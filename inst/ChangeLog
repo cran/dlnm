@@ -1,4 +1,18 @@
 ==============================================================================
+Changes in dlnm 2.0.6 (17 Oct 2013)
+===================================
+
+Minor changes
+-------------
+
+    o Included function equalknots() to place knots at equally-spaced values.
+
+    o Changes in .get-() functions to allow changes in lme4 objects.
+
+    o Error fixed in examples of vignette dlnmExtended.
+
+
+==============================================================================
 Changes in dlnm 2.0.3 (10 Sept 2013)
 ===================================
 
