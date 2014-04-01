@@ -1,7 +1,7 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2013
+### R routines for the R package dlnm (c) Antonio Gasparrini 2014
 #
-`poly` <-
+poly <-
 function(x, degree=1, scale, int=FALSE) {
 #
 ################################################################################

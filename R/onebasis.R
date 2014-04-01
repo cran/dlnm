@@ -1,7 +1,7 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2013
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2014
 #
-`onebasis` <-
+onebasis <-
 function(x, fun="ns", cen, ...) {
 #
 ################################################################################
@@ -15,7 +15,7 @@ function(x, fun="ns", cen, ...) {
   # CHECK fun
   if(!is.character(fun)) stop("'fun' must be character")
   # CHECK OLD CODE
-  .oldonebasis(fun,args)
+  checkoldonebasis(fun,args)
   # CHECK fun HAS x ARGUMENT
   if(all(names(formals(fun))!="x")) stop("'fun' must contain argument 'x'")
 #

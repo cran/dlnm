@@ -1,7 +1,7 @@
 ###
 ### Code from Roger Peng, included in the function Lag() in the package tsModel
 #
-`.Lag` <-
+Lag2 <-
 function(v, k, group = NULL) {
   stopifnot(length(k) > 0)
   v <- as.numeric(v)

@@ -15,7 +15,7 @@ integer(x, values, int=FALSE)
 \arguments{
   \item{x }{ the predictor variable. Missing values are allowed.}
   \item{values }{ the values for which the indicator variables should be computed. Used internally, usually to be left as missing.}
-  \item{int }{ Logical. If \code{TRUE}, an intercept is included in the basis matrix. See Details below.}
+  \item{int }{ logical. If \code{TRUE}, an intercept is included in the basis matrix. See Details below.}
 }
 
 \details{

@@ -1,4 +1,29 @@
 ==============================================================================
+Changes in dlnm 2.0.9 (01 Apr 2014)
+===================================
+
+Major changes
+-------------
+
+    o Function strata() now accepts an additional argument 'ref' to select the
+      reference category. Also, the intercept is now defined as a vector of 1's.
+
+    o Old functions crossplot(), mkbasis() and mklagbasis() removed.
+
+Minor changes
+-------------
+
+    o Functions now defined with unquoted names (problem with RStudio).
+
+    o Internal functions now defined with names without initial dots.
+
+    o checkgroup modified: now number of obs in each groups can also be less
+      than df in argvar. Required in previous versions, not anymore.
+
+    o Documentation changed accordingly, references updated.
+
+
+==============================================================================
 Changes in dlnm 2.0.6 (17 Oct 2013)
 ===================================
 

@@ -30,7 +30,7 @@ A numeric matrix of exposure histories, with rows corresponding to the values in
 }
 
 \references{
-Gasparrini A. Modeling exposure-lag-response associations with distributed lag non-linear models. 2013; accepted for publication. [freely available \href{http://www.ag-myresearch.com/statmed2013}{here}]
+Gasparrini A. Modeling exposure-lag-response associations with distributed lag non-linear models. 2014; \bold{33}(5):881-899. [freely available \href{http://www.ag-myresearch.com/statmed2014}{here}]
 }
 
 \author{Antonio Gasparrini, \email{antonio.gasparrini@lshtm.ac.uk}}

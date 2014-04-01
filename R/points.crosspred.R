@@ -1,7 +1,7 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2013
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2014
 #
-`points.crosspred` <-
+points.crosspred <-
 function(x, ptype, var=NULL, lag=NULL, ci="n", ci.arg,
   ci.level=x$ci.level, cumul=FALSE, exp=NULL, ...) {
 #
@@ -29,7 +29,7 @@ function(x, ptype, var=NULL, lag=NULL, ci="n", ci.arg,
   if(!is.null(var)&&!var%in%x$predvar&&(ptype=="slices")) {
     stop("'var' must match values used for prediction")
   }
-  if(!is.null(lag)&&!lag%in%.seq(x$lag,x$bylag)&&(ptype=="slices")) {
+  if(!is.null(lag)&&!lag%in%seqlag(x$lag,x$bylag)&&(ptype=="slices")) {
     stop("'lag' must match values used for prediction")
   }
   if(!ci%in%c("area","bars","lines","n")) {
@@ -91,7 +91,7 @@ function(x, ptype, var=NULL, lag=NULL, ci="n", ci.arg,
       plot.arg <- list(type="p",col=2)
       plot.arg <- modifyList(plot.arg,list(...))		
       # PLOT CONFIDENCE INTERVALS (IF ANY)
-      .fci(ci=ci,x=x$predvar,high=x$mathigh[,xlag],
+      fci(ci=ci,x=x$predvar,high=x$mathigh[,xlag],
         low=x$matlow[,xlag],ci.arg,plot.arg)
       plot.arg <- modifyList(plot.arg,c(list(x=x$predvar,
         y=x$matfit[,xlag])))
@@ -104,9 +104,9 @@ function(x, ptype, var=NULL, lag=NULL, ci="n", ci.arg,
       plot.arg <- list(type="p",col=2)
       plot.arg <- modifyList(plot.arg,list(...))		
       # PLOT CONFIDENCE INTERVALS (IF ANY)
-      .fci(ci=ci,x=.seq(x$lag,x$bylag),high=x$mathigh[xvar,],
+      fci(ci=ci,x=seqlag(x$lag,x$bylag),high=x$mathigh[xvar,],
         low=x$matlow[xvar,],ci.arg,plot.arg)
-      plot.arg <- modifyList(plot.arg,c(list(x=.seq(x$lag,x$bylag),
+      plot.arg <- modifyList(plot.arg,c(list(x=seqlag(x$lag,x$bylag),
         y=x$matfit[xvar,])))
       do.call("points",plot.arg)
     }
@@ -121,7 +121,7 @@ function(x, ptype, var=NULL, lag=NULL, ci="n", ci.arg,
     plot.arg <- list(type="p",col=2)
     plot.arg <- modifyList(plot.arg,list(...))
     # SET CONFIDENCE INTERVALS
-    .fci(ci=ci,x=x$predvar,high=x$allhigh,
+    fci(ci=ci,x=x$predvar,high=x$allhigh,
       low=x$alllow,ci.arg,plot.arg)
     plot.arg <- modifyList(plot.arg,c(list(x=x$predvar,y=x$allfit)))
     # PLOT

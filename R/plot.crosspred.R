@@ -1,7 +1,7 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2013
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2014
 #
-`plot.crosspred` <-
+plot.crosspred <-
 function(x, ptype, var=NULL, lag=NULL, ci="area", ci.arg,
   ci.level=x$ci.level, cumul=FALSE, exp=NULL, ...) {
 #
@@ -34,7 +34,7 @@ function(x, ptype, var=NULL, lag=NULL, ci="area", ci.arg,
   if(!is.null(var)&&sum(var%in%x$predvar)!=length(var)&&(ptype=="slices")) {
     stop("'var' must match values used for prediction")
   }
-  if(!is.null(lag)&&sum(lag%in%.seq(x$lag,x$bylag))!=length(lag)&&(ptype=="slices")) {
+  if(!is.null(lag)&&sum(lag%in%seqlag(x$lag,x$bylag))!=length(lag)&&(ptype=="slices")) {
     stop("'lag' must match values used for prediction")
   }
   if(!ci%in%c("area","bars","lines","n")) {
@@ -114,7 +114,7 @@ function(x, ptype, var=NULL, lag=NULL, ci="area", ci.arg,
         if(length(lag)+length(var)>1)  plot.arg$cex.axis <- 0.7
         plot.arg <- modifyList(plot.arg,list(...))		
         # SET CONFIDENCE INTERVALS
-        ci.list <- list(panel.first=call(".fci",ci=ci,x=x$predvar,
+        ci.list <- list(panel.first=call("fci",ci=ci,x=x$predvar,
           high=x$mathigh[,xlag[i]],low=x$matlow[,xlag[i]],ci.arg,plot.arg,
           noeff=noeff))
         plot.arg <- modifyList(plot.arg,c(ci.list,
@@ -139,11 +139,11 @@ function(x, ptype, var=NULL, lag=NULL, ci="area", ci.arg,
         if(length(lag)+length(var)>1)  plot.arg$cex.axis <- 0.7
         plot.arg <- modifyList(plot.arg,list(...))		
         # SET CONFIDENCE INTERVALS
-        ci.list <- list(panel.first=call(".fci",ci=ci,x=.seq(x$lag,x$bylag),
+        ci.list <- list(panel.first=call("fci",ci=ci,x=seqlag(x$lag,x$bylag),
           high=x$mathigh[xvar[i],],low=x$matlow[xvar[i],],ci.arg,plot.arg,
           noeff=noeff))
         plot.arg <- modifyList(plot.arg,c(ci.list,
-          list(x=.seq(x$lag,x$bylag),y=x$matfit[xvar[i],])))
+          list(x=seqlag(x$lag,x$bylag),y=x$matfit[xvar[i],])))
         if(length(lag)+length(var)>1) {
           plot.arg$main <- ""
           plot.arg$xlab <- "Lag"
@@ -168,7 +168,7 @@ function(x, ptype, var=NULL, lag=NULL, ci="area", ci.arg,
       col=2,xlab="Var",ylab="Outcome",frame.plot=FALSE)
     plot.arg <- modifyList(plot.arg,list(...))
     # SET CONFIDENCE INTERVALS
-    ci.list <- list(panel.first=call(".fci",ci=ci,x=x$predvar,
+    ci.list <- list(panel.first=call("fci",ci=ci,x=x$predvar,
       high=x$allhigh,low=x$alllow,ci.arg,plot.arg,noeff=noeff))
     plot.arg <- modifyList(plot.arg,c(ci.list,
       list(x=x$predvar,y=x$allfit)))
@@ -187,7 +187,7 @@ function(x, ptype, var=NULL, lag=NULL, ci="area", ci.arg,
     col1 <- colorRampPalette(c("blue","white"))
     col2 <- colorRampPalette(c("white","red"))
     col <- c(col1(sum(levels<noeff)),col2(sum(levels>noeff)))
-    filled.contour(x=x$predvar,y=.seq(x$lag,x$bylag),z=x$matfit,col=col,
+    filled.contour(x=x$predvar,y=seqlag(x$lag,x$bylag),z=x$matfit,col=col,
       levels=levels,...)
   }
 #
@@ -202,7 +202,7 @@ function(x, ptype, var=NULL, lag=NULL, ci="area", ci.arg,
       ylab="Lag",	zlab="Outcome",col="lightskyblue",
       zlim=c(min(x$matfit),max(x$matfit)),ltheta=290,shade=0.75,r=sqrt(3),d=5)
     plot.arg <- modifyList(plot.arg,list(...))
-    plot.arg <- modifyList(plot.arg,list(x=x$predvar,y=.seq(x$lag,x$bylag),
+    plot.arg <- modifyList(plot.arg,list(x=x$predvar,y=seqlag(x$lag,x$bylag),
       z=x$matfit))
     # PLOT
     do.call("persp",plot.arg)

@@ -13,7 +13,7 @@ lin(x, int=FALSE)
 
 \arguments{
   \item{x }{ the predictor variable. Missing values are allowed.}
-  \item{int }{ Logical. If \code{TRUE}, an intercept is included in the basis matrix, namely a vector of 1's.}
+  \item{int }{ logical. If \code{TRUE}, an intercept is included in the basis matrix, namely a vector of 1's.}
 }
 
 \details{

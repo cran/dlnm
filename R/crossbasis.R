@@ -1,17 +1,17 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2013
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2014
 #
-`crossbasis` <-
+crossbasis <-
   function(x, lag, argvar=list(), arglag=list(), group=NULL, ...) {         
 #
 ################################################################################
 # COHERENCE CHECKS
 #
   # OLD USAGE
-  .oldcrossbasis(argvar,arglag,list(...))
+  checkoldcrossbasis(argvar,arglag,list(...))
 #
   #  lag MUST BE A POSITIVE INTEGER VECTOR 
-  lag <- if(missing(lag)) c(0,NCOL(x)-1) else .mklag(lag)
+  lag <- if(missing(lag)) c(0,NCOL(x)-1) else mklag(lag)
 #  
   if(!is.list(argvar)) stop("'var' must be a list")
   if(!is.list(arglag)) stop("'arglag' must be a list")
@@ -43,13 +43,13 @@
   # IF NOT SPECIFIED AND AN ARGUMENT, INCLUDE AN INTERCEPT BY DEFAULT
   if(is.null(arglag$int)) arglag$int <- TRUE
 #
-  basislag <- do.call("onebasis",modifyList(arglag,list(x=.seq(lag),cen=FALSE))) 
+  basislag <- do.call("onebasis",modifyList(arglag,list(x=seqlag(lag),cen=FALSE))) 
 #
 ############################################################################
 # CROSSBASIS COMPUTATION
 #
   # GROUP
-  if(!is.null(group)) .checkgroup(group,x,basisvar,lag)
+  if(!is.null(group)) checkgroup(group,x,basisvar,lag)
 #
   # COMPUTE CROSS-BASIS:
   #   FOR TIME SERIES DATA, COMPUTE THE MATRIX OF LAGGED OCCURRENCES FIRST
@@ -57,7 +57,7 @@
   crossbasis <- matrix(0,nrow=dim[1],ncol=ncol(basisvar)*ncol(basislag))
   for(v in seq(length=ncol(basisvar))) {
     if(dim[2]==1L) {
-      mat <- as.matrix(.Lag(basisvar[, v],.seq(lag),group=group))
+      mat <- as.matrix(Lag2(basisvar[, v],seqlag(lag),group=group))
     } else mat <- matrix(basisvar[,v],ncol=diff(lag)+1)
     for(l in seq(length=ncol(basislag))) {
       crossbasis[,ncol(basisvar)*(l-1)+v] <- mat%*%(basislag[,l])

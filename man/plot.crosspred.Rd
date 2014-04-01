@@ -58,7 +58,7 @@ For a detailed illustration of the use of the functions, see:
 \references{
 Gasparrini A. Distributed lag linear and non-linear models in R: the package dlnm. \emph{Journal of Statistical Software}. 2011; \bold{43}(8):1-20. [freely available \href{http://www.ag-myresearch.com/jss2011}{here}].
 
-Gasparrini A. Modeling exposure-lag-response associations with distributed lag non-linear models. 2013; Epub ahead of print. DOI: 10.1002/sim.5963. [freely available \href{http://www.ag-myresearch.com/statmed2013}{here}]
+Gasparrini A. Modeling exposure-lag-response associations with distributed lag non-linear models. 2014; \bold{33}(5):881-899. [freely available \href{http://www.ag-myresearch.com/statmed2014}{here}]
   
 Gasparrini A., Armstrong, B.,Kenward M. G. Distributed lag non-linear models. \emph{Statistics in Medicine}. 2010; \bold{29}(21):2224-2234. [freely available \href{http://www.ag-myresearch.com/statmed2010}{here}]
 }
@@ -68,7 +68,7 @@ Gasparrini A., Armstrong, B.,Kenward M. G. Distributed lag non-linear models. \e
 \note{
 All the predictions are plotted using a reference value corresponding to the centering point for continuous functions or to the default values for the other options (see \code{\link{onebasis}} and \code{\link{crossbasis}}). Exponentiated predictions are returned by default if \code{x$model.link} is equal to \code{log} or \code{logit}.
 
-These methods for class \code{"crosspred"} have replaced the old function \code{crossplot} since version 1.3.0. The old function has been kept in the namespace of the package, but its use is discouraged.
+These methods for class \code{"crosspred"} have replaced the old function \code{crossplot} since version 1.3.0.
 }
 
 \section{Warnings}{

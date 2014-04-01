@@ -14,15 +14,17 @@ thr(x, thr.value=NULL, side=NULL, int=FALSE)
 
 \arguments{
   \item{x }{ the predictor variable. Missing values are allowed.}
-  \item{thr.value }{ Numeric scalar or vector defining the threshold value(s).}
-  \item{side }{ Type of threshold parameterization: \code{"l"} for low, \code{"h"} for high, \code{"d"} for double. See Details below.}
-  \item{int }{ Logical. If \code{TRUE}, an intercept is included in the basis matrix, namely a vector of 1's.}
+  \item{thr.value }{ numeric scalar or vector defining the threshold value(s).}
+  \item{side }{ type of threshold parameterization: \code{"l"} for low, \code{"h"} for high, \code{"d"} for double. See Details below.}
+  \item{int }{ logical. If \code{TRUE}, an intercept is included in the basis matrix. See Details below.}
 }
 
 \details{
 A linear threshold function defines a linear relationship beyond a specific threshold. A high linear threshold defines a linear increase above the threshold, while a low linear threshold defines a linear increase below. A double linear threshold includes both of them.
 
 The argument \code{thr.value} is placed at the median if not provided. If \code{side} is not provided, the default is \code{side="h"} when \code{thr.value} is a scalar, \code{side="d"} otherwise. Only the minimum (for \code{side="h"} and \code{side="l"}) and minimum and maximum values (for \code{side="d"}) of \code{thr.value} are considered.
+
+If \code{int=TRUE}, an intercept is included in the model, namely an additional variable with a constant value of 1.
 }
 
 \value{

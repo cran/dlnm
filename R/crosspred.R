@@ -1,7 +1,7 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2013
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2014
 #
-`crosspred` <-
+crosspred <-
 function(basis, model=NULL, coef=NULL, vcov=NULL, model.link=NULL, at=NULL,
   from=NULL, to=NULL, by=NULL, lag, bylag=1, ci.level=0.95, cumul=FALSE) {
 #
@@ -35,7 +35,7 @@ function(basis, model=NULL, coef=NULL, vcov=NULL, model.link=NULL, at=NULL,
     stop("'ci.level' must be numeric and between 0 and 1")
 #
   #  lag MUST BE A POSITIVE INTEGER VECTOR, BY DEFAULT THAT USED FOR ESTIMATION
-  lag <- if(missing(lag)) attr$lag else .mklag(lag)
+  lag <- if(missing(lag)) attr$lag else mklag(lag)
   if(lag!=attr$lag && attr$arglag$fun=="integer")
       stop("prediction for lag sub-period not allowed for type 'integer'")
 #
@@ -51,9 +51,9 @@ function(basis, model=NULL, coef=NULL, vcov=NULL, model.link=NULL, at=NULL,
   # IF MODEL PROVIDED, EXTRACT FROM HERE, OTHERWISE DIRECTLY FROM COEF AND VCOV
   if(!is.null(model)) {
     model.class <- class(model)
-    coef <- .getcoef(model,model.class,cond)
-    vcov <- .getvcov(model,model.class,cond)
-    model.link <- .getlink(model,model.class)
+    coef <- getcoef(model,model.class,cond)
+    vcov <- getvcov(model,model.class,cond)
+    model.link <- getlink(model,model.class)
   } else model.class <- NA
 #
   # CHECK COEF AND VCOV
@@ -95,7 +95,7 @@ function(basis, model=NULL, coef=NULL, vcov=NULL, model.link=NULL, at=NULL,
 #####################################
 #
   # PREDLAG
-  predlag <- .seq(lag,bylag)
+  predlag <- seqlag(lag,bylag)
   # EXPAND at IF A VECTOR HAS BEEN PROVIDED
   if(is.matrix(at)) {
     matlag <- at
@@ -115,7 +115,7 @@ function(basis, model=NULL, coef=NULL, vcov=NULL, model.link=NULL, at=NULL,
 #
   # NAMES
   rownames(matfit) <- rownames(matse) <- predvar
-  colnames(matfit) <- colnames(matse) <- outer("lag",.seq(lag,bylag),
+  colnames(matfit) <- colnames(matse) <- outer("lag",seqlag(lag,bylag),
     paste,sep="")
 #
 ##########################################################################
@@ -123,14 +123,14 @@ function(basis, model=NULL, coef=NULL, vcov=NULL, model.link=NULL, at=NULL,
 #####################################
 #
   # PREDLAG
-  predlag <- .seq(lag)
+  predlag <- seqlag(lag)
   # EXPAND at IF A VECTOR HAS BEEN PROVIDED
   if(is.matrix(at)) {
     matlag <- at
   } else matlag <- t(rep(1,length(predlag)))%x%predvar 
   # CREATE THE BASIS FOR VAR AND LAG
   basisvar <- do.call("onebasis",c(list(x=matlag),attr$argvar))
-  basislag <- do.call("onebasis",c(list(x=.seq(lag)),attr$arglag))
+  basislag <- do.call("onebasis",c(list(x=seqlag(lag)),attr$arglag))
 #
   # CREATE OVERALL AND (OPTIONAL) CUMULATIVE EFFECTS AND SE
   ZMall <- 0
@@ -152,7 +152,7 @@ function(basis, model=NULL, coef=NULL, vcov=NULL, model.link=NULL, at=NULL,
   names(allfit) <- names(allse) <- predvar
   if(cumul) {
     rownames(cumfit) <- rownames(cumse) <- predvar
-    colnames(cumfit) <- colnames(cumse) <- outer("lag",.seq(lag),paste,sep="")
+    colnames(cumfit) <- colnames(cumse) <- outer("lag",seqlag(lag),paste,sep="")
   }
 #
 ###########################################################################

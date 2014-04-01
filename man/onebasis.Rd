@@ -34,7 +34,7 @@ The function to be called is chosen through the argument \code{fun}. Standard ch
   
   \item \bold{\code{"poly"}}: polynomials functions. Performed through a call to the internal function \code{\link{poly}} (be aware that this is different from \code{\link[stats]{poly}} in the package \pkg{stats}). Arguments passed through \code{\dots} may include \code{degree} and \code{int}.
   
-  \item \bold{\code{"strata"}}: indicator variables defining strata. Performed through a call to the function \code{\link{strata}}. Arguments passed through \code{\dots} may include \code{breaks}, \code{df} and \code{int}.
+  \item \bold{\code{"strata"}}: indicator variables defining strata. Performed through a call to the function \code{\link{strata}}. Arguments passed through \code{\dots} may include \code{breaks}, \code{df}, \code{ref} and \code{int}.
   
   \item \bold{\code{"thr"}}: high, low or double linear threshold functions. Performed through a call to the function \code{\link{thr}}. Arguments passed through \code{\dots} may include \code{thr.value}, \code{side} and \code{int}.
   
@@ -86,14 +86,14 @@ onebasis(1:5, "thr", thr=3, side="l", int=TRUE)
 ### relationship between PM10 and mortality estimated by a step function
 b <- onebasis(chicagoNMMAPS$pm10, "strata", breaks=c(20,40))
 summary(b)
-model <- lm(death ~ b, family=quasipoisson(), chicagoNMMAPS)
+model <- glm(death ~ b, family=quasipoisson(), chicagoNMMAPS)
 pred <- crosspred(b, model, at=0:60)
 plot(pred, xlab="PM10", ylab="RR", main="RR for PM10")
 
 ### relationship between temperature and mortality: double threshold
 b <- onebasis(chicagoNMMAPS$temp, "thr", thr=c(10,25))
 summary(b)
-model <- lm(death ~ b, family=quasipoisson(), chicagoNMMAPS)
+model <- glm(death ~ b, family=quasipoisson(), chicagoNMMAPS)
 pred <- crosspred(b, model, by=1)
 plot(pred, xlab="Temperature (C)", ylab="RR", main="RR for temperature")
 

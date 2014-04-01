@@ -1,7 +1,7 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2013
+### R routines for the R package dlnm (c) Antonio Gasparrini 2013-2014
 #
-`.exphist1` <-
+exphistint <-
 function(time1, exp, lag) {
 #
 ################################################################################
@@ -21,19 +21,19 @@ function(time1, exp, lag) {
 }
 #
 #
-`exphist` <-
+exphist <-
 function(exp, time, lag) {
 #
 ################################################################################
 #
   # CHECKS
   exp <- as.vector(exp)
-  lag <- if(missing(lag)) c(0,length(exp)-1) else .mklag(lag)
+  lag <- if(missing(lag)) c(0,length(exp)-1) else mklag(lag)
   time <- if(missing(time)) seq(length(exp)) else round(time)
   if(any(time<1)) stop("time must composed by positive integer numbers")
 #
   # GENERATE EXPOSURE HISTORIES FOR EACH time
-  hist <- do.call(rbind,lapply(time,.exphist1,exp,lag))
+  hist <- do.call(rbind,lapply(time,exphistint,exp,lag))
   rownames(hist) <- time
 #
   return(hist)

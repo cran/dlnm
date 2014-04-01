@@ -1,7 +1,7 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2013
+### R routines for the R package dlnm (c) Antonio Gasparrini 2013-2014
 #
-`equalknots` <-
+equalknots <-
 function(x, nk=NULL, fun="ns", df=1, degree=3, int=FALSE) {
 #
 ################################################################################

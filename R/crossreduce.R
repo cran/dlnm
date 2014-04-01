@@ -1,7 +1,7 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2013
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2014
 #
-`crossreduce` <-
+crossreduce <-
 function(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
   model.link=NULL, at=NULL, from=NULL, to=NULL, by=NULL, lag, bylag=1,
   ci.level=0.95) {
@@ -39,7 +39,7 @@ function(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
   } else value <- NULL
 #
   #  lag MUST BE A POSITIVE INTEGER VECTOR, BY DEFAULT THAT USED FOR ESTIMATION
-  lag <- if(missing(lag)) attr$lag else .mklag(lag)
+  lag <- if(missing(lag)) attr$lag else mklag(lag)
   if(lag!=attr$lag && attr$arglag$fun=="integer")
       stop("prediction for lag sub-period not allowed for type 'integer'")
 #
@@ -53,9 +53,9 @@ function(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
   # IF MODEL PROVIDED, EXTRACT FROM HERE, OTHERWISE DIRECTLY FROM COEF AND VCOV
   if(!is.null(model)) {
     model.class <- class(model)
-    coef <- .getcoef(model,model.class,cond)
-    vcov <- .getvcov(model,model.class,cond)
-    model.link <- .getlink(model,model.class)
+    coef <- getcoef(model,model.class,cond)
+    vcov <- getvcov(model,model.class,cond)
+    model.link <- getlink(model,model.class)
   } else {
     model.class <- NA
     model.link <- NA
@@ -92,7 +92,7 @@ function(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
 #
   # CREATE TRANSFORMATION MATRIX AND BASIS
   if(type=="overall") {
-    lagbasis <- do.call("onebasis",c(list(x=.seq(lag)),attr$arglag))
+    lagbasis <- do.call("onebasis",c(list(x=seqlag(lag)),attr$arglag))
     M <- (t(rep(1,diff(lag)+1)) %*% lagbasis) %x% 
       diag(ncol(basis)/ncol(lagbasis))
     newbasis <- do.call("onebasis",c(list(x=predvar),attr$argvar))
@@ -103,7 +103,7 @@ function(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
   } else if(type=="var") {
     varbasis <- do.call("onebasis",c(list(x=value),attr$argvar))
     M <- diag(ncol(basis)/ncol(varbasis)) %x% varbasis
-    newbasis <- do.call("onebasis",c(list(x=.seq(lag,bylag)),attr$arglag))
+    newbasis <- do.call("onebasis",c(list(x=seqlag(lag,bylag)),attr$arglag))
   }
 #
   # CREATE NEW SET OF COEF AND VCOV
@@ -118,7 +118,7 @@ function(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
   fit <- as.vector(newbasis%*%newcoef)
   se <- sqrt(diag(newbasis%*%newvcov%*%t(newbasis)))
   if(type=="var") {
-    names(fit) <- names(se) <- outer("lag",.seq(lag,bylag),paste,sep="")
+    names(fit) <- names(se) <- outer("lag",seqlag(lag,bylag),paste,sep="")
   }else names(fit) <- names(se) <- predvar
 #
 ###########################################################################

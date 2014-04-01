@@ -16,19 +16,17 @@ export(exphist)
 #################
 #
 # poly,thr,strata,lin,integer
-#
-# crossplot,mkbasis,mklagbasis
-#
+
 #
 #################
 # INTERNAL
 #################
 #
 # DOCUMENTED
-# .mklag,.fci,.seq,.Lag,.getcoef,.getvcov,.getlink
+# mklag,fci,seqlag,Lag2,getcoef,getvcov,getlink
 #
 # NOT DOCUMENTED:
-#.onAttach,.checkgroup,.oldonebasis,.oldcrossbasis
+#.onAttach,checkgroup,oldonebasis,oldcrossbasis
 #
 #################
 # IMPORTED

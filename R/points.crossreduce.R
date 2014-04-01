@@ -1,7 +1,7 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2013
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2014
 #
-`points.crossreduce` <-
+points.crossreduce <-
 function(x, ci="n", ci.arg, ci.level=x$ci.level, exp=NULL, ...) {
 #
 ################################################################################
@@ -38,13 +38,13 @@ function(x, ci="n", ci.arg, ci.level=x$ci.level, exp=NULL, ...) {
 ##########################################################################
 # GRAPH
 #
-  xvar <- if(x$type=="var") .seq(x$lag,x$bylag) else x$predvar
+  xvar <- if(x$type=="var") seqlag(x$lag,x$bylag) else x$predvar
 #
   # SET DEFAULT VALUES IF NOT INCLUDED BY THE USER
   plot.arg <- list(type="p",col=2)
   plot.arg <- modifyList(plot.arg,list(...))
   # SET CONFIDENCE INTERVALS
-  .fci(ci=ci,x=xvar,high=x$high,low=x$low,ci.arg,plot.arg)
+  fci(ci=ci,x=xvar,high=x$high,low=x$low,ci.arg,plot.arg)
   plot.arg <- modifyList(plot.arg,c(list(x=xvar,y=x$fit)))
   # PLOT
   do.call("points",plot.arg)

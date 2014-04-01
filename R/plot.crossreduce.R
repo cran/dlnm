@@ -1,7 +1,7 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2013
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2014
 #
-`plot.crossreduce` <-
+plot.crossreduce <-
 function(x, ci="area", ci.arg, ci.level=x$ci.level, exp=NULL, ...) {
 #
 ################################################################################
@@ -39,7 +39,7 @@ function(x, ci="area", ci.arg, ci.level=x$ci.level, exp=NULL, ...) {
 # GRAPH
 #
   if(x$type=="var") {
-    xvar <- .seq(x$lag,x$bylag)
+    xvar <- seqlag(x$lag,x$bylag)
     xlab <- "Lag"
   } else {
     xvar <- x$predvar
@@ -51,7 +51,7 @@ function(x, ci="area", ci.arg, ci.level=x$ci.level, exp=NULL, ...) {
     col=2,xlab=xlab,ylab="Outcome",frame.plot=FALSE)
   plot.arg <- modifyList(plot.arg,list(...))
   # SET CONFIDENCE INTERVALS
-  ci.list <- list(panel.first=call(".fci",ci=ci,x=xvar,
+  ci.list <- list(panel.first=call("fci",ci=ci,x=xvar,
     high=x$high,low=x$low,ci.arg,plot.arg,noeff=noeff))
   plot.arg <- modifyList(plot.arg,c(ci.list,list(x=xvar,y=x$fit)))
   # PLOT

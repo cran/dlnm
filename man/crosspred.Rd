@@ -66,7 +66,7 @@ The function \code{\link{summary.crosspred}} returns a summary of the list.
 \references{
 Gasparrini A. Distributed lag linear and non-linear models in R: the package dlnm. \emph{Journal of Statistical Software}. 2011; \bold{43}(8):1-20. [freely available \href{http://www.ag-myresearch.com/jss2011.html}{here}].
 
-Gasparrini A. Modeling exposure-lag-response associations with distributed lag non-linear models. 2013; Epub ahead of print. DOI: 10.1002/sim.5963. [freely available \href{http://www.ag-myresearch.com/statmed2013}{here}]
+Gasparrini A. Modeling exposure-lag-response associations with distributed lag non-linear models. 2014; \bold{33}(5):881-899. [freely available \href{http://www.ag-myresearch.com/statmed2014}{here}]
   
 Gasparrini A., Armstrong, B.,Kenward M. G. Distributed lag non-linear models. \emph{Statistics in Medicine}. 2010; \bold{29}(21):2224-2234. [freely available \href{http://www.ag-myresearch.com/statmed2010}{here}]
 }

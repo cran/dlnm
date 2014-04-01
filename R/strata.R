@@ -1,8 +1,8 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2013
+### R routines for the R package dlnm (c) Antonio Gasparrini 2013-2014
 #
-`strata` <-
-function(x, df=1, breaks=NULL, int=FALSE) {
+strata <-
+function(x, df=1, breaks=NULL, ref=1, int=FALSE) {
 #
 ################################################################################
 #
@@ -17,13 +17,21 @@ function(x, df=1, breaks=NULL, int=FALSE) {
   } else if(df-int>0) breaks <- quantile(x,1/(df-int+1)*1:((df-int)),na.rm=TRUE)
 #
   # TRANSFORMATION
-  x <- cut(x,c(range[1]-0.0001,breaks,range[2]+0.0001),right=FALSE)
-  basis <- matrix(outer(x,levels(x),"==")+0,ncol=length(levels(x)))
-  if(int==FALSE && !is.null(breaks)) basis <- basis[,-1,drop=FALSE]
+  xcat <- cut(x,c(range[1]-0.0001,breaks,range[2]+0.0001),right=FALSE)
+  basis <- matrix(outer(xcat,levels(xcat),"==")+0,ncol=length(levels(xcat)))
+#
+  # DEFINE REFERENCE
+  if(!ref%in%seq(ncol(basis)))
+    stop("wrong value in 'ref' argument. See help('strata')")
+  if(!is.null(breaks)) {
+    basis <- basis[,-ref,drop=FALSE]
+    if(int) basis <- cbind(1,basis)
+  }
 #
   # NAMES AND ATTRIBUTES
   dimnames(basis) <- list(nx,seq(ncol(basis)))
-  attributes(basis) <- c(attributes(basis),list(df=df,breaks=breaks,int=int))
+  attributes(basis) <- c(attributes(basis),list(df=df,breaks=breaks,ref=ref,
+    int=int))
 #
   class(basis) <- c("strata","matrix")
 #

@@ -146,14 +146,14 @@ plot(pred,"slices",var=25,xlab="Lag",ylab="CVD count",type="p",pch=19,ci="bars")
 ###################################################
 ### code chunk number 22: internal1 (eval = FALSE)
 ###################################################
-## help(.getcoef)
+## help(getcoef)
 
 
 ###################################################
 ### code chunk number 23: internal1 (eval = FALSE)
 ###################################################
-## dlnm:::.oldonebasis
-## getAnywhere(.oldonebasis)
+## dlnm:::fci
+## getAnywhere(fci)
 
 
 ###################################################

@@ -8,25 +8,28 @@ The function generates a basis matrix including indicator variables defining int
 }
 
 \usage{
-strata(x, df=1, breaks=NULL, int=FALSE)
+strata(x, df=1, breaks=NULL, ref=1, int=FALSE)
 
 }
 
 \arguments{
   \item{x }{ the predictor variable. Missing values are allowed.}
-  \item{df }{ Dimension of the basis, equal to the number of strata. They depend on \code{breaks} if provided.}
-  \item{breaks }{ Internal cut-off points defining the strata as right-open intervals. If provided, they determine \code{df}.}
-  \item{int }{ Logical. If \code{TRUE}, an intercept is included in the basis matrix. See Details below.}
+  \item{df }{ dimension of the basis, equal to the number of strata. They depend on \code{breaks} if provided.}
+  \item{breaks }{ internal cut-off points defining the strata as right-open intervals. If provided, they determine \code{df}.}
+  \item{ref }{ interval used as reference category. Default to the first stratum.}
+  \item{int }{ logical. If \code{TRUE}, an intercept is included in the basis matrix. See Details below.}
 }
 
 \details{
 The strata are defined by right-open intervals specified through \code{breaks}. If these are not provided, a number of intervals equal to \code{df} is placed at equally-spaced quantiles. This step is performed through an internal call to \code{\link[base]{cut}}.
 
-The argument \code{int} determines the presence of an intercept. If \code{FALSE}, the first interval is excluded, and the parameterization is indentical to dummy variables with the first group as a reference.
+The argument \code{ref} indentifies the reference category, specified by excluding the related stratum in the dummy parameterization of the basis.
+
+If \code{int=TRUE}, an intercept is included in the model, namely an additional variable with a constant value of 1.
 }
 
 \value{
-A matrix object of class \code{"strata"}. It contains the attributes \code{df}, \code{breaks} and \code{int}, with values which can be different than the arguments provided due to internal reset.}
+A matrix object of class \code{"strata"}. It contains the attributes \code{df}, \code{breaks}, \code{ref} and \code{int}, with values which can be different than the arguments provided due to internal reset.}
 
 \author{Antonio Gasparrini, \email{antonio.gasparrini@lshtm.ac.uk}}
 
@@ -45,6 +48,7 @@ See \code{\link{dlnm-package}} for an introduction to the package and for links 
 dlnm:::strata(1:5, breaks=3)
 dlnm:::strata(1:5, df=3)
 dlnm:::strata(1:5, df=3, int=TRUE)
+dlnm:::strata(1:5, df=3, ref=2, int=TRUE)
 
 ### use as an internal function in onebasis
 b <- onebasis(chicagoNMMAPS$pm10, "strata", breaks=c(20,40))

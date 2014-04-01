@@ -14,13 +14,15 @@ poly(x, degree=1, scale, int=FALSE)
 
 \arguments{
   \item{x }{ the predictor variable. Missing values are allowed.}
-  \item{degree }{ Numerical scalar defining the degree of the polynomial.}
-  \item{scale }{ Scaling factor. Default to the maximum of the absolute value of \code{x}.}
-  \item{int }{ Logical. If \code{TRUE}, an intercept is included in the basis matrix. See Details below.}
+  \item{degree }{ numerical scalar defining the degree of the polynomial.}
+  \item{scale }{ scaling factor. Default to the maximum of the absolute value of \code{x}.}
+  \item{int }{ logical. If \code{TRUE}, an intercept is included in the basis matrix. See Details below.}
 }
 
 \details{
-The predictor vector is scaled by default to avoid numerical problem with powers of very high/low values.
+The predictor vector is scaled by default through the argument \code{scale} to avoid numerical problem with powers of very high/low values.
+
+If \code{int=TRUE}, an intercept is included in the model, namely an additional variable with a constant value of 1.
 }
 
 \value{

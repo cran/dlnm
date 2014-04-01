@@ -1,8 +1,22 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2013
+### R routines for the R package dlnm (c) Antonio Gasparrini 2013-2014
 #
-`.oldonebasis` <- 
+checkgroup <- 
+function(group,x,basisvar,lag) {
+#
+################################################################################
+#
+  if(NCOL(x)>1L) stop("'group' allowed only for time series data")
+  if(min(tapply(x,group,length))<=diff(lag))
+    stop("each group must have length > diff(lag)")
+}
+#
+#
+checkoldonebasis <- 
 function(fun,args) {
+#
+################################################################################
+#
   # ARGUMENT bound FOR SPLINE FUNCTIONS
   if(fun%in%c("ns","bs")&&!is.null(args$bound)) {
     names(args)[names(args)=="bound"] <- "Boundary.knots"
@@ -28,7 +42,7 @@ function(fun,args) {
 }
 #
 #
-`.oldcrossbasis` <- 
+checkoldcrossbasis <- 
 function(argvar,arglag,addarg) {
 #
 ################################################################################
@@ -45,7 +59,7 @@ function(argvar,arglag,addarg) {
     warning("argument 'type' replaced by 'fun'. See ?onebasis")
   }
   # OLD DEFAULT KNOTS PLACEMENT FOR LAG SPACE
-  .checklag <- function(fun=NULL,df=NULL,knots=NULL,...) {
+  checklag <- function(fun=NULL,df=NULL,knots=NULL,...) {
     #browser()
     if((is.null(fun)||fun%in%c("ns","bs","strata")) && 
       is.null(knots) && (!is.null(df)&&df>1))
@@ -54,7 +68,7 @@ function(argvar,arglag,addarg) {
         "\n","See also help(logknots) for setting the knots",
         "\n","consistently with the previous versions")
   }
-  do.call(.checklag,arglag)
+  do.call(checklag,arglag)
   # 'VERY' OLD USAGE
   if(any(c("vartype","vardf","vardegree","varknots","varbound","varint",
     "cen","cenvalue","maxlag","lagtype","lagdf","lagdegree","lagknots",

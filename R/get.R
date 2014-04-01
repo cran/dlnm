@@ -1,7 +1,7 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2013
+### R routines for the R package dlnm (c) Antonio Gasparrini 2013-2014
 #
-`.getcoef` <-
+getcoef <-
 function(model, class, cond) {
 #
 ################################################################################
@@ -22,7 +22,7 @@ function(model, class, cond) {
 }
 #
 #
-`.getvcov` <-
+getvcov <-
 function(model, class, cond) {
 #
 ################################################################################
@@ -45,7 +45,7 @@ function(model, class, cond) {
 }
 #
 #
-`.getlink` <-
+getlink <-
 function(model, class) {
 #
 ################################################################################
