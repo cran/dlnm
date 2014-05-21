@@ -82,7 +82,8 @@ crossbasis <-
 #
 #
   attributes(crossbasis) <- c(attributes(crossbasis),
-    list(range=range(x,na.rm=T),lag=lag,argvar=argvar,arglag=arglag))
+    list(df=c(ncol(basisvar),ncol(basislag)),range=range(x,na.rm=T),lag=lag,
+      argvar=argvar,arglag=arglag))
   if(!is.null(group)) attributes(crossbasis)$group <- length(unique(group))
 #
   class(crossbasis) <- c("crossbasis","matrix")

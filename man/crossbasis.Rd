@@ -36,13 +36,13 @@ The argument \code{group}, only used for time series data, defines groups of obs
 }
 
 \value{
-A matrix object of class \code{"crossbasis"} which can be included in a model formula in order to fit a DLNM. It contains the attributes \code{range} (range of the original vector of observations), \code{lag} (lag range), \code{argvar} and \code{arglag} (lists of arguments defining the basis functions in each space, which can be modified if compared to the arguments above). The function \code{\link{summary.crossbasis}} returns a summary of the cross-basis matrix and the related attributes, and can be used to check the options for the basis functions chosen for the two dimensions.
+A matrix object of class \code{"crossbasis"} which can be included in a model formula in order to fit a DLNM. It contains the attributes \code{df} (vector of length 2 with the df for each dimension), \code{range} (range of the original vector of observations), \code{lag} (lag range), \code{argvar} and \code{arglag} (lists of arguments defining the basis functions in each space, which can be modified if compared to the arguments above). The function \code{\link{summary.crossbasis}} returns a summary of the cross-basis matrix and the related attributes, and can be used to check the options for the basis functions chosen for the two dimensions.
 }
 
 \references{
 Gasparrini A. Distributed lag linear and non-linear models in R: the package dlnm. \emph{Journal of Statistical Software}. 2011; \bold{43}(8):1-20. [freely available \href{http://www.ag-myresearch.com/jss2011}{here}].
 
-Gasparrini A. Modeling exposure-lag-response associations with distributed lag non-linear models. 2014; \bold{33}(5):881-899. [freely available \href{http://www.ag-myresearch.com/statmed2014}{here}]
+Gasparrini A. Modeling exposure-lag-response associations with distributed lag non-linear models. \emph{Statistics in Medicine}. 2014; \bold{33}(5):881-899. [freely available \href{http://www.ag-myresearch.com/statmed2014}{here}]
   
 Gasparrini A., Armstrong, B.,Kenward M. G. Distributed lag non-linear models. \emph{Statistics in Medicine}. 2010; \bold{29}(21):2224-2234. [freely available \href{http://www.ag-myresearch.com/statmed2010}{here}]
 }

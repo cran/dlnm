@@ -66,7 +66,7 @@ The function \code{\link{summary.crosspred}} returns a summary of the list.
 \references{
 Gasparrini A. Distributed lag linear and non-linear models in R: the package dlnm. \emph{Journal of Statistical Software}. 2011; \bold{43}(8):1-20. [freely available \href{http://www.ag-myresearch.com/jss2011.html}{here}].
 
-Gasparrini A. Modeling exposure-lag-response associations with distributed lag non-linear models. 2014; \bold{33}(5):881-899. [freely available \href{http://www.ag-myresearch.com/statmed2014}{here}]
+Gasparrini A. Modeling exposure-lag-response associations with distributed lag non-linear models. \emph{Statistics in Medicine}. 2014; \bold{33}(5):881-899. [freely available \href{http://www.ag-myresearch.com/statmed2014}{here}]
   
 Gasparrini A., Armstrong, B.,Kenward M. G. Distributed lag non-linear models. \emph{Statistics in Medicine}. 2010; \bold{29}(21):2224-2234. [freely available \href{http://www.ag-myresearch.com/statmed2010}{here}]
 }
@@ -107,7 +107,7 @@ summary(cb2.temp)
 
 # run the model
 library(splines)
-model2 <- glm(death ~  cb2.o3 + cb2.temp + ns(doy, 4) + ns(year,3) + dow,
+model2 <- glm(death ~  cb2.o3 + cb2.temp + ns(doy, 4) + ns(time,3) + dow,
   family=quasipoisson(), chicagoNMMAPSseas)
   
 # get the predictions for o3 at specific exposure values

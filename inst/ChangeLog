@@ -1,4 +1,18 @@
 ==============================================================================
+Changes in dlnm 2.1.0 (21 May 2014)
+===================================
+
+Minor changes
+-------------
+
+    o Added attribute 'df' in crossbasis objects, with df for each dimension.
+
+    o Adjustment to the example on seasonal analysis.
+
+    o References corrected.
+
+
+==============================================================================
 Changes in dlnm 2.0.9 (01 Apr 2014)
 ===================================
 

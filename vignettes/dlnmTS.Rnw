@@ -203,10 +203,10 @@ cb2.temp <- crossbasis(chicagoNMMAPSseas$temp, lag=10,
 
 The argument \Rarg{group} indicates the variable which defines multiple series: the function then breaks the series at the end of each group and replaces the first rows up to the maximum lag of the cross-basis matrix in the following series with \Rcode{NA}. Each series must be consecutive, complete and ordered. Here I make the assumption that the effect of \ozone{} is null up to 40.3 \microg{} and then linear, applying an high threshold parameterization (\Rcode{fun="thr"}). For temperature, I use a double threshold with the assumption that the effect is linear below 15\Ctemp{} and above 25\Ctemp{}, and null in between. The threshold values are chosen with the argument \Rarg{thr.value} (abbreviated to \Rarg{thr}), while the un-specified argument \Rarg{side} is set to the default value \Rcode{"h"} for the first cross-basis and to \Rcode{"d"} for the second one (given two threshold values are provided). Regarding the lag dimension, I specify an unconstrained function for \ozone{}, applying one parameter for each lag (\Rarg{fun="integer"}) up to a 5 days (with minimum lag equal to 0 by default). For temperature, I define 3 strata intervals at lag 0-1, 2-5, 6-10. A summary of the choices made for the cross-bases can be shown by the method \Rmethod{summary}.
 
-The regression model includes natural splines for day of the year and year, in order to describe the seasonal effect within each year, and the long-time trend, respectively. Apart from that, the estimates and predictions are carried out in the same way as in Section~\ref{sec:example1simple}. The code is:
+The regression model includes natural splines for day of the year and time, in order to describe the seasonal effect within each year, and the long-time trend, respectively. In particular, the latter has far less degrees of freedom, if compared to the previous analysis, as it only needs to capture a smooth annual trend. Apart from that, the estimates and predictions are carried out in the same way as in Section~\ref{sec:example1simple}. The code is:
 
 <<example2modelpred>>=
-model2 <- glm(death ~  cb2.o3 + cb2.temp + ns(doy, 4) + ns(year,3) + dow,
+model2 <- glm(death ~  cb2.o3 + cb2.temp + ns(doy, 4) + ns(time,3) + dow,
   family=quasipoisson(), chicagoNMMAPSseas)
 pred2.o3 <- crosspred(cb2.o3, model2, at=c(0:65,40.3,50.3))
 @

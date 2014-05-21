@@ -91,7 +91,7 @@ cb2.temp <- crossbasis(chicagoNMMAPSseas$temp, lag=10,
 ###################################################
 ### code chunk number 13: example2modelpred
 ###################################################
-model2 <- glm(death ~  cb2.o3 + cb2.temp + ns(doy, 4) + ns(year,3) + dow,
+model2 <- glm(death ~  cb2.o3 + cb2.temp + ns(doy, 4) + ns(time,3) + dow,
   family=quasipoisson(), chicagoNMMAPSseas)
 pred2.o3 <- crosspred(cb2.o3, model2, at=c(0:65,40.3,50.3))
 
