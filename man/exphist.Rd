@@ -14,7 +14,7 @@ exphist(exp, time, lag)
 \arguments{
   \item{exp }{ an exposure profile defined at equally-spaced time units, from time 1 on.}
   \item{time }{ either a numeric scalar or vector of positive integer numbers specifying the time points at which each exposure history is evaluated. By default, all the time points of \code{exp}.}
-  \item{lag }{ either an integer scalar or vector of length 2, defining the the maximum lag or the lag range, respectively. By default, the lag period from 0 to \code{length(exp)-1}.}
+  \item{lag }{ either an integer scalar or vector of length 2, defining the the maximum lag or the lag range, respectively. Only non-negative lags allowed. By default, the lag period from 0 to \code{length(exp)-1}.}
 }
 
 \details{

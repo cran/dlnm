@@ -29,6 +29,7 @@ function(exp, time, lag) {
   # CHECKS
   exp <- as.vector(exp)
   lag <- if(missing(lag)) c(0,length(exp)-1) else mklag(lag)
+  if(any(lag<0)) stop("only non-negative lags allowed")
   time <- if(missing(time)) seq(length(exp)) else round(time)
   if(any(time<1)) stop("time must composed by positive integer numbers")
 #

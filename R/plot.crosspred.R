@@ -12,7 +12,7 @@ function(x, ptype, var=NULL, lag=NULL, ci="area", ci.arg,
   if(missing(ptype)) {
     if(!is.null(var)||!is.null(lag)) {
       ptype <- "slices"
-    }else if(x$lag[2]==0) {
+    }else if(diff(x$lag)==0) {
       ptype <- "overall"
     } else ptype <- "3d"
   }
@@ -196,7 +196,7 @@ function(x, ptype, var=NULL, lag=NULL, ci="area", ci.arg,
 #########
 #
   if(ptype=="3d") {
-    if(x$lag[2]==0) stop("3D plot not conceivable for unlagged associations")
+    if(diff(x$lag)==0) stop("3D plot not conceivable for unlagged associations")
     # SET DEFAULT VALUES IF NOT INCLUDED BY THE USER
     plot.arg <- list(ticktype="detailed",theta=210,phi=30,xlab="Var",
       ylab="Lag",	zlab="Outcome",col="lightskyblue",

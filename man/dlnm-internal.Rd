@@ -31,6 +31,7 @@ getlink(model, class)
 }
 
 \arguments{
+  \item{lag }{ either an integer scalar or vector of length 2, defining the the maximum lag or the lag range, respectively.}
   \item{ci }{ type of confidence intervals representation.}
   \item{x }{ the coordinates of the x axis.}
   \item{high, low }{ the coordinates of the y axis for the interval.}
