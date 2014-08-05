@@ -1,4 +1,4 @@
-e80bd0c31adc4104535ed6e96ca20c28 *DESCRIPTION
+54646018e15226fcbb892aef3eac37b5 *DESCRIPTION
 bace2f1851acb726348c873988948877 *NAMESPACE
 4f42b0cee41cc03aac76c538f29d4121 *R/Lag2.R
 46b322932446217c27ed9f214d9f2e1b *R/check.R
@@ -11,7 +11,7 @@ d9070d355a8bebb7e3a9beca7887a6c7 *R/equalknots.R
 03057748df3637d8dd193e560373090e *R/exphist.R
 c1bb30ac48763e56a1f61a9b34734ebf *R/fci.R
 1e70b9c060bdf7a5985c8d5b95c54bd7 *R/get.R
-f02bcc99cc423c8b5fddba42851413ec *R/integer.R
+f0637d894d13fd0002c27be2c4888c96 *R/integer.R
 ba626849aa298fec84d47321affa7dc5 *R/lin.R
 57f042eec35747d67d3e82248dceb0a3 *R/lines.crosspred.R
 b22a96c7b2c0a92516fe7a951808fa97 *R/lines.crossreduce.R
@@ -38,19 +38,19 @@ dd462cafa82808bcc3f46cd67ad0cdc7 *data/chicagoNMMAPS.rda
 2e60ec3cb2648af992c728ef1dcf7267 *data/drug.rda
 adc695ed75c53ab9d4537f8abf35ed0b *data/nested.rda
 ad5960ca77bead2b6959d0909a546c61 *inst/CITATION
-26be8979ed237274e2f82e72f98df5ba *inst/ChangeLog
+baed571e9d7d131ca57546458a5476fe *inst/ChangeLog
 91afdd669a36d742c32a969c5620890d *inst/Changesince151
 d345193c5b991d9e97e60397c8bb9d05 *inst/Changesince200
 06e9fa134bab285cbc60f9d2a6193329 *inst/doc/biblioVignette.bib
 14418c9f8e3eb26f6271eeec92f9d14c *inst/doc/dlnmExtended.R
 186fd48e16d1e8a33c19798406171b1c *inst/doc/dlnmExtended.Rnw
-065e2d2906d1ecdd24a0837a41593a5f *inst/doc/dlnmExtended.pdf
+c64602579b05499f98c36f87da67a1b4 *inst/doc/dlnmExtended.pdf
 d7c27eed1693dc9fd39435ea6053883a *inst/doc/dlnmOverview.R
 86810b54000610ed86bf1c31a317f14d *inst/doc/dlnmOverview.Rnw
-e09334857dac8034bd16266bfa33fa87 *inst/doc/dlnmOverview.pdf
+3972ab554602d6b0bec8a643964c3fa0 *inst/doc/dlnmOverview.pdf
 d67adb2f02bfc83d7dfc3437ce4de1dc *inst/doc/dlnmTS.R
 22a863f5a6d511e1ead6e76610b8f6f2 *inst/doc/dlnmTS.Rnw
-d6f5d15daed6e7cfd23de92814074367 *inst/doc/dlnmTS.pdf
+09d447d18246cd056e58cf6e24825f33 *inst/doc/dlnmTS.pdf
 9408c6021d021246a1ebce33505b4e0b *man/chicagoNMMAPS.Rd
 ff2c1b99783f19f2804d80b6dd4b16b7 *man/coef.crosspred.Rd
 862873c173c5fbd3f57335682892bc93 *man/crossbasis.Rd
@@ -61,7 +61,7 @@ ecf90abbb5650776238bf668f55b5f51 *man/dlnm-package.Rd
 6cd3aa55cccccc637e5d93e037cbdb98 *man/drug.Rd
 f491a5cdf0037c73d6fbb689a6387d85 *man/equalknots.Rd
 1e0816a493de57f276630b2db9e1a6a2 *man/exphist.Rd
-fa26c7edc1f3998f124a9e763b3295f7 *man/integer.Rd
+decb831fc0d190a097d31c702d3930e4 *man/integer.Rd
 f0af9df971f12050196f63b9912bbd31 *man/lin.Rd
 6c744a4749c5a0e23c78e62c9b61ba34 *man/logknots.Rd
 936bce7b8a2bec79359fb0b56f717d2f *man/nested.Rd
