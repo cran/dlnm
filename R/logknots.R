@@ -1,8 +1,8 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2013-2014
+### R routines for the R package dlnm (c) Antonio Gasparrini 2013-2016
 #
 logknots <-
-function(x, nk=NULL, fun="ns", df=1, degree=3, int=TRUE) {
+function(x, nk=NULL, fun="ns", df=1, degree=3, intercept=TRUE) {
 #
 ################################################################################
 #
@@ -15,7 +15,8 @@ function(x, nk=NULL, fun="ns", df=1, degree=3, int=TRUE) {
   # CHOOSE NUMBER OF KNOTS IF NOT PROVIDED
   if(is.null(nk)) {
     fun <- match.arg(fun,c("ns","bs","strata"))
-    nk <- switch(fun,"ns"=df-1-int,"bs"=df-degree-int,"strata"=df-int)
+    nk <- switch(fun,"ns"=df-1-intercept,"bs"=df-degree-intercept,
+      "strata"=df-intercept)
   }
 #
   # DEFINE KNOTS AT EQUALLY-SPACED LOG-VALUES ALONG lag

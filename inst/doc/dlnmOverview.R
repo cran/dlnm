@@ -46,7 +46,7 @@ onebasis(1:5,fun="poly",degree=3)
 ### code chunk number 8: onebasis2
 ###################################################
 mylog <- function(x) log(x)
-onebasis(1:5,"mylog",cen=FALSE)
+onebasis(1:5,"mylog")
 
 
 ###################################################
@@ -60,7 +60,7 @@ hist
 ###################################################
 ### code chunk number 10: crossbasis1
 ###################################################
-crossbasis(hist,lag=c(2,5),argvar=list(fun="poly",degree=2,cen=5),
+crossbasis(hist,lag=c(2,5),argvar=list(fun="poly",degree=2),
   arglag=list(fun="strata",breaks=4))[,]
 
 
@@ -96,7 +96,7 @@ crosspred(cb,model,at=histpred)$allfit
 ###################################################
 ### code chunk number 15: plot3dcontournoeval (eval = FALSE)
 ###################################################
-## plot(pred,ptype="3d",main="3D plot",xlab="Temperature",zlab="CVD count",
+## plot(pred,ptype="3d",main="3D plot",xlab="Temperature",zlab="CVD excess count",
 ##   theta=200, ltheta=180)
 ## plot(pred,ptype="contour",key.title=title("CVD"),
 ##   plot.title=title("Contour plot",xlab="Temperature",ylab="Lag"))
@@ -105,7 +105,7 @@ crosspred(cb,model,at=histpred)$allfit
 ###################################################
 ### code chunk number 16: plot3d
 ###################################################
-plot(pred,ptype="3d",main="3D plot",xlab="Temperature",zlab="CVD count",
+plot(pred,ptype="3d",main="3D plot",xlab="Temperature",zlab="CVD excess count",
   theta=200, ltheta=180)
 
 
@@ -162,5 +162,6 @@ plot(pred,"slices",var=25,xlab="Lag",ylab="CVD count",type="p",pch=19,ci="bars")
 ## file.show(system.file("ChangeLog", package="dlnm"))
 ## file.show(system.file("Changesince151", package="dlnm"))
 ## file.show(system.file("Changesince200", package="dlnm"))
+## file.show(system.file("Changesince220", package="dlnm"))
 
 

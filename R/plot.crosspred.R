@@ -1,5 +1,5 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2014
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2016
 #
 plot.crosspred <-
 function(x, ptype, var=NULL, lag=NULL, ci="area", ci.arg,
@@ -8,6 +8,8 @@ function(x, ptype, var=NULL, lag=NULL, ci="area", ci.arg,
 ################################################################################
 #
   if(class(x)!="crosspred") stop("'x' must be of class 'crosspred'")
+  ci <- match.arg(ci,c("area","bars","lines","n"))
+#
   # SETTING DEFAULT FOR ptype: OVERALL FOR NO LAG, SLICES FOR VAR/LAG, OTHERWISE 3D
   if(missing(ptype)) {
     if(!is.null(var)||!is.null(lag)) {
@@ -16,9 +18,8 @@ function(x, ptype, var=NULL, lag=NULL, ci="area", ci.arg,
       ptype <- "overall"
     } else ptype <- "3d"
   }
-  if(!ptype%in%c("slices","3d","contour","overall")) {
-    stop("'ptype' must be one of 'slices','3d','contour','overall'")
-  }
+  ptype <- match.arg(ptype,c("slices","3d","contour","overall"))
+#
   if(is.null(var)&&is.null(lag)&&(ptype=="slices")) {
     stop("at least 'var' or 'lag' must be provided when ptype='slices'")
   }
@@ -36,9 +37,6 @@ function(x, ptype, var=NULL, lag=NULL, ci="area", ci.arg,
   }
   if(!is.null(lag)&&sum(lag%in%seqlag(x$lag,x$bylag))!=length(lag)&&(ptype=="slices")) {
     stop("'lag' must match values used for prediction")
-  }
-  if(!ci%in%c("area","bars","lines","n")) {
-    stop("'ci' must be one of 'area', 'bars', 'lines' or 'n'")
   }
   if(missing(ci.arg)) {
     ci.arg <- list()
@@ -73,7 +71,7 @@ function(x, ptype, var=NULL, lag=NULL, ci="area", ci.arg,
   noeff <- 0
 #
   # EXPONENTIAL
-  if((is.null(exp)&&x$model.link%in%c("log","logit"))||
+  if((is.null(exp)&&!is.null(x$model.link)&&x$model.link%in%c("log","logit"))||
     (!is.null(exp)&&exp==TRUE)) {
     x$matfit <- exp(x$matfit)
     x$mathigh <- exp(x$mathigh)
@@ -109,8 +107,8 @@ function(x, ptype, var=NULL, lag=NULL, ci="area", ci.arg,
       xlag <- paste("lag",lag,sep="")
       for(i in seq(along=lag)) {
         # SET DEFAULT VALUES IF NOT INCLUDED BY THE USER
-        plot.arg <- list(type="l",col=2,xlab="Var",ylab="Outcome",
-          ylim=c(min(x$matlow[,xlag]),max(x$mathigh[,xlag])),frame.plot=FALSE)
+        plot.arg <- list(type="l",xlab="Var",ylab="Outcome",
+          ylim=c(min(x$matlow[,xlag]),max(x$mathigh[,xlag])),bty="l")
         if(length(lag)+length(var)>1)  plot.arg$cex.axis <- 0.7
         plot.arg <- modifyList(plot.arg,list(...))		
         # SET CONFIDENCE INTERVALS
@@ -134,8 +132,8 @@ function(x, ptype, var=NULL, lag=NULL, ci="area", ci.arg,
       xvar <- as.character(var)
       for(i in seq(along=var)) {
         # SET DEFAULT VALUES IF NOT INCLUDED BY THE USER
-        plot.arg <- list(type="l",col=2,xlab="Lag",ylab="Outcome",
-          ylim=c(min(x$matlow[xvar,]),max(x$mathigh[xvar,])),frame.plot=FALSE)
+        plot.arg <- list(type="l",xlab="Lag",ylab="Outcome",
+          ylim=c(min(x$matlow[xvar,]),max(x$mathigh[xvar,])),bty="l")
         if(length(lag)+length(var)>1)  plot.arg$cex.axis <- 0.7
         plot.arg <- modifyList(plot.arg,list(...))		
         # SET CONFIDENCE INTERVALS
@@ -165,7 +163,7 @@ function(x, ptype, var=NULL, lag=NULL, ci="area", ci.arg,
   if(ptype=="overall") {
     # SET DEFAULT VALUES IF NOT INCLUDED BY THE USER
     plot.arg <- list(type="l",ylim=c(min(x$alllow),max(x$allhigh)),
-      col=2,xlab="Var",ylab="Outcome",frame.plot=FALSE)
+      xlab="Var",ylab="Outcome",bty="l")
     plot.arg <- modifyList(plot.arg,list(...))
     # SET CONFIDENCE INTERVALS
     ci.list <- list(panel.first=call("fci",ci=ci,x=x$predvar,

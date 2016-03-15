@@ -1,5 +1,5 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2014
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2016
 #
 summary.crossbasis <-
 function(object, ...) {
@@ -15,17 +15,20 @@ function(object, ...) {
   cat("total df: ",ncol(object),"\n")
 #
   cat("\nBASIS FOR VAR:\n")
-  for(i in seq(attr$argvar)[-2]) {
+  attr$argvar$cen <- NULL
+  for(i in seq(attr$argvar)) {
     cat(names(attr$argvar[i]),": ",sep="")
-    cat(attr$argvar[[i]],"\n",sep=" ")
+    if(length(attr$argvar[[i]])<7) {
+      cat(attr$argvar[[i]],"\n",sep=" ")
+    } else cat(attr$argvar[[i]][seq(7)],"...","\n",sep=" ")
   }
-  if(!is.logical(attr$argvar$cen) )
-    cat("centered at",attr$argvar$cen,"\n") else cat("not centered","\n")
 #  
   cat("\nBASIS FOR LAG:\n")
-  for(i in seq(attr$arglag)[-2]) {
+  for(i in seq(attr$arglag)) {
     cat(names(attr$arglag[i]),": ",sep="")
-    cat(attr$arglag[[i]],"\n",sep=" ")
+    if(length(attr$arglag[[i]])<7) {
+      cat(attr$arglag[[i]],"\n",sep=" ")
+    } else cat(attr$arglag[[i]][seq(7)],"...","\n",sep=" ")
   }
   cat("\n")
 }

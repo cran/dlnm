@@ -8,20 +8,20 @@ The function generates a basis matrix including a linear un-transformed variable
 }
 
 \usage{
-lin(x, int=FALSE)
+lin(x, intercept=FALSE)
 }
 
 \arguments{
   \item{x }{ the predictor variable. Missing values are allowed.}
-  \item{int }{ logical. If \code{TRUE}, an intercept is included in the basis matrix, namely a vector of 1's.}
+  \item{intercept }{ logical. If \code{TRUE}, an intercept is included in the basis matrix, namely a vector of 1's.}
 }
 
 \details{
-The function returns a basis matrix with the un-transformed variable, optionally with an intercept if \code{int=TRUE}.
+The function returns a basis matrix with the un-transformed variable, optionally with an intercept if \code{intercept=TRUE}.
 }
 
 \value{
-A matrix object of class \code{"lin"}. It contains the attribute \code{int}.
+A matrix object of class \code{"lin"}. It contains the attribute \code{intercept}.
 }
 
 \author{Antonio Gasparrini, \email{antonio.gasparrini@lshtm.ac.uk}}
@@ -39,7 +39,7 @@ See \code{\link{dlnm-package}} for an introduction to the package and for links 
 \examples{
 ### simple use (accessing non-exported function through ':::')
 dlnm:::lin(1:5)
-dlnm:::lin(1:5, int=TRUE)
+dlnm:::lin(1:5, intercept=TRUE)
 
 ### use as an internal function in onebasis (note the centering)
 b <- onebasis(chicagoNMMAPS$pm10, "lin")

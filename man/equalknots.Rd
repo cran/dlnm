@@ -8,7 +8,7 @@ This function defines the position of knot or cut-off values at equally-spaced v
 }
 
 \usage{
-equalknots(x, nk=NULL, fun="ns", df=1, degree=3, int=FALSE)
+equalknots(x, nk=NULL, fun="ns", df=1, degree=3, intercept=FALSE)
 }
 
 \arguments{
@@ -17,11 +17,11 @@ equalknots(x, nk=NULL, fun="ns", df=1, degree=3, int=FALSE)
   \item{fun }{ character scalar with the name of the function for which the knots or cut-offs must be created. See Details below.}
   \item{df }{ degree of freedom.}
   \item{degree }{ degree of the piecewise polynomial. Only for \code{fun="bs"}.}
-  \item{int }{ logical. If an intercept is included in the basis function.}
+  \item{intercept }{ logical. If an intercept is included in the basis function.}
 }
 
 \details{
-The number of knots is set with the argument \code{nk}, or otherwise determined by the choice of function and number of degrees of freedom through the arguments \code{fun} and \code{df}. Specifically, the number of knots is set to \code{df-1-int} for \code{"ns"}, \code{df-degree-int} for \code{"bs"}, or \code{df-int} for \code{"strata"}.
+The number of knots is set with the argument \code{nk}, or otherwise determined by the choice of function and number of degrees of freedom through the arguments \code{fun} and \code{df}. Specifically, the number of knots is set to \code{df-1-intercept} for \code{"ns"}, \code{df-degree-intercept} for \code{"bs"}, or \code{df-intercept} for \code{"strata"}.
 }
 
 \value{
@@ -47,7 +47,7 @@ equalknots(20, fun="strata", df=4)
 
 ### with and without without intercept
 equalknots(20, fun="ns", df=4)
-equalknots(20, fun="ns", df=4, int=TRUE)
+equalknots(20, fun="ns", df=4, intercept=TRUE)
 }
 
 \keyword{smooth}

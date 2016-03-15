@@ -1,8 +1,8 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2014
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2016
 #
 onebasis <-
-function(x, fun="ns", cen, ...) {
+function(x, fun="ns", ...) {
 #
 ################################################################################
 #
@@ -11,13 +11,10 @@ function(x, fun="ns", cen, ...) {
   range <- range(x,na.rm=TRUE)
   args <- list(...)
   args$x <- x
+  cen <- args$cen
 #
-  # CHECK fun
-  if(!is.character(fun)) stop("'fun' must be character")
-  # CHECK OLD CODE
-  checkoldonebasis(fun,args)
-  # CHECK fun HAS x ARGUMENT
-  if(all(names(formals(fun))!="x")) stop("'fun' must contain argument 'x'")
+  # CHECK THE CONTENT AND OPTIONALLY MODIFY OBJECTS THROUGH assign
+  checkonebasis(fun,args,cen)
 #
 ###########################################################################
 # TRANSFORMATION
@@ -28,21 +25,10 @@ function(x, fun="ns", cen, ...) {
   if(is.null(dim(basis))) dim(basis) <- c(length(x),1)
   attr <- attributes(basis)
 #
-################################################################################
-# CENTERING 
-#
-  if((!is.null(attr$int)&&attr$int) || 
-    (fun%in%c("thr","strata","integer"))) cen <- FALSE
-  if(missing(cen) || (is.logical(cen))&&cen) cen <- mean(x,na.rm=TRUE)
-  ind <- match(names(formals(fun)),names(attr),nomatch=0)
-  argscen <- if(all(ind==0)) list() else attr[ind]
-  if(!is.logical(cen))
-    basis <- sweep(basis,2,do.call(fun,args=c(list(x=cen),argscen)))
-#
 ##########################################################################
 #
-  # NAMES AND ATTRIBUTES
-  attributes(basis) <- c(list(fun=fun,cen=cen,range=range),attr)
+  # NAMES AND ATTRIBUTES (KEEP cen IF PROVIDED, TO BE USED LATER FOR CENTERING)
+  attributes(basis) <- c(list(fun=fun),attr,list(range=range,cen=cen))
   dimnames(basis) <- list(nx,paste("b",seq(ncol(basis)),sep=""))
 #
   class(basis) <- c("onebasis","matrix")

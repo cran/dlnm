@@ -1,5 +1,5 @@
 ==============================================================================
-Changes since dlnm 2.0.0 (10 Sept 2013) : further info
+Changes in dlnm 2.0.0 (10 Sept 2013) : further info
 ===================================
 
 Since version 2.0.0, the dlnm package includes important changes. These changes 
@@ -30,7 +30,7 @@ The syntax for the old versions still works in many other cases, and changes are
 included internally when possible. However, the functions return a warning with
 a suggestion of adopting the new syntax.
 
-An updated version of published code in various articles is available at:
+An updated version of code published in various articles is available at:
 www.ag-myresearch.com
 
 Detailed info on changes are provided in:

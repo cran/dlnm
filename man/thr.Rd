@@ -8,7 +8,7 @@ The function generates a basis matrix including transformed variables through hi
 }
 
 \usage{
-thr(x, thr.value=NULL, side=NULL, int=FALSE)
+thr(x, thr.value=NULL, side=NULL, intercept=FALSE)
 
 }
 
@@ -16,7 +16,7 @@ thr(x, thr.value=NULL, side=NULL, int=FALSE)
   \item{x }{ the predictor variable. Missing values are allowed.}
   \item{thr.value }{ numeric scalar or vector defining the threshold value(s).}
   \item{side }{ type of threshold parameterization: \code{"l"} for low, \code{"h"} for high, \code{"d"} for double. See Details below.}
-  \item{int }{ logical. If \code{TRUE}, an intercept is included in the basis matrix. See Details below.}
+  \item{intercept }{ logical. If \code{TRUE}, an intercept is included in the basis matrix. See Details below.}
 }
 
 \details{
@@ -24,11 +24,11 @@ A linear threshold function defines a linear relationship beyond a specific thre
 
 The argument \code{thr.value} is placed at the median if not provided. If \code{side} is not provided, the default is \code{side="h"} when \code{thr.value} is a scalar, \code{side="d"} otherwise. Only the minimum (for \code{side="h"} and \code{side="l"}) and minimum and maximum values (for \code{side="d"}) of \code{thr.value} are considered.
 
-If \code{int=TRUE}, an intercept is included in the model, namely an additional variable with a constant value of 1.
+If \code{intercept=TRUE}, an intercept is included in the model, namely an additional variable with a constant value of 1.
 }
 
 \value{
-A matrix object of class \code{"thr"}. It contains the attributes \code{thr.value}, \code{side} and \code{int}, with values which can be different than the arguments provided due to internal reset.}
+A matrix object of class \code{"thr"}. It contains the attributes \code{thr.value}, \code{side} and \code{intercept}, with values which can be different than the arguments provided due to internal reset.}
 
 \author{Antonio Gasparrini, \email{antonio.gasparrini@lshtm.ac.uk}}
 
@@ -46,7 +46,7 @@ See \code{\link{dlnm-package}} for an introduction to the package and for links 
 ### simple use (accessing non-exported function through ':::')
 dlnm:::thr(1:5, thr=3)
 dlnm:::thr(1:5, side="d")
-dlnm:::thr(1:5, side="d", int=TRUE)
+dlnm:::thr(1:5, side="d", intercept=TRUE)
 
 ### use as an internal function in onebasis
 b <- onebasis(chicagoNMMAPS$pm10, "thr", thr.value=20)

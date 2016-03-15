@@ -1,8 +1,8 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2013-2014
+### R routines for the R package dlnm (c) Antonio Gasparrini 2013-2016
 #
 lin <-
-function(x, int=FALSE) {
+function(x, intercept=FALSE) {
 #
 ################################################################################
 #
@@ -11,11 +11,11 @@ function(x, int=FALSE) {
 #
   # TRANSFORMATION
   basis <- as.matrix(x)
-  if(int) basis <- cbind(1,basis)
+  if(intercept) basis <- cbind(1,basis)
 #
   # NAMES AND ATTRIBUTES
   dimnames(basis) <- list(nx,seq(ncol(basis)))
-  attributes(basis) <- c(attributes(basis),list(int=int))
+  attributes(basis) <- c(attributes(basis),list(intercept=intercept))
 #
   class(basis) <- c("lin","matrix")
 #

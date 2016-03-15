@@ -1,5 +1,5 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2014
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2016
 #
 summary.crossreduce <-
 function(object, ...) {
@@ -21,10 +21,9 @@ function(object, ...) {
     cat(names(args[i]),": ",sep="")
     cat(args[[i]],"\n",sep=" ")
   }
-#
-  if(attr$cen) cat("centered at",attr$cen,"\n") else cat("not centered","\n")
 #  
   cat("\nPREDICTIONS:\n")
+  if(!is.null(object$cen)) cat("centered at:",object$cen,"\n")
   if(object$type!="var") cat("range:",min(object$predvar),"to",
     max(object$predvar),"\n")
   if(object$type=="var") cat("lag period:",object$lag,"\n")

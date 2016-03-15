@@ -1,8 +1,8 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2013-2014
+### R routines for the R package dlnm (c) Antonio Gasparrini 2013-2016
 #
 integer <-
-function(x, values, int=FALSE) {
+function(x, values, intercept=FALSE) {
 #
 ################################################################################
 #
@@ -18,12 +18,13 @@ function(x, values, int=FALSE) {
 #
   # IF INTERCEPT IS NOT REQUIRED, DROP THE FIRST COLUMN
   if(ncol(basis)>1L) {
-    if(!int) basis <- basis[,-1L,drop=FALSE]
-  } else int <- TRUE
+    if(!intercept) basis <- basis[,-1L,drop=FALSE]
+  } else intercept <- TRUE
 #
   # NAMES AND ATTRIBUTES
   dimnames(basis) <- list(nx,seq(ncol(basis)))
-  attributes(basis) <- c(attributes(basis),list(values=levels,int=int))
+  attributes(basis) <- c(attributes(basis),list(values=levels,
+    intercept=intercept))
 #
   class(basis) <- c("integer","matrix")
 #

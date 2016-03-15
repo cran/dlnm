@@ -39,7 +39,7 @@ Qnest[1:3,1:11]
 ###################################################
 ### code chunk number 6: cbdrug
 ###################################################
-cbdrug <- crossbasis(Qdrug, lag=27, argvar=list("lin",cen=0),
+cbdrug <- crossbasis(Qdrug, lag=27, argvar=list("lin"),
   arglag=list(fun="ns",knots=c(9,18)))
 
 
@@ -97,8 +97,8 @@ plot(pdrug, lag=10, ylab="Effect at lag 10", xlab="Dose",ylim=c(-1,5))
 ###################################################
 ### code chunk number 15: cbnested
 ###################################################
-cbnest <- crossbasis(Qnest, lag=c(3,40), argvar=list("bs",degree=2,
-  df=3,cen=0), arglag=list(fun="ns",knots=c(10,30),int=F))
+cbnest <- crossbasis(Qnest, lag=c(3,40), argvar=list("bs",degree=2,df=3),
+  arglag=list(fun="ns",knots=c(10,30),intercept=F))
 
 
 ###################################################
@@ -106,7 +106,7 @@ cbnest <- crossbasis(Qnest, lag=c(3,40), argvar=list("bs",degree=2,
 ###################################################
 library(survival)
 mnest <- clogit(case~cbnest+strata(riskset), nested)
-pnest <- crosspred(cbnest,mnest, at=0:20*5)
+pnest <- crosspred(cbnest,mnest, cen=0, at=0:20*5)
 
 
 ###################################################
@@ -144,55 +144,47 @@ mylog <- function(x) log(x+1)
 ###################################################
 ### code chunk number 22: cbnest2
 ###################################################
-cbnest2 <- crossbasis(Qnest, lag=c(3,40), argvar=list("mylog",cen=0),
-  arglag=list(fun="ns",knots=c(10,30),int=F))
+cbnest2 <- crossbasis(Qnest, lag=c(3,40), argvar=list("mylog"),
+  arglag=list(fun="ns",knots=c(10,30),intercept=F))
 summary(cbnest2)
 
 
 ###################################################
-### code chunk number 23: pnest2noeval (eval = FALSE)
-###################################################
-## mnest2 <- clogit(case~cbnest2+strata(riskset), nested)
-## pnest2 <- crosspred(cbnest2, mnest2, at=0:20*5)
-## plot(pnest2, zlab="OR", xlab="Exposure", ylab="Lag (years)")
-## plot(pnest2, var=50, ylab="OR for exposure 50", xlab="Lag (years)", xlim=c(0,40))
-## lines(pnest, var=50, lty=2)
-## plot(pnest2, lag=5, ylab="OR at lag 5", xlab="Exposure", ylim=c(0.95,1.15))
-## lines(pnest, lag=5, lty=2)
-
-
-###################################################
-### code chunk number 24: pnest2
+### code chunk number 23: pnest2
 ###################################################
 mnest2 <- clogit(case~cbnest2+strata(riskset), nested)
-pnest2 <- crosspred(cbnest2, mnest2, at=0:20*5)
-
+pnest2 <- crosspred(cbnest2, mnest2, cen=0, at=0:20*5)
+plot(pnest2, zlab="OR", xlab="Exposure", ylab="Lag (years)")
+plot(pnest2, var=50, ylab="OR for exposure 50", xlab="Lag (years)", xlim=c(0,40))
+lines(pnest, var=50, lty=2)
+plot(pnest2, lag=5, ylab="OR at lag 5", xlab="Exposure", ylim=c(0.95,1.15))
+lines(pnest, lag=5, lty=2)
 
 
 ###################################################
-### code chunk number 25: plotnest3d2
+### code chunk number 24: plotnest3d2
 ###################################################
 plot(pnest2, zlab="OR", xlab="Exposure", ylab="Lag (years)")
 
 
 ###################################################
-### code chunk number 26: plotnestlag2
+### code chunk number 25: plotnestlag2
 ###################################################
 plot(pnest2, var=50, ylab="OR for exposure 50", xlab="Lag (years)", xlim=c(0,40))
 lines(pnest, var=50, lty=2)
 
 
 ###################################################
-### code chunk number 27: plotnestvar2
+### code chunk number 26: plotnestvar2
 ###################################################
 plot(pnest2, lag=5, ylab="OR at lag 5", xlab="Exposure", ylim=c(0.95,1.15))
 lines(pnest, lag=5, lty=2)
 
 
 ###################################################
-### code chunk number 28: fdecay
+### code chunk number 27: fdecay
 ###################################################
-fdecay <- function(x,scale=5,...) {
+fdecay <- function(x,scale=5) {
   basis <- exp(-x/scale)
   attributes(basis)$scale <- scale
   return(basis)
@@ -200,15 +192,15 @@ fdecay <- function(x,scale=5,...) {
 
 
 ###################################################
-### code chunk number 29: cbdrug2
+### code chunk number 28: cbdrug2
 ###################################################
-cbdrug2 <- crossbasis(Qdrug, lag=27, argvar=list("lin",cen=0),
+cbdrug2 <- crossbasis(Qdrug, lag=27, argvar=list("lin"),
   arglag=list(fun="fdecay",scale=6))
 summary(cbdrug2)
 
 
 ###################################################
-### code chunk number 30: pdrug2noeval
+### code chunk number 29: pdrug2
 ###################################################
 mdrug2 <- lm(out~cbdrug2+sex, drug)
 pdrug2 <- crosspred(cbdrug2, mdrug2, at=0:20*5)
@@ -220,27 +212,27 @@ lines(pdrug, lag=10, lty=2)
 
 
 ###################################################
-### code chunk number 31: plotdrug3d2
+### code chunk number 30: plotdrug3d2
 ###################################################
 plot(pdrug2, zlab="Effect", xlab="Dose", ylab="Lag (days)")
 
 
 ###################################################
-### code chunk number 32: plotdruglag2
+### code chunk number 31: plotdruglag2
 ###################################################
 plot(pdrug2, var=60, ylab="Effect at dose 60", xlab="Lag (days)", ylim=c(-1,5))
 lines(pdrug, var=60, lty=2)
 
 
 ###################################################
-### code chunk number 33: plotdrugvar2
+### code chunk number 32: plotdrugvar2
 ###################################################
 plot(pdrug2, lag=10, ylab="Effect at lag 10", xlab="Dose",ylim=c(-1,5))
 lines(pdrug, lag=10, lty=2)
 
 
 ###################################################
-### code chunk number 34: hist
+### code chunk number 33: hist
 ###################################################
 expnested <- rep(c(10,0,13), c(5,5,10))
 hist <- exphist(expnested, time=length(expnested), lag=c(3,40))
@@ -248,32 +240,32 @@ hist
 
 
 ###################################################
-### code chunk number 35: predhist
+### code chunk number 34: predhist
 ###################################################
 pnesthist <- crosspred(cbnest2, mnest2, at=hist)
 with(pnesthist, c(allRRfit,allRRlow,allRRhigh))
 
 
 ###################################################
-### code chunk number 36: exp
+### code chunk number 35: exp
 ###################################################
 expdrug <- rep(c(10,50,0,20),c(2,1,1,2)*7)
 
 
 ###################################################
-### code chunk number 37: fexphist2
+### code chunk number 36: fexphist2
 ###################################################
 dynhist <- exphist(expdrug, lag=27)
 
 
 ###################################################
-### code chunk number 38: pdynnest
+### code chunk number 37: pdynnest
 ###################################################
 pdyndrug <- crosspred(cbdrug2, mdrug2, at=dynhist)
 
 
 ###################################################
-### code chunk number 39: plotdynnest
+### code chunk number 38: plotdynnest
 ###################################################
 plot(pdyndrug,"overall", ylab="Effect", xlab="Time (days)", ylim=c(-10,27), 
   xlim=c(1,50), yaxt="n")

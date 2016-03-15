@@ -1,5 +1,5 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2014
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2016
 #
 summary.crosspred <-
 function(object, ...) {
@@ -8,6 +8,7 @@ function(object, ...) {
 #
   cat("PREDICTIONS:\n")
   cat("values:",length(object$predvar),"\n")
+  if(!is.null(object$cen)) cat("centered at:",object$cen,"\n")
   cat("range:",min(object$predvar),",",max(object$predvar),"\n")
   cat("lag:",object$lag,"\n")
   cat("exponentiated:",ifelse(!is.null(object$allRRfit),"yes","no"),"\n")

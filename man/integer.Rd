@@ -8,24 +8,23 @@ The function generates a basis matrix including indicator variables defining int
 }
 
 \usage{
-integer(x, values, int=FALSE)
-
+integer(x, values, intercept=FALSE)
 }
 
 \arguments{
   \item{x }{ the predictor variable. Missing values are allowed.}
   \item{values }{ the values for which the indicator variables should be computed. Used internally, usually to be left as missing.}
-  \item{int }{ logical. If \code{TRUE}, an intercept is included in the basis matrix. See Details below.}
+  \item{intercept }{ logical. If \code{TRUE}, an intercept is included in the basis matrix. See Details below.}
 }
 
 \details{
 The function returns indicator variables for intervals defined by the integer values within the range of \code{x}. It is expressly created to specify an unconstrained function in the space of lags for distributed lag linear or non-linear models, and probably of no use beyond that.
 
-The argument \code{int} determines the presence of an intercept. If \code{FALSE}, the interval corresponding to the first value in \code{values} is excluded, and the parameterization is indentical to dummy variables with the first group as a reference.
+The argument \code{intercept} determines the presence of an intercept. If \code{FALSE}, the interval corresponding to the first value in \code{values} is excluded, and the parameterization is indentical to dummy variables with the first group as a reference.
 }
 
 \value{
-A matrix object of class \code{"integer"}. It contains the attributes \code{values} and \code{int}.}
+A matrix object of class \code{"integer"}. It contains the attributes \code{values} and \code{intercept}.}
 
 \author{Antonio Gasparrini, \email{antonio.gasparrini@lshtm.ac.uk}}
 
@@ -42,7 +41,7 @@ See \code{\link{dlnm-package}} for an introduction to the package and for links 
 \examples{
 ### simple use (accessing non-exported function through ':::')
 dlnm:::integer(1:5)
-dlnm:::integer(1:5, int=TRUE)
+dlnm:::integer(1:5, intercept=TRUE)
 }
 
 \keyword{smooth}

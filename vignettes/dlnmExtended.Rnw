@@ -145,11 +145,11 @@ In this first example, I analyse the temporal dependency between the intake of a
 The first step is the definition of a cross-basis function and the derivation of a cross-basis matrix. This is obtained through the function \Rfun{crossbasis}:
 
 <<cbdrug>>=
-cbdrug <- crossbasis(Qdrug, lag=27, argvar=list("lin",cen=0),
+cbdrug <- crossbasis(Qdrug, lag=27, argvar=list("lin"),
   arglag=list(fun="ns",knots=c(9,18)))
 @
 
-The results is stored in the object \Robj{cbdrug}, namely a matrix of transformed variables with special attributes. The first unnamed argument \Rarg{x}, differently from the original applications in time series described in the vignette \textbf{\textsf{dlnmTS}}, is the matrix of exposure histories. However, the rest of the syntax is identical. The argument \Rarg{lag} specifies the lag period, with minimum lag placed by default at 0. The lag period must be consistent with the dimension (\emph{i.e.} number of columns) of the matrix \Robj{Qdrug}. The arguments \Rarg{argvar} and \Rarg{arglag} define the exposure-response and lag-response functions, respectively, chosen here as a simple linear function centered at 0 and a natural cubic spline with knots at lag 9 and 18. An intercept is included by default in the lag-response function if not otherwise stated. Given the linearity assumption, this can be technically defined as a DLM. See \Rcomm{?crossbasis} for a complete list of options and additional details.
+The results is stored in the object \Robj{cbdrug}, namely a matrix of transformed variables with special attributes. The first unnamed argument \Rarg{x}, differently from the original applications in time series described in the vignette \textbf{\textsf{dlnmTS}}, is the matrix of exposure histories. However, the rest of the syntax is identical. The argument \Rarg{lag} specifies the lag period, with minimum lag placed by default at 0. The lag period must be consistent with the dimension (\emph{i.e.} number of columns) of the matrix \Robj{Qdrug}. The arguments \Rarg{argvar} and \Rarg{arglag} define the exposure-response and lag-response functions, respectively, chosen here as a simple linear function and a natural cubic spline with knots at lag 9 and 18. An intercept is included by default in the lag-response function if not otherwise stated. Given the linearity assumption, this can be technically defined as a DLM. See \Rcomm{?crossbasis} for a complete list of options and additional details.
 
 A summary of the transformation can be obtained by the method function \Rfun{summary} for objects of class \Rclass{crossbasis}:
 
@@ -164,7 +164,7 @@ mdrug <- lm(out~cbdrug+sex, drug)
 pdrug <- crosspred(cbdrug, mdrug, at=0:20*5)
 @
 
-The function \Rfun{crosspred} accepts the cross-basis matrix and the related model object as the first two arguments. The argument \Rarg{at}, if provided as a numeric vector, determines the predictor levels at which predictions should be computed. The effect summaries are saved in the object \Robj{pdrug} of class \Rclass{crosspred}, from which can be extracted:
+The function \Rfun{crosspred} accepts the cross-basis matrix and the related model object as the first two arguments. The argument \Rarg{at}, if provided as a numeric vector, determines the predictor levels at which predictions should be computed. The reference value, not directly defined here, is set by default to 0 for the function \Rfun{lin}. The effect summaries are saved in the object \Robj{pdrug} of class \Rclass{crosspred}, from which can be extracted:
 
 <<pdrugest1>>=
 with(pdrug,cbind(allfit,alllow,allhigh)["50",])
@@ -233,8 +233,8 @@ In a second example, I assess how protracted exposures to an occupational agent 
 An initial assumption is that the exposures sustained in the last three years, corresponding to lag 0--2, are not affecting the risk of occurrence of cancer. Consistently with this assumption, the matrix of exposure history \Robj{Qnest} has been derived for lag period 3--40. The cross-basis matrix can therefore be created by:
 
 <<cbnested,fig=T>>=
-cbnest <- crossbasis(Qnest, lag=c(3,40), argvar=list("bs",degree=2,
-  df=3,cen=0), arglag=list(fun="ns",knots=c(10,30),int=F))
+cbnest <- crossbasis(Qnest, lag=c(3,40), argvar=list("bs",degree=2,df=3),
+  arglag=list(fun="ns",knots=c(10,30),intercept=F))
 @
 
 The chosen basis functions are a quadratic spline for the dimensions of predictor and a natural cubic spline for lags. In the former, only the number of degrees of freedom are chosen, and the single knot is placed by default at the median. Note that in the spline for the lag-response the intercept is excluded, so the function is forced to predict a null effect at the beginning of the lag period, consistently with the assumption above. The command \Rcomm{summary(cbnest)} can show additional details.
@@ -244,10 +244,10 @@ The cross-basis objects can be included again in the formula of a regression mod
 <<pnest>>=
 library(survival)
 mnest <- clogit(case~cbnest+strata(riskset), nested)
-pnest <- crosspred(cbnest,mnest, at=0:20*5)
+pnest <- crosspred(cbnest,mnest, cen=0, at=0:20*5)
 @
 
-Similarly to the previous example, estimates of the effect summaries can be extracted from the object \Robj{pnest}, although this time using the objects with prefix \Rcode{allRR-} and \Rcode{matRR-} which store the exponentiated predictions in the scale of OR (see \Rcomm{?crosspred}). The same types of graphs displayed in Figure~\ref{fig:plotdrug} are obtained by:
+Note how in this case the centering value must be selected directly through the argument \Rarg{cen}, as no straightforward reference exist for non-linear functions such as \Rfun{bs}. Similarly to the previous example, estimates of the effect summaries can be extracted from the object \Robj{pnest}, although this time using the objects with prefix \Rcode{allRR-} and \Rcode{matRR-} which store the exponentiated predictions in the scale of OR (see \Rcomm{?crosspred}). The same types of graphs displayed in Figure~\ref{fig:plotdrug} are obtained by:
 
 <<plotnestnoeval,eval=F>>=
 plot(pnest, zlab="OR", xlab="Exposure", ylab="Lag (years)")
@@ -314,26 +314,22 @@ mylog <- function(x) log(x+1)
 This step is required as \Rfun{log} is a primitive function and cannot be used directly. The original exposure is summed to 1 to prevent problems with 0 values in the logarithm. The new function \Rfun{mylog} can now be used directly in \Rfun{crossbasis} in place of \Rfun{bs} to model the exposure-response curve:
 
 <<cbnest2>>=
-cbnest2 <- crossbasis(Qnest, lag=c(3,40), argvar=list("mylog",cen=0),
-  arglag=list(fun="ns",knots=c(10,30),int=F))
+cbnest2 <- crossbasis(Qnest, lag=c(3,40), argvar=list("mylog"),
+  arglag=list(fun="ns",knots=c(10,30),intercept=F))
 summary(cbnest2)
 @
 
-The additional argument \Rarg{cen} is still passed internally to \Rfun{onebasis} to center the basis matrix, and should be included. Note how the total \emph{df} of the cross-basis are now 3, if compared to the 9 in the original transformation, as the exposure-response is modelled with only 1 \emph{df}. the rest of the code is almost identical, just substituting the newly created objects:
+Note how the total \emph{df} of the cross-basis are now 3, if compared to the 9 in the original transformation, as the exposure-response is modelled with only 1 \emph{df}. The rest of the code is almost identical, just substituting the newly created objects:
 
-<<pnest2noeval,eval=F>>=
+<<pnest2>>=
 mnest2 <- clogit(case~cbnest2+strata(riskset), nested)
-pnest2 <- crosspred(cbnest2, mnest2, at=0:20*5)
+pnest2 <- crosspred(cbnest2, mnest2, cen=0, at=0:20*5)
 plot(pnest2, zlab="OR", xlab="Exposure", ylab="Lag (years)")
 plot(pnest2, var=50, ylab="OR for exposure 50", xlab="Lag (years)", xlim=c(0,40))
 lines(pnest, var=50, lty=2)
 plot(pnest2, lag=5, ylab="OR at lag 5", xlab="Exposure", ylim=c(0.95,1.15))
 lines(pnest, lag=5, lty=2)
 @
-
-<<pnest2,echo=F>>=
-mnest2 <- clogit(case~cbnest2+strata(riskset), nested)
-pnest2 <- crosspred(cbnest2, mnest2, at=0:20*5)
 
 <<plotnest3d2,echo=F,fig=T>>=
 plot(pnest2, zlab="OR", xlab="Exposure", ylab="Lag (years)")
@@ -378,24 +374,24 @@ The results presented in Figure~\ref{fig:plotnest2} can be compared with those o
 Another example of application of user-defined functions is provided by extending the analysis illustrated in Section~\ref{sec:firstexample}. The inspection of Figure~\ref{fig:plotdruglag} suggested that the lag-response curve follows an exponential decay trajectory. It may be reasonable to apply a function modelling this shape instead than a natural cubic spline. This decay function can be defined as:
 
 <<fdecay>>=
-fdecay <- function(x,scale=5,...) {
+fdecay <- function(x,scale=5) {
   basis <- exp(-x/scale)
   attributes(basis)$scale <- scale
   return(basis)
 }
 @
 
-The argument \Rarg{scale}, with default value 5, is used to control the degree of decay. Note how this must be included as an attribute of the vector returned by the new function \Rfun{fdecay}. The additional '\Rarg{...}' argument is needed for user-written lag-response functions as the presence of an argument \Rarg{int} is checked internally by \Rfun{crossbasis} for this dimension. Again, we can use this new function to obtain the alternative cross-basis transformation:
+The argument \Rarg{scale}, with default value 5, is used to control the degree of decay. Note how this must be included as an attribute of the vector returned by the new function \Rfun{fdecay}. Again, we can use this new function to obtain the alternative cross-basis transformation:
 
 <<cbdrug2>>=
-cbdrug2 <- crossbasis(Qdrug, lag=27, argvar=list("lin",cen=0),
+cbdrug2 <- crossbasis(Qdrug, lag=27, argvar=list("lin"),
   arglag=list(fun="fdecay",scale=6))
 summary(cbdrug2)
 @
 
 Again, the computational step used in Section~\ref{sec:firstexample} can be repeated to perform the modified analysis:
 
-<<pdrug2noeval>>=
+<<pdrug2>>=
 mdrug2 <- lm(out~cbdrug2+sex, drug)
 pdrug2 <- crosspred(cbdrug2, mdrug2, at=0:20*5)
 plot(pdrug2, zlab="Effect", xlab="Dose", ylab="Lag (days)")

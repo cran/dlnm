@@ -104,13 +104,13 @@ In this first example, I specify a simple DLM, assessing the effect of \PM{} on 
 First, I run \Rfun{crossbasis} to build the two cross-basis matrices, saving them in two objects. The names of the two objects must be different in order to predict the associations separately for each of them. This is the code:
 
 <<example1crossbasis>>=
-cb1.pm <- crossbasis(chicagoNMMAPS$pm10, lag=15, argvar=list(fun="lin",cen=0),
+cb1.pm <- crossbasis(chicagoNMMAPS$pm10, lag=15, argvar=list(fun="lin"),
   arglag=list(fun="poly",degree=4))
-cb1.temp <- crossbasis(chicagoNMMAPS$temp, lag=3, argvar=list(df=5,cen=21),
+cb1.temp <- crossbasis(chicagoNMMAPS$temp, lag=3, argvar=list(df=5),
   arglag=list(fun="strata",breaks=1))
 @
 
-In applications with time series data, the first argument \Rarg{x} is used to specify the vector series. The function internally passes the arguments in \Rarg{argvar} and \Rarg{arglag} to \Rfun{onebasis} in order to build the basis for predictor and lags, respectively. In this case, we assume that the effect of \PM{} is linear (\Rarg{fun="lin"}), while modelling the relationship with temperature through a natural cubic spline with 5 degrees of freedom (\Rarg{fun="ns"}, chos en by default). The internal knots (if not provided) are placed by \Rfun{ns} at the default equally spaced quantiles, while the boundary knots are located at the temperature range, so only \Rarg{df} must be specified. I center \PM{} and temperature to 0 \microg{} and 21\Ctemp{}, respectively, in order to compute the predicted effects versus these reference values.
+In applications with time series data, the first argument \Rarg{x} is used to specify the vector series. The function internally passes the arguments in \Rarg{argvar} and \Rarg{arglag} to \Rfun{onebasis} in order to build the basis for predictor and lags, respectively. In this case, we assume that the effect of \PM{} is linear (\Rarg{fun="lin"}), while modelling the relationship with temperature through a natural cubic spline with 5 degrees of freedom (\Rarg{fun="ns"}, chosen by default). The internal knots (if not provided) are placed by \Rfun{ns} at the default equally spaced quantiles, while the boundary knots are located at the temperature range, so only \Rarg{df} must be specified.
 
 Regarding the bases for the space of the lags, I specify the lagged effect of PM\textsubscript{10} up to 15 days of lag (minimum lag equal to 0 by default), with a 4\textsuperscript{th} degree polynomial function (setting \texttt{degree=4}). The delayed effect of temperature are defined by two lag strata (0 and 1-3), assuming the effects as constant within each stratum. The argument \Rarg{breaks=1} defines the lower boundary of the second interval.
 
@@ -134,26 +134,26 @@ The estimated association with specific levels of \PM{} on mortality, predicted 
 pred1.pm <- crosspred(cb1.pm, model1, at=0:20, bylag=0.2, cumul=TRUE)
 @
 
-The functions include the \Robj{basis1.pm} and \Robj{model1} objects used to estimate the parameters as the first two arguments, while \Rcode{at=0:20} states that the prediction must be computed for each integer value from 0 to 20 \microg{}. By setting \Rcode{bylag=0.2}, the prediction is computed along the lag space with an increment of 0.2. This finer grid is meant to produce a smoother lag curve when the results are plotted. The argument \Rarg{cumul} (default to \Robj{FALSE}) indicates that also incremental cumulative associations along lags must be included. Now that the predictions have been stored in \Robj{pred1.pm}, they can be plot by specific method functions. For example:
+The function includes the \Robj{basis1.pm} and \Robj{model1} objects used to estimate the parameters as the first two arguments, while \Rcode{at=0:20} states that the prediction must be computed for each integer value from 0 to 20 \microg{}. By setting \Rcode{bylag=0.2}, the prediction is computed along the lag space with an increment of 0.2. This finer grid is meant to produce a smoother lag curve when the results are plotted. The argument \Rarg{cumul} (default to \Robj{FALSE}) indicates that also incremental cumulative associations along lags must be included. No centering is defined through the argument \Rarg{cen}, and the reference value is therefore set at value 0 by default (this happens for the function \Rfun{lin}). Now that the predictions have been stored in \Robj{pred1.pm}, they can be plot by specific method functions. For example:
 
 <<example1slices,fig=T,echo=F>>=
 plot(pred1.pm, "slices", var=10, col=3, ylab="RR", ci.arg=list(density=15,lwd=2),
-  main="Association with a 10-unit increase in PM10")
+  main="Lag-response curve for a 10-unit increase in PM10")
 @
 
 <<example1slicescumul,fig=T,echo=F>>=
-plot(pred1.pm, "slices", var=10, cumul=TRUE, ylab="Cumulative RR",
-	main="Cumulative association with a 10-unit increase in PM10")
+plot(pred1.pm, "slices", var=10, col=2, cumul=TRUE, ylab="Cumulative RR",
+  main="Lag-response curve of incremental cumulative effects")
 @
 
 <<example1slicesnoeval,eval=F>>=
 plot(pred1.pm, "slices", var=10, col=3, ylab="RR", ci.arg=list(density=15,lwd=2),
   main="Association with a 10-unit increase in PM10")
-plot(pred1.pm, "slices", var=10, cumul=TRUE, ylab="Cumulative RR",
+plot(pred1.pm, "slices", var=10, col=2, cumul=TRUE, ylab="Cumulative RR",
   main="Cumulative association with a 10-unit increase in PM10")
 @
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\caption{}
   \begin{subfigure}{0.49\textwidth}
@@ -183,7 +183,7 @@ cbind(pred1.pm$allRRlow, pred1.pm$allRRhigh)["10",]
 \section{Example 2: seasonal analysis}
 \label{sec:example2seas}
 
-The purpose of the second example is to illustrate an analysis where the data are restricted to a specific season. The peculiar feature of this analysis is that the data are assumed to be composed by multiple equally-spaced and ordered series of the same season for each year, and do not represent a single continuous series. In this case, I assess the effect of ozone and temperature on mortality up to 5 and 10 days of lag, respectively, using the same steps already seen in Section~\ref{sec:example1simple}.
+The purpose of the second example is to illustrate an analysis where the data are restricted to a specific season. The peculiar feature of this analysis is that the data are assumed to be composed by multiple equally-spaced and ordered series of multiple seasons in different years, and do not represent a single continuous series. In this case, I assess the effect of ozone and temperature on mortality up to 5 and 10 days of lag, respectively, using the same steps already seen in Section~\ref{sec:example1simple}.
 
 First, I create a seasonal time series data set obtained by restricting to the summer period (June-September), and save it in the data frame \Robj{chicagoNMMAPS}:
 
@@ -194,11 +194,12 @@ chicagoNMMAPSseas <- subset(chicagoNMMAPS, month %in% 6:9)
 Again, I first create the cross-basis matrices:
 
 <<example2crossbasis>>=
-cb2.o3 <- crossbasis(chicagoNMMAPSseas$o3, lag=5, argvar=list(fun="thr",
-  thr=40.3), arglag=list(fun="integer"), group=chicagoNMMAPSseas$year)
+cb2.o3 <- crossbasis(chicagoNMMAPSseas$o3, lag=5,
+  argvar=list(fun="thr",thr=40.3), arglag=list(fun="integer"),
+  group=chicagoNMMAPSseas$year)
 cb2.temp <- crossbasis(chicagoNMMAPSseas$temp, lag=10,
-  argvar=list(fun="thr",thr=c(15,25)), arglag=list(fun="strata",
-  breaks=c(2,6)), group=chicagoNMMAPSseas$year)
+  argvar=list(fun="thr",thr=c(15,25)), arglag=list(fun="strata",breaks=c(2,6)),
+  group=chicagoNMMAPSseas$year)
 @
 
 The argument \Rarg{group} indicates the variable which defines multiple series: the function then breaks the series at the end of each group and replaces the first rows up to the maximum lag of the cross-basis matrix in the following series with \Rcode{NA}. Each series must be consecutive, complete and ordered. Here I make the assumption that the effect of \ozone{} is null up to 40.3 \microg{} and then linear, applying an high threshold parameterization (\Rcode{fun="thr"}). For temperature, I use a double threshold with the assumption that the effect is linear below 15\Ctemp{} and above 25\Ctemp{}, and null in between. The threshold values are chosen with the argument \Rarg{thr.value} (abbreviated to \Rarg{thr}), while the un-specified argument \Rarg{side} is set to the default value \Rcode{"h"} for the first cross-basis and to \Rcode{"d"} for the second one (given two threshold values are provided). Regarding the lag dimension, I specify an unconstrained function for \ozone{}, applying one parameter for each lag (\Rarg{fun="integer"}) up to a 5 days (with minimum lag equal to 0 by default). For temperature, I define 3 strata intervals at lag 0-1, 2-5, 6-10. A summary of the choices made for the cross-bases can be shown by the method \Rmethod{summary}.
@@ -211,25 +212,27 @@ model2 <- glm(death ~  cb2.o3 + cb2.temp + ns(doy, 4) + ns(time,3) + dow,
 pred2.o3 <- crosspred(cb2.o3, model2, at=c(0:65,40.3,50.3))
 @
 
-The values for which the prediction must be computed are specified in \Rarg{at}: here I define the integers from 0 to 65 \microg{} (approximately the range of ozone distribution), plus the threshold and the value 50.3 \microg{} corresponding to a 10-unit increase above the threshold. The vector is automatically ordered. I plot the predictor-specific lag-response relationship for a 10-unit increase in \ozone{}, similarly to Section~\ref{sec:example1simple} but with 80\% confidence intervals, and also the overall cumulative exposure-response relationship. The related code is (results in Figures~\ref{fig:example2slices}--\ref{fig:example2overall}):
+The values for which the prediction must be computed are specified in \Rarg{at}: here I define the integers from 0 to 65 \microg{} (approximately the range of ozone distribution), plus the threshold and the value 50.3 \microg{} corresponding to a 10-unit increase above the threshold. The vector is automatically ordered. A reference is automatically selected exposure-response curve modelled by \Rfun{thr}, and the argument \Rarg{cen} can be left undefined.
+
+I plot the predictor-specific lag-response relationship for a 10-unit increase in \ozone{}, similarly to Section~\ref{sec:example1simple} but with 80\% confidence intervals, and also the overall cumulative exposure-response relationship. The related code is (results in Figures~\ref{fig:example2slices}--\ref{fig:example2overall}):
 
 <<example2slices,fig=T,echo=F>>=
-plot(pred2.o3, "slices", var=50.3, ci="bars", type="p", pch=19, ci.level=0.80,
-  main="Association with a 10-unit increase above threshold (80%CI)")
+plot(pred2.o3, "slices", var=50.3, ci="bars", type="p", col=2, pch=19,
+  ci.level=0.80, main="Lag-response a 10-unit increase above threshold (80CI)")
 @
 <<example2overall,fig=T,echo=F>>=
-plot(pred2.o3,"overall",xlab="Ozone", ci="lines", ylim=c(0.9,1.3), lwd=2,
+plot(pred2.o3,"overall",xlab="Ozone", ci="l", col=3, ylim=c(0.9,1.3), lwd=2,
   ci.arg=list(col=1,lty=3), main="Overall cumulative association for 5 lags")
 @
 
 <<example2noeval1,eval=F>>=
-plot(pred2.o3, "slices", var=50.3, ci="bars", type="p", pch=19, ci.level=0.80,
-	main="Association with a 10-unit increase above threshold (80%CI)")
-plot(pred2.o3,"overall",xlab="Ozone", ci="lines", ylim=c(0.9,1.3), lwd=2,
+plot(pred2.o3, "slices", var=50.3, ci="bars", type="p", col=2, pch=19,
+  ci.level=0.80, main="Lag-response a 10-unit increase above threshold (80CI)")
+plot(pred2.o3,"overall",xlab="Ozone", ci="l", col=3, ylim=c(0.9,1.3), lwd=2,
   ci.arg=list(col=1,lty=3), main="Overall cumulative association for 5 lags")
 @
 
-\begin{figure}
+\begin{figure}[h]
   \centering
 	\caption{}
   \begin{subfigure}{0.49\textwidth}
@@ -246,7 +249,7 @@ plot(pred2.o3,"overall",xlab="Ozone", ci="lines", ylim=c(0.9,1.3), lwd=2,
   \end{subfigure}
 \end{figure}
 
-In the first statement, the argument \Rarg{ci="bars"} dictates that, differently from the default \Rcode{"area"} seen in Figures~\ref{fig:example1slices}--\ref{fig:example1slicescumul}, the confidence intervals are represented by bars. In addition, the argument \Rcode{ci.level=0.80} states that 80\% confidence intervals must be plotted. Finally, I chose points, instead of the default line, with specific symbol, by the arguments \Rarg{type} and \Rarg{pch}. In the second statement, the argument \Rarg{type="overall"} indicates that the overall cumulative association must be plotted, with confidence intervals as lines, \Rarg{ylim} defining the range of the y-axis, \Rarg{lwd} the thickness of the line. Similarly to the previous example, the display of confidence intervals are refined through the list of arguments specified by \Rarg{ci.arg}, passed in this case to the low-level function \Rfun{lines}.
+In the first statement, the argument \Rarg{ci="bars"} dictates that, differently from the default \Rcode{"area"} seen in Figures~\ref{fig:example1slices}--\ref{fig:example1slicescumul}, the confidence intervals are represented by bars. In addition, the argument \Rcode{ci.level=0.80} states that 80\% confidence intervals must be plotted. Finally, I chose points, instead of the default line, with specific symbol, by the arguments \Rarg{type} and \Rarg{pch}. In the second statement, the argument \Rarg{type="overall"} indicates that the overall cumulative association must be plotted, with confidence intervals as lines, \Rarg{ylim} defining the range of the y-axis, \Rarg{lwd} the thickness of the line. In this case, confidence intervals are displayed as lines, selected through an abbreviation \Rcode{"l"} in the argument \Rarg{ci}. Similarly to the previous example, the display of confidence intervals are refined through the list of arguments specified by \Rarg{ci.arg}, passed in this case to the low-level function \Rfun{lines}.
 
 Similarly to the previous example, we can extract from \Robj{pred2.o3} the estimated overall cumulative effect for a 10-unit increase in ozone above the threshold ($50.3-40.3$ \microg{}), together with its 95\% confidence intervals:
 
@@ -268,22 +271,22 @@ In this example I specify a more complex DLNM, where the dependency is estimated
 First, I define the cross-basis matrices. In particular, the cross-basis for temperature is specified through a natural and non-natural splines, using the functions \Rfun{ns} and \Rfun{bs} from the package \Rpkg{splines}. This is the code:
 
 <<example3crossbasis>>=
-cb3.pm <- crossbasis(chicagoNMMAPS$pm10, lag=1, argvar=list(fun="lin",cen=0),
+cb3.pm <- crossbasis(chicagoNMMAPS$pm10, lag=1, argvar=list(fun="lin"),
   arglag=list(fun="strata"))
 varknots <- equalknots(chicagoNMMAPS$temp,fun="bs",df=5,degree=2)
 lagknots <- logknots(30, 3)
 cb3.temp <- crossbasis(chicagoNMMAPS$temp, lag=30, argvar=list(fun="bs",
-  knots=varknots,cen=21), arglag=list(knots=lagknots))
+  knots=varknots), arglag=list(knots=lagknots))
 @
 
-The chosen basis functions for the space of the predictor are a linear function for the effect of \PM{} and a quadratic B-spline (\Rarg{fun="bs"}) with 5 degrees of freedom for temperature, with \Rarg{knots} placed by default at equally spaced value in the space of the predictor, selected through the function \Rfun{equalknots}. The basis for temperature is centered at 21\Ctemp{}, which will represent the reference point for the predicted associations. Regarding the space of lags, I assume a simple lag 0-1 parameterization for \PM{} (i.e. a single strata up to lag 1, with minimum lag equal to 0 by default, keeping the default values of \Rarg{df=1}), while I define another cubic spline, this time with the natural constraint (\Rarg{fun="ns"} by default) for the lag dimension of temperature. The knots for the spline for lags are placed at equally-spaced values in the log scale of lags, using the function \Rfun{logknots}. This used to be the default values in versions of the package earlier than 2.0.0.
+The chosen basis functions for the space of the predictor are a linear function for the effect of \PM{} and a quadratic B-spline (\Rarg{fun="bs"}) with 5 degrees of freedom for temperature, with \Rarg{knots} placed by default at equally spaced value in the space of the predictor, selected through the function \Rfun{equalknots}. Regarding the space of lags, I assume a simple lag 0-1 parameterization for \PM{} (i.e. a single strata up to lag 1, with minimum lag equal to 0 by default, keeping the default values of \Rarg{df=1}), while I define another cubic spline, this time with the natural constraint (\Rarg{fun="ns"} by default) for the lag dimension of temperature. The knots for the spline for lags are placed at equally-spaced values in the log scale of lags, using the function \Rfun{logknots}. This used to be the default values in versions of the package earlier than 2.0.0.
 
 The estimation, prediction and plotting of the association between temperature and mortality are performed by:
 
 <<example3noeval,eval=F>>=
 model3 <- glm(death ~  cb3.pm + cb3.temp + ns(time, 7*14) + dow,
   family=quasipoisson(), chicagoNMMAPS)
-pred3.temp <- crosspred(cb3.temp, model3, by=1)
+pred3.temp <- crosspred(cb3.temp, model3, cen=21, by=1)
 plot(pred3.temp, xlab="Temperature", zlab="RR", theta=200, phi=40, lphi=30,
   main="3D graph of temperature effect")
 plot(pred3.temp, "contour", xlab="Temperature", key.title=title("RR"),
@@ -293,7 +296,7 @@ plot(pred3.temp, "contour", xlab="Temperature", key.title=title("RR"),
 <<example3plot3d,fig=T,echo=F>>=
 model3 <- glm(death ~  cb3.pm + cb3.temp + ns(time, 7*14) + dow,
   family=quasipoisson(), chicagoNMMAPS)
-pred3.temp <- crosspred(cb3.temp, model3, by=1)
+pred3.temp <- crosspred(cb3.temp, model3, cen=21, by=1)
 plot(pred3.temp, xlab="Temperature", zlab="RR", theta=200, phi=40, lphi=30,
   main="3D graph of temperature effect")
 @
@@ -303,9 +306,7 @@ plot(pred3.temp, "contour", xlab="Temperature", key.title=title("RR"),
   plot.title=title("Contour plot",xlab="Temperature",ylab="Lag"))
 @
 
-Note that prediction values are chosen only with the argument \Rcode{by=1} in \Rfun{crosspred}, defining all the integer values within the predictor range. The first plotting expression produces a 3-D plot illustrated in Figure~\ref{fig:example3plot3d}, with non-default choices for perspective and lightning obtained through the arguments \Rarg{theta}-\Rarg{phi}-\Rarg{lphi}. The second plotting expression specifies the contour plot in Figure~\ref{fig:example3plotcontour} with titles and axis labels chosen by arguments \Rarg{plot.title} and \Rarg{key.title}. The user can find additional information and a complete list of arguments in the help pages of the original high-level plotting functions (typing \Rcomm{?persp} and \Rcomm{?filled.contour}).
-
-\begin{figure}[h]
+\begin{figure}[!t]
   \centering
   \caption{}
   \begin{subfigure}{0.49\textwidth}
@@ -321,6 +322,8 @@ Note that prediction values are chosen only with the argument \Rcode{by=1} in \R
     \label{fig:example3plotcontour}
   \end{subfigure}
 \end{figure}
+
+Note that prediction values are centered here at 21\Ctemp{}, the point which represents the reference for the interpretation of the estimated effects. This step is needed here, as the relationship is modelled with a non-linear function with no obvious reference value. The values are chosen only with the argument \Rcode{by=1} in \Rfun{crosspred}, defining all the integer values within the predictor range. The first plotting expression produces a 3-D plot illustrated in Figure~\ref{fig:example3plot3d}, with non-default choices for perspective and lightning obtained through the arguments \Rarg{theta}-\Rarg{phi}-\Rarg{lphi}. The second plotting expression specifies the contour plot in Figure~\ref{fig:example3plotcontour} with titles and axis labels chosen by arguments \Rarg{plot.title} and \Rarg{key.title}. The user can find additional information and a complete list of arguments in the help pages of the original high-level plotting functions (typing \Rcomm{?persp} and \Rcomm{?filled.contour}).
 
 Plots in Figures~\ref{fig:example3plot3d}--\ref{fig:example3plotcontour} offer a comprehensive summary of the bi-dimensional exposure-lag-response association, but are limited in their ability to inform on associations at specific values of predictor or lags. In addition, they are also limited for inferential purposes, as the uncertainty of the estimated association is not reported in 3-D and contour plots. A more detailed analysis is provided by plotting "slices" of the effect surface for specific predictor and lag values. The code is:
 
@@ -345,9 +348,7 @@ plot(pred3.temp, "slices", var=c(-20,33), lag=c(0,5), col=4,
   ci.arg=list(density=40,col=grey(0.7)))
 @
 
-The results are reported in Figures~\ref{fig:example3slices}--\ref{fig:example3slices2}. Figure~\ref{fig:example3slices} illustrates lag-response curves specific to mild and extreme cold and hot temperatures of -20\Ctemp{}, 0\Ctemp{}, 27\Ctemp{}, and 33\Ctemp{} (with reference at 21\Ctemp{}). Figures~\ref{fig:example3slices2} depicts both exposure-response relationships specific to lag 0 and 5 (left column), and lag-response relationships specific to temperatures -20\Ctemp{} and 33\Ctemp{} (right column). The arguments \Rarg{var} and \Rarg{lag} define the values of temperature and lag for "slices" to be cut in the effect surface in Figure~\ref{fig:example3plot3d}--\ref{fig:example3plotcontour}. The argument \Rcode{ci="n"} in the first expression states that confidence intervals must not be plotted. In the multi-panel Figure~\ref{fig:example3slices2}, the list argument \Rarg{ci.arg} is used to plot confidence intervals as shading lines with increased grey contrast, more visible here.
-
-\begin{figure}
+\begin{figure}[!b]
   \centering
   \caption{}
   \begin{subfigure}{0.49\textwidth}
@@ -364,6 +365,8 @@ The results are reported in Figures~\ref{fig:example3slices}--\ref{fig:example3s
   \end{subfigure}
 \end{figure}
 
+The results are reported in Figures~\ref{fig:example3slices}--\ref{fig:example3slices2}. Figure~\ref{fig:example3slices} illustrates lag-response curves specific to mild and extreme cold and hot temperatures of -20\Ctemp{}, 0\Ctemp{}, 27\Ctemp{}, and 33\Ctemp{} (with reference at 21\Ctemp{}). Figures~\ref{fig:example3slices2} depicts both exposure-response relationships specific to lag 0 and 5 (left column), and lag-response relationships specific to temperatures -20\Ctemp{} and 33\Ctemp{} (right column). The arguments \Rarg{var} and \Rarg{lag} define the values of temperature and lag for "slices" to be cut in the effect surface in Figure~\ref{fig:example3plot3d}--\ref{fig:example3plotcontour}. The argument \Rcode{ci="n"} in the first expression states that confidence intervals must not be plotted. In the multi-panel Figure~\ref{fig:example3slices2}, the list argument \Rarg{ci.arg} is used to plot confidence intervals as shading lines with increased grey contrast, more visible here.
+
 The preliminary interpretation suggests that cold temperatures are associated with longer mortality risk than heat, but not immediate, showing a "protective" effect at lag 0. This analytical proficiency would be hardly achieved with simpler models, probably losing important details of the association.
 
 %-------------------------%%-------------------------%%-------------------------%
@@ -373,8 +376,8 @@ The preliminary interpretation suggests that cold temperatures are associated wi
 In this last example, I show how we can reduce the fit of a bi-dimensional DLNM to summaries expressed by parameters of one-dimensional basis, using the function \Rfun{crossreduce}. This method is thoroughly illustrated in \citet{gasparrini2013bmcmrm}. First, I specify a new cross-basis matrix, run the model and predict in the usual way:
 
 <<example4prep>>=
-cb4 <- crossbasis(chicagoNMMAPS$temp, lag=30, argvar=list(fun="thr",
-  thr=c(10,25)), arglag=list(knots=lagknots))
+cb4 <- crossbasis(chicagoNMMAPS$temp, lag=30,
+  argvar=list(fun="thr",thr=c(10,25)), arglag=list(knots=lagknots))
 model4 <- glm(death ~  cb4 + ns(time, 7*14) + dow,
   family=quasipoisson(), chicagoNMMAPS)
 pred4 <- crosspred(cb4, model4, by=1)
@@ -405,24 +408,6 @@ lines(redall, ci="lines",col=4,lty=2)
 legend("top",c("Original","Reduced"),col=c(2,4),lty=1:2,ins=0.1)
 @
 
-The process may also be clarified by re-constructing the orginal one-dimensional basis and predicting the association given the modified parameters. As an example, I reproduce the natural cubic spline for the space of the lag using \Rfun{onebasis}, and predict the results, with:
-
-<<example4reconstr>>=
-b4 <- onebasis(0:30,knots=attributes(cb4)$arglag$knots,int=TRUE,cen=FALSE)
-pred4b <- crosspred(b4,coef=coef(redvar),vcov=vcov(redvar),model.link="log",by=1)
-@
-
-The spline basis is computed on the integer values corresponding to lag \Rcode{0:30}, with knots at the same values as the original cross-basis, and uncentered with intercept as the default for basis for lags. Predictions are computed using the modified parameters reduced to predictor-specific association for 33\Ctemp{}. The identical fit of the original, reduced and re-constructed prediction is illustrated in Figure~\ref{fig:example4plotvar}, produced by:
-
-<<example4plotvar,fig=T>>=
-plot(pred4, "slices", var=33, ylab="RR", ylim=c(0.9,1.2),
-  main="Predictor-specific association at 33C")
-lines(redvar, ci="lines", col=4, lty=2)
-points(pred4b, col=1, pch=19, cex=0.6)
-legend("top",c("Original","Reduced","Reconstructed"),col=c(2,4,1),lty=c(1:2,NA),
-  pch=c(NA,NA,19),pt.cex=0.6,ins=0.1)
-@
-
 \begin{figure}
   \centering
   \caption{}
@@ -439,6 +424,24 @@ legend("top",c("Original","Reduced","Reconstructed"),col=c(2,4,1),lty=c(1:2,NA),
     \label{fig:example4plotvar}
   \end{subfigure}
 \end{figure}
+
+The process may also be clarified by re-constructing the orginal one-dimensional basis and predicting the association given the modified parameters. As an example, I reproduce the natural cubic spline for the space of the lag using \Rfun{onebasis}, and predict the results, with:
+
+<<example4reconstr>>=
+b4 <- onebasis(0:30,knots=attributes(cb4)$arglag$knots,intercept=TRUE)
+pred4b <- crosspred(b4,coef=coef(redvar),vcov=vcov(redvar),model.link="log",by=1)
+@
+
+The spline basis is computed on the integer values corresponding to lag \Rcode{0:30}, with knots at the same values as the original cross-basis, and uncentered with intercept as the default for basis for lags. Predictions are computed using the modified parameters reduced to predictor-specific association for 33\Ctemp{}. The identical fit of the original, reduced and re-constructed prediction is illustrated in Figure~\ref{fig:example4plotvar}, produced by:
+
+<<example4plotvar,fig=T>>=
+plot(pred4, "slices", var=33, ylab="RR", ylim=c(0.9,1.2),
+  main="Predictor-specific association at 33C")
+lines(redvar, ci="lines", col=4, lty=2)
+points(pred4b, col=1, pch=19, cex=0.6)
+legend("top",c("Original","Reduced","Reconstructed"),col=c(2,4,1),lty=c(1:2,NA),
+  pch=c(NA,NA,19),pt.cex=0.6,ins=0.1)
+@
 
 
 %-------------------------%%-------------------------%%-------------------------%

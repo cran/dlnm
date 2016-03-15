@@ -1,5 +1,5 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2014
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2016
 #
 fci <-
 function(ci, x, high, low, ci.arg, plot.arg, noeff=NULL) {
@@ -22,7 +22,9 @@ function(ci, x, high, low, ci.arg, plot.arg, noeff=NULL) {
       x1=x+range,y1=low))
     do.call(segments,segments.arg)
   } else if(ci=="lines") {
-    lines.arg <- modifyList(list(lty=2,col=plot.arg$col),ci.arg)
+    lines.arg <- list(lty=2)
+    if(!is.null(plot.arg$col)) lines.arg$col <- plot.arg$col
+    lines.arg <- modifyList(lines.arg,ci.arg)
     lines.arg <- modifyList(lines.arg,list(x=x,y=high))
     do.call(lines,lines.arg)
     lines.arg <- modifyList(lines.arg,list(x=x,y=low))

@@ -31,7 +31,7 @@ Differently than for plotting functions for \code{crosspred} objects (see the me
 
 These methods allow a great flexibility in the choice of graphical parameters, specified through arguments of the original plotting functions. See \code{\link[graphics]{plot.default}}, \code{\link[graphics]{lines}} and \code{\link[graphics]{points}} for information on additional graphical arguments. Some arguments, if not specified, are set to different default values than the original functions.
 
-Confidence intervals are plotted for \code{ptype} equal to \code{"overall"} or \code{"slices"}. Their type is determined  by \code{ci}, with options \code{"area"} (default for \code{plot}), \code{"bars"}, \code{"lines"} or \code{"n"} (no confidence intervals, default for \code{points} and \code{lines}). The appearance may be modified through \code{ci.arg}, a list of arguments passed to to low-level plotting functions: \code{\link[graphics]{polygon}} for \code{"area"}, \code{\link[graphics]{segments}} for \code{"bars"} and \code{\link[graphics]{lines}} for \code{"lines"}. See the original functions for a complete list of the arguments. This option offers flexibility in the choice of confidence intervals display. As above, some unspecified arguments are set to different default values.
+Confidence intervals are plotted for \code{ptype} equal to \code{"overall"} or \code{"slices"}. Their type is determined  by \code{ci}, with options \code{"area"} (default for \code{plot}), \code{"bars"}, \code{"lines"} or \code{"n"} (no confidence intervals, default for \code{points} and \code{lines}). Their appearance may be modified through \code{ci.arg}, a list of arguments passed to to low-level plotting functions: \code{\link[graphics]{polygon}} for \code{"area"}, \code{\link[graphics]{segments}} for \code{"bars"} and \code{\link[graphics]{lines}} for \code{"lines"}. See the original functions for a complete list of the arguments. This option offers flexibility in the choice of confidence intervals display. As above, some unspecified arguments are set to different default values.
 
 For a detailed illustration of the use of the functions, see:
 
@@ -45,7 +45,7 @@ Gasparrini A., Armstrong, B., Kenward M. G. Reducing and meta-analyzing estimate
 \author{Antonio Gasparrini, \email{antonio.gasparrini@lshtm.ac.uk}}
 
 \note{
-All the predictions are plotted using a reference value corresponding to the centering point for continuous functions or to the default values for the other options (see \code{\link{onebasis}} and \code{\link{crossbasis}}). Exponentiated predictions are returned by default if \code{x$model.link} is equal to \code{log} or \code{logit}.
+All the predictions are plotted using a reference value corresponding to the centering point for continuous functions or different values for the other functions (see the related help pages). This is determined by the argument \code{cen} in \code{\link{crossreduce}}. Exponentiated predictions are returned by default if \code{x$model.link} is equal to \code{log} or \code{logit}.
 }
 
 \seealso{
@@ -63,8 +63,8 @@ cb4 <- crossbasis(chicagoNMMAPS$temp, lag=30, argvar=list(fun="thr",
 
 # # run the model and get the predictions
 library(splines)
-model4 <- glm(death ~  cb4 + ns(time, 7*14) + dow,
-  family=quasipoisson(), chicagoNMMAPS)
+model4 <- glm(death ~  cb4 + ns(time, 7*14) + dow, family=quasipoisson(),
+  chicagoNMMAPS)
 pred4 <- crosspred(cb4, model4, by=1)
 
 # reduce to overall cumulative association
@@ -88,14 +88,14 @@ lines(redall, ci="lines",col=4,lty=2)
 legend("top",c("Original","Reduced"),col=c(2,4),lty=1:2,ins=0.1)
 
 # reconstruct the fit in terms of uni-dimensional function
-b4 <- onebasis(0:30,knots=attributes(cb4)$arglag$knots,int=TRUE,cen=FALSE)
+b4 <- onebasis(0:30,knots=attributes(cb4)$arglag$knots,intercept=TRUE)
 pred4b <- crosspred(b4,coef=coef(redvar),vcov=vcov(redvar),model.link="log",by=1)
 
 # test
 plot(pred4, "slices", var=33, ylab="RR", ylim=c(0.9,1.2),
   main="Lag-response association at 33C")
 lines(redvar, ci="lines", col=4, lty=2)
-points(pred4b, col=1, pch=19, cex=0.6)
+points(pred4b, pch=19, cex=0.6)
 legend("top",c("Original","Reduced","Reconstructed"),col=c(2,4,1),lty=c(1:2,NA),
   pch=c(NA,NA,19),pt.cex=0.6,ins=0.1)
 }

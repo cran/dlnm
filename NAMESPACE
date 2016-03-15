@@ -4,6 +4,8 @@
 #
 export(onebasis,crossbasis,crosspred,crossreduce)
 export(plot.crosspred,lines.crosspred,points.crosspred)
+#export(smooth.construct.cbs.smooth.spec)
+#export(cbPen)
 export(plot.crossreduce,lines.crossreduce,points.crossreduce)
 export(summary.onebasis,summary.crossbasis,summary.crosspred,summary.crossreduce)
 export(coef.crosspred,vcov.crosspred,coef.crossreduce,vcov.crossreduce)
@@ -15,18 +17,19 @@ export(exphist)
 # NOT EXPORTED
 #################
 #
-# poly,thr,strata,lin,integer
-
+# poly,thr,strata,lin, integer
+# ps, cr
 #
 #################
 # INTERNAL
 #################
 #
 # DOCUMENTED
-# mklag,fci,seqlag,Lag2,getcoef,getvcov,getlink
+# checkcrossbasis,checkgroup,checkonebasis,fci,getcoef,getlink,getvcov,mkat,
+# mkcen,mklag,mkXpred,seqlag
 #
 # NOT DOCUMENTED:
-#.onAttach,checkgroup,oldonebasis,oldcrossbasis
+#.onAttach
 #
 #################
 # IMPORTED
@@ -34,10 +37,14 @@ export(exphist)
 #
 import(stats,graphics,grDevices)
 importFrom(utils,packageDescription)
+importFrom(utils,modifyList)
 importFrom(splines,ns)
 importFrom(splines,bs)
 importFrom(nlme,fixef)
-#importFrom(tsModel,Lag)
+importFrom(tsModel,Lag)
+#importFrom(mgcv,smooth.construct.tensor.smooth.spec)
+importFrom(mgcv,tensor.prod.model.matrix)
+importFrom(mgcv,PredictMat)
 #
 #################
 # METHODS

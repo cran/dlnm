@@ -1,5 +1,5 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2014
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2016
 #
 plot.crossreduce <-
 function(x, ci="area", ci.arg, ci.level=x$ci.level, exp=NULL, ...) {
@@ -7,9 +7,8 @@ function(x, ci="area", ci.arg, ci.level=x$ci.level, exp=NULL, ...) {
 ################################################################################
 #
   if(class(x)!="crossreduce") stop("'x' must be of class 'crossreduce'")
-  if(!ci%in%c("area","bars","lines","n")) {
-    stop("'ci' must be one of 'area', 'bars', 'lines' or 'n'")
-  }
+  ci <- match.arg(ci,c("area","bars","lines","n"))
+#
   if(missing(ci.arg)) {
     ci.arg <- list()
   } else if(!is.list(ci.arg)) stop("'ci.arg' must be a list")
@@ -27,7 +26,7 @@ function(x, ci="area", ci.arg, ci.level=x$ci.level, exp=NULL, ...) {
   x$low <- x$fit-z*x$se
   noeff <- 0 
   # EXPONENTIAL
-  if((is.null(exp)&&x$model.link%in%c("log","logit"))||
+  if((is.null(exp)&&!is.null(x$model.link)&&x$model.link%in%c("log","logit"))||
     (!is.null(exp)&&exp==TRUE)) {
     x$fit <- exp(x$fit)
     x$high <- exp(x$high)
@@ -48,7 +47,7 @@ function(x, ci="area", ci.arg, ci.level=x$ci.level, exp=NULL, ...) {
 #
   # SET DEFAULT VALUES IF NOT INCLUDED BY THE USER
   plot.arg <- list(type="l",ylim=c(min(x$low),max(x$high)),
-    col=2,xlab=xlab,ylab="Outcome",frame.plot=FALSE)
+    xlab=xlab,ylab="Outcome",bty="l")
   plot.arg <- modifyList(plot.arg,list(...))
   # SET CONFIDENCE INTERVALS
   ci.list <- list(panel.first=call("fci",ci=ci,x=xvar,

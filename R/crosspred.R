@@ -1,43 +1,47 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2014
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2016
 #
 crosspred <-
 function(basis, model=NULL, coef=NULL, vcov=NULL, model.link=NULL, at=NULL,
-  from=NULL, to=NULL, by=NULL, lag, bylag=1, ci.level=0.95, cumul=FALSE) {
+  from=NULL, to=NULL, by=NULL, lag, bylag=1, cen=NULL, ci.level=0.95,
+  cumul=FALSE) {
 #
 ################################################################################
+# DETERMINE THE TYPE OF MODEL AND CHECKS
 #
-  list <- vector("list",0)
-  name <- deparse(substitute(basis))
+  # TYPE OF PREDICTION: CROSSBASIS, ONEBASIS, OR PENALIZED GAM
+  type <- if(any(class(basis)%in%"crossbasis")) "cb" else 
+    if(any(class(basis)%in%"onebasis")) "one" else "gam"
 #
-###########################################################################
-# CHECK CROSSBASIS AND WRITE CONDITION (REGULAR EXPRESSION) TO EXTRACT COEF-VCOV
+  # CHECKS ON TYPE, AND SET name, basis AND RESET type
+  errormes <- "arguments 'basis' and 'model' not consistent. See help(crosspred)"
+  if(type=="gam") {
+    if(!is.character(basis)||length(basis)>1L) stop(errormes)
+    if(is.null(model)||!any(class(model)%in%"gam")) stop(errormes)
+    name <- basis
+    sterms <- sapply(model$smooth,function(x) x$term[1])
+    if(name%in%sterms) basis <- model$smooth[[which(sterms==name)[1]]] else 
+      stop(errormes)
+    if(length(which(sterms==name))>1)
+      warning(paste(name,"included in multiple smoothers, only the first one taken"))
+    if(!"cbs.smooth"%in%class(basis) && basis$dim>1L)
+      stop("predictions not provided for multidimensional smoothers")
+  } else name <- deparse(substitute(basis))
 #
-  # IF SIMPLE BASIS, THEN RE-CREATE ATTRIBUTES
-  attr <- attributes(basis)
-  if(any(class(basis)=="onebasis")) {
-    ind <- match(names(formals(attr$fun)),names(attr),nomatch=0)
-    attr <- list(range=attr$range,lag=c(0,0),argvar=c(attr[c("fun","cen")],
-      attr[ind]),arglag=list(fun="strata",df=1,int=TRUE))
-    cond <- paste(name,"[[:print:]]*b[0-9]{1,2}",sep="")
-  } else cond <- paste(name,"[[:print:]]*v[0-9]{1,2}\\.l[0-9]{1,2}",sep="")
-  if(ncol(basis)==1L) cond <- name
+  #  EXTRACT lag (DEPENDENT ON TYPE)
+  lag <- if(missing(lag)) switch(type,
+    cb = attr(basis,"lag"),
+    one = c(0,0),
+    gam = if(is.null(basis$lag)) c(0,0) else basis$lag
+  ) else mklag(lag)
+  if(type=="cb" && lag!=attr(basis,"lag") && attr(basis,"arglag")$fun=="integer")
+    stop("prediction for lag sub-period not allowed for type 'integer'")
 #
-  if(!any(class(basis)%in%c("crossbasis","onebasis")))
-    stop("the first argument must be an object of class 'crossbasis' or 'onebasis'")
-#
-###########################################################################
-# OTHER COHERENCE CHECKS
-#
+  # OTHER COHERENCE CHECKS
   if(is.null(model)&&(is.null(coef)||is.null(vcov)))
     stop("At least 'model' or 'coef'-'vcov' must be provided")
   if(!is.numeric(ci.level)||ci.level>=1||ci.level<=0)
     stop("'ci.level' must be numeric and between 0 and 1")
-#
-  #  lag MUST BE A POSITIVE INTEGER VECTOR, BY DEFAULT THAT USED FOR ESTIMATION
-  lag <- if(missing(lag)) attr$lag else mklag(lag)
-  if(lag!=attr$lag && attr$arglag$fun=="integer")
-      stop("prediction for lag sub-period not allowed for type 'integer'")
 #
   # CUMULATIVE EFFECTS ONLY WITH LAGGED EFFECTS AND lag[1]==0
   if(cumul==TRUE && (diff(lag)==0L || lag[1]!=0L)) {
@@ -45,108 +49,87 @@ function(basis, model=NULL, coef=NULL, vcov=NULL, model.link=NULL, at=NULL,
     warning("Cumulative predictions only computed if diff(lag)>0 and lag[1]=0")
   }
 #
-###########################################################################
+################################################################################
 # SET COEF, VCOV CLASS AND LINK FOR EVERY TYPE OF MODELS
+#
+  # WRITE CONDITIONS (DEPENDENT ON TYPE AND IF MATRIX/VECTOR)
+  cond <- if(type=="gam") with(basis,first.para:last.para) else
+    if(ncol(basis)==1L) name else
+    if(type=="one") paste(name,"[[:print:]]*b[0-9]{1,2}",sep="") else
+      paste(name,"[[:print:]]*v[0-9]{1,2}\\.l[0-9]{1,2}",sep="")
 #
   # IF MODEL PROVIDED, EXTRACT FROM HERE, OTHERWISE DIRECTLY FROM COEF AND VCOV
   if(!is.null(model)) {
     model.class <- class(model)
-    coef <- getcoef(model,model.class,cond)
-    vcov <- getvcov(model,model.class,cond)
+    coef <- getcoef(model,model.class)
+    ind <- if(type=="gam") cond else grep(cond,names(coef))
+    coef <- coef[ind]
+    vcov <- getvcov(model,model.class)[ind,ind,drop=FALSE]
     model.link <- getlink(model,model.class)
   } else model.class <- NA
 #
-  # CHECK COEF AND VCOV
-  if(length(coef)!=ncol(basis) || length(coef)!=dim(vcov)[1] ||
-    any(is.na(coef))|| any(is.na(vcov))) {
-    stop("number of estimated parameters does not match number of cross-functions.
-  Possible reasons:
-  1) 'model' and 'basis' objects do not match
-  2) wrong 'coef' or 'vcov' arguments or methods
-  3) model dropped some cross-functions because of collinearity (set to NA)
-  4) name of basis matrix matches other parameters in the model formula
-  Unlikely, but in this case change the name of the onebasis-crossbasis object")
-  }
+  # CHECK
+  npar <- if(type=="gam") length(ind) else ncol(basis)
+  if(length(coef)!=npar || length(coef)!=dim(vcov)[1] || any(is.na(coef)) ||
+      any(is.na(vcov)))
+    stop("coef/vcov not consistent with basis matrix. See help(crosspred)")
 #
 ##########################################################################
-# PREDVAR
+# AT, PREDVAR, PREDLAG AND CENTERING
 #
-  # SET PREDVAR FROM AT, FROM/TO/BY OR AUTOMATICALLY
-  # IF at IS A MATRIX, PREDVAR IS ITS ROWNAMES (IF ANY) OR DEFAULT
-  if(is.null(at)) {
-    if(is.null(from)) from <- attr$range[1]
-    if(is.null(to)) to <- attr$range[2]
-    nobs <- ifelse(is.null(by),50,max(1,diff(attr$range)/by))
-    pretty <- pretty(c(from,to),n=nobs)
-    pretty <- pretty[pretty>=from&pretty<=to]	
-    predvar <- if(is.null(by)) pretty else seq(from=min(pretty),
-      to=to,by=by)
-  } else if(is.matrix(at)) {
-    if(dim(at)[2]!=diff(lag)+1L)
-      stop("matrix in 'at' must have ncol=diff(lag)+1")
-    if(!is.null(rownames(at))) {
-      predvar <- as.numeric(rownames(at))
-      if(any(is.na(predvar))) stop("rownames(at) must represent numurical values")
-    } else predvar <- seq(nrow(at))
-  } else predvar <- sort(unique(at))
+  # RANGE
+  range <- if(type=="gam") range(model$model[[basis$term[1]]]) else
+    attr(basis,"range")
 #
-##########################################################################
-# PREDICTION OF LAG-SPECIFIC EFFECTS
-#####################################
-#
-  # PREDLAG
+  # SET at, predvar AND predlag
+  at <- mkat(at,from,to,by,range,lag,bylag)
+  predvar <- if(is.matrix(at)) rownames(at) else at
   predlag <- seqlag(lag,bylag)
-  # EXPAND at IF A VECTOR HAS BEEN PROVIDED
-  if(is.matrix(at)) {
-    matlag <- at
-  } else matlag <- matrix(rep(predvar,length(predlag)),nrow=length(predvar))
-  # CREATE THE BASIS FOR VAR AND LAG
-  basisvar <- do.call("onebasis",c(list(x=matlag),attr$argvar))
-  basislag <- do.call("onebasis",c(list(x=predlag),attr$arglag))
 #
-  # CREATE LAG-SPECIFIC EFFECTS AND SE + (OPTIONAL) CUMULATIVE
-  matfit <- matse <- matrix(0,length(predvar),length(predlag))
-  for(i in seq(length(predlag))) {
-    ind <- seq(length(predvar))+length(predvar)*(i-1)
-    ZM <- basislag[i,,drop=FALSE] %x% basisvar[ind,,drop=FALSE]
-    matfit[,i] <- ZM %*% coef
-    matse[,i] <- sqrt(diag(ZM %*% vcov %*% t(ZM)))
-  }
+  # DEFINE CENTERING VALUE (NULL IF UNCENTERED), AND REMOVE INFO FROM BASIS
+  cen <- mkcen(cen,type,basis,range)
+  if(type=="one") attributes(basis)$cen <- NULL
+  if(type=="cb") attributes(basis)$argvar$cen <- NULL
+#
+################################################################################
+# PREDICTION OF LAG-SPECIFIC EFFECTS
+#
+  # CREATE THE MATRIX OF TRANSFORMED CENTRED VARIABLES (DEPENDENT ON TYPE)
+  Xpred <- mkXpred(type,basis,at,predvar,predlag,cen)
+#
+  # CREATE LAG-SPECIFIC EFFECTS AND SE
+  matfit <- matrix(Xpred%*%coef,length(predvar),length(predlag)) 
+  matse <- matrix(sqrt(pmax(0,rowSums((Xpred%*%vcov)*Xpred))),length(predvar),
+    length(predlag)) 
 #
   # NAMES
   rownames(matfit) <- rownames(matse) <- predvar
-  colnames(matfit) <- colnames(matse) <- outer("lag",seqlag(lag,bylag),
-    paste,sep="")
+  colnames(matfit) <- colnames(matse) <- outer("lag",predlag,paste,sep="")
 #
-##########################################################################
+################################################################################
 # PREDICTION OF OVERALL+CUMULATIVE EFFECTS
-#####################################
 #
-  # PREDLAG
+  # RE-CREATE LAGGED VALUES (NB: ONLY LAG INTEGERS)
   predlag <- seqlag(lag)
-  # EXPAND at IF A VECTOR HAS BEEN PROVIDED
-  if(is.matrix(at)) {
-    matlag <- at
-  } else matlag <- t(rep(1,length(predlag)))%x%predvar 
-  # CREATE THE BASIS FOR VAR AND LAG
-  basisvar <- do.call("onebasis",c(list(x=matlag),attr$argvar))
-  basislag <- do.call("onebasis",c(list(x=seqlag(lag)),attr$arglag))
+#
+  # CREATE THE MATRIX OF TRANSFORMED VARIABLES (DEPENDENT ON TYPE)
+  Xpred <- mkXpred(type,basis,at,predvar,predlag,cen)
 #
   # CREATE OVERALL AND (OPTIONAL) CUMULATIVE EFFECTS AND SE
-  ZMall <- 0
+  Xpredall <- 0
   if(cumul) {
-    cumfit <- cumse <- matrix(0,length(predvar),diff(lag)+1)
+    cumfit <- cumse <- matrix(0,length(predvar),length(predlag))
   }
-  for (i in 1:(diff(lag)+1)) {
+  for (i in seq(length(predlag))) {
     ind <- seq(length(predvar))+length(predvar)*(i-1)
-    ZMall <- ZMall + basislag[i,,drop=FALSE] %x% basisvar[ind,,drop=FALSE]
+    Xpredall <- Xpredall + Xpred[ind,,drop=FALSE]
     if(cumul) {
-      cumfit[, i] <- ZMall %*% coef
-      cumse[, i] <- sqrt(diag(ZMall %*% vcov %*% t(ZMall)))
+      cumfit[, i] <- Xpredall %*% coef
+      cumse[, i] <- sqrt(pmax(0,rowSums((Xpredall%*%vcov)*Xpredall)))
     }
   }
-  allfit <- as.vector(ZMall %*% coef)
-  allse <- sqrt(diag(ZMall %*% vcov %*% t(ZMall)))
+  allfit <- as.vector(Xpredall %*% coef)
+  allse <- sqrt(pmax(0,rowSums((Xpredall%*%vcov)*Xpredall)))
 #
   # NAMES
   names(allfit) <- names(allse) <- predvar
@@ -155,21 +138,15 @@ function(basis, model=NULL, coef=NULL, vcov=NULL, model.link=NULL, at=NULL,
     colnames(cumfit) <- colnames(cumse) <- outer("lag",seqlag(lag),paste,sep="")
   }
 #
-###########################################################################
+################################################################################
+# CREATE THE OBJECT
 #
-  list$predvar <- predvar
-  list$lag <- lag
-  list$bylag <- bylag
-  list$coefficients <- coef
-  list$vcov <- vcov
-  list$matfit <- matfit
-  list$matse <- matse
-  list$allfit <- allfit
-  list$allse <- allse
-  if(cumul) {
-    list$cumfit <- cumfit
-    list$cumse <- cumse
-  }
+  # INITIAL LIST, THEN ADD COMPONENTS
+  list <- list(predvar=predvar)
+  if(!is.null(cen)) list$cen <- cen
+  list <- c(list,list(lag=lag,bylag=bylag,coefficients=coef,vcov=vcov,
+    matfit=matfit,matse=matse,allfit=allfit,allse=allse))
+  if(cumul) list <- c(list,list(cumfit=cumfit,cumse=cumse))
 #
   # MATRICES AND VECTORS WITH EXPONENTIATED EFFECTS AND CONFIDENCE INTERVALS
   z <- qnorm(1-(1-ci.level)/2)

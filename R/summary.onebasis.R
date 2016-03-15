@@ -1,5 +1,5 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2014
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2016
 #
 summary.onebasis <-
 function(object, ...) {
@@ -18,7 +18,4 @@ function(object, ...) {
     cat(names(args[i]),": ",sep="")
     cat(args[[i]],"\n",sep=" ")
   }
-#
-  if(!is.logical(attr$cen))
-    cat("centered at",attr$cen,"\n") else cat("not centered","\n")
 }

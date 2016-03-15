@@ -1,4 +1,69 @@
 ==============================================================================
+Changes in dlnm 2.2.2 (15 Mar 2016)
+===================================
+
+Major changes
+-------------
+
+    o Centering procedure moved from onebasis() to crosspred()-crossreduce().
+      This change simplifies the steps of obtaining predictions with different
+      references, as it avoids refitting the model. At the moment the inclusion 
+      of 'ce' in onebasis()-crossbasis() generates a warning, but the info is
+      kept internally and the old code should still work.
+      
+    o Consistently withe the change above, crosspred()-crossreduce() now have
+      a 'cen' argument to specify the reference value.
+      
+    o Major changes in crosspred()-crossreduce(), with several auxiliary
+      functions build to simplify the internal code. Specifically: mkat(),
+      mkcen(), mklag(), mkXpred(). See the related help page.
+
+    o New import of the function tensor.prod.model.matrix() from mgcv, to
+      simplify the computation of the tensor product in crosspred().
+      
+    o Published code has been updated accordingly, and included in the related
+      web pages at http://www.ag-myresearch.com/. The function attrdl() (not
+      included in the package but used in published code) has been changed as
+      well.
+      
+Minor changes
+-------------
+
+    o Changed default for colour (now black) and frame (now bty=”l”) in
+      plotting functions.
+      
+    o Namespace changed accordingly, with imports from mgcv.
+
+    o Lag2() removed, back to Lag() imported from package tsModel.
+
+    o Documentation changed accordingly, references updated.
+    
+    
+==============================================================================
+Changes in dlnm 2.1.4 (15 Jan 2015)
+===================================
+
+Minor changes
+-------------
+
+    o Changes in function strata(), now with possibility of setting 'ref=0',
+      thus obtaining a different dummy parameterization.
+
+    o Changes in summary.crossbasis() to print only a subset of long arguments
+
+
+==============================================================================
+Changes in dlnm 2.1.4 (14 Aug 2014)
+===================================
+
+Minor changes
+-------------
+
+    o Bug fixed in plot()-points()-lines() methods when model.link was not
+      provided.
+
+
+==============================================================================
 Changes in dlnm 2.1.3 (05 Aug 2014)
 ===================================
 

@@ -1,24 +1,19 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2014
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2016
 #
 crossreduce <-
 function(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
-  model.link=NULL, at=NULL, from=NULL, to=NULL, by=NULL, lag, bylag=1,
+  model.link=NULL, at=NULL, from=NULL, to=NULL, by=NULL, lag, bylag=1, cen=NULL,
   ci.level=0.95) {
 #
 ################################################################################
-#
-  list <- vector("list",0)
-  name <- deparse(substitute(basis))
-#
-###########################################################################
 # CHECK BASIS AND WRITE CONDITION (REGULAR EXPRESSION) TO EXTRACT COEF-VCOV
 #
   if(all(class(basis)!="crossbasis")) {
     stop("the first argument must be an object of class 'crossbasis'")
   }
+  name <- deparse(substitute(basis))
   attr <- attributes(basis)
-  cond <- paste(name,"[[:print:]]*v[0-9]{1,2}\\.l[0-9]{1,2}",sep="")
   if(ncol(basis)==1) cond <- name
 #
 ###########################################################################
@@ -50,42 +45,37 @@ function(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
 ###########################################################################
 # SET COEF, VCOV CLASS AND LINK FOR EVERY TYPE OF MODELS
 #
+  # WRITE CONDITIONS (DEPENDENT ON TYPE AND IF MATRIX/VECTOR)
+  cond <- paste(name,"[[:print:]]*v[0-9]{1,2}\\.l[0-9]{1,2}",sep="")
+#
   # IF MODEL PROVIDED, EXTRACT FROM HERE, OTHERWISE DIRECTLY FROM COEF AND VCOV
   if(!is.null(model)) {
     model.class <- class(model)
-    coef <- getcoef(model,model.class,cond)
-    vcov <- getvcov(model,model.class,cond)
+    coef <- getcoef(model,model.class)
+    ind <- grep(cond,names(coef))
+    coef <- coef[ind]
+    vcov <- getvcov(model,model.class)[ind,ind,drop=FALSE]
     model.link <- getlink(model,model.class)
-  } else {
-    model.class <- NA
-    model.link <- NA
-  }
+  } else model.class <- NA
 #
   # CHECK COEF AND VCOV
-  if(length(coef)!=ncol(basis) || length(coef)!=dim(vcov)[1] ||
-    any(is.na(coef))|| any(is.na(vcov))) {
-    stop("number of estimated parameters does not match number of cross-functions.
-  Possible reasons:
-  1) 'model' and 'basis' objects do not match
-  2) wrong 'coef' or 'vcov' arguments or methods
-  3) model dropped some cross-functions because of collinearity (set to NA)
-  4) name of basis matrix matches other parameters in the model formula
-  Unlikely, but in this case change the name of the onebasis-crossbasis object")
-  }
+  npar <- if(type=="gam") length(ind) else ncol(basis)
+  npar <- if(type=="gam") length(ind) else ncol(basis)
+  if(length(coef)!=npar || length(coef)!=dim(vcov)[1] || any(is.na(coef)) ||
+      any(is.na(vcov)))
+    stop("coef/vcov do not consistent with basis matrix. See help(crossreduce)")
 #
 ##########################################################################
-# PREDVAR
+# AT AND CENTERING
 #
-  # SET PREDVAR FROM AT, FROM/TO/BY OR AUTOMATICALLY
-  if(is.null(at)) {
-    if(is.null(from)) from <- attr$range[1]
-    if(is.null(to)) to <- attr$range[2]
-    pretty <- pretty(c(from,to),n=50,min.n=30)
-    pretty <- pretty[pretty>=from&pretty<=to]  
-    if(is.null(by)) {
-      predvar <- pretty
-    } else predvar <- seq(from=min(pretty),to=max(pretty),by=by)
-  } else predvar <- sort(unique(at))
+  # SET at
+  if(is.matrix(at)) stop("argument 'at' must be a vector")
+  range <- attr$range
+  at <- mkat(at,from,to,by,range,lag,bylag)
+#
+  # DEFINE CENTERING VALUE (NULL IF UNCENTERED), AND REMOVE INFO FROM BASIS
+  cen <- mkcen(cen,type="cb",basis,range)
+  attributes(basis)$argvar$cen <- attr$argvar$cen <- NULL
 #
 ##########################################################################
 # REDUCTION
@@ -95,13 +85,25 @@ function(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
     lagbasis <- do.call("onebasis",c(list(x=seqlag(lag)),attr$arglag))
     M <- (t(rep(1,diff(lag)+1)) %*% lagbasis) %x% 
       diag(ncol(basis)/ncol(lagbasis))
-    newbasis <- do.call("onebasis",c(list(x=predvar),attr$argvar))
-  }else if(type=="lag") {
+    newbasis <- do.call("onebasis",c(list(x=at),attr$argvar))
+    if(!is.null(cen)) {
+      basiscen <- do.call("onebasis",c(list(x=cen),attr$argvar))
+      newbasis <- scale(newbasis,center=basiscen,scale=FALSE)
+    }
+  } else if(type=="lag") {
     lagbasis <- do.call("onebasis",c(list(x=value),attr$arglag))
     M <- lagbasis %x% diag(ncol(basis)/ncol(lagbasis))
-    newbasis <- do.call("onebasis",c(list(x=predvar),attr$argvar))
+    newbasis <- do.call("onebasis",c(list(x=at),attr$argvar))
+    if(!is.null(cen)) {
+      basiscen <- do.call("onebasis",c(list(x=cen),attr$argvar))
+      newbasis <- scale(newbasis,center=basiscen,scale=FALSE)
+    }
   } else if(type=="var") {
     varbasis <- do.call("onebasis",c(list(x=value),attr$argvar))
+    if(!is.null(cen)) {
+      basiscen <- do.call("onebasis",c(list(x=cen),attr$argvar))
+      varbasis <- scale(varbasis,center=basiscen,scale=FALSE)
+    }
     M <- diag(ncol(basis)/ncol(varbasis)) %x% varbasis
     newbasis <- do.call("onebasis",c(list(x=seqlag(lag,bylag)),attr$arglag))
   }
@@ -119,20 +121,17 @@ function(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
   se <- sqrt(diag(newbasis%*%newvcov%*%t(newbasis)))
   if(type=="var") {
     names(fit) <- names(se) <- outer("lag",seqlag(lag,bylag),paste,sep="")
-  }else names(fit) <- names(se) <- predvar
+  }else names(fit) <- names(se) <- at
 #
 ###########################################################################
+# CREATE THE OBJECT
 #
-  list$coefficients <- newcoef
-  list$vcov <- newvcov
-  list$basis <- newbasis
-  list$type <- type
-  list$value <- value
-  if(type!="var") list$predvar <- predvar
-  list$lag <- lag
-  list$bylag <- bylag
-  list$fit <- fit
-  list$se <- se
+  # INITIAL LIST
+  list <- list(coefficients=newcoef,vcov=newvcov,basis=newbasis,type=type,
+    value=value)
+  if(type!="var") list$predvar <- at
+  if(!is.null(cen)) list$cen <- cen
+  list <- c(list,list(lag=lag,bylag=bylag,fit=fit,se=se))
 #
   # VECTORS WITH EXPONENTIATED EFFECTS AND CONFIDENCE INTERVALS
   z <- qnorm(1-(1-ci.level)/2)

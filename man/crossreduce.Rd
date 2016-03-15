@@ -10,7 +10,7 @@ The function reduces the fit of a bi-dimensional DLNM to summaries defined in th
 
 \usage{
 crossreduce(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
-  model.link=NULL, at=NULL, from=NULL, to=NULL, by=NULL, lag, bylag=1,
+  model.link=NULL, at=NULL, from=NULL, to=NULL, by=NULL, lag, bylag=1, cen=NULL,
   ci.level=0.95)
   
 \method{summary}{crossreduce}(object, ...)
@@ -20,12 +20,13 @@ crossreduce(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
   \item{basis }{ an object of class \code{"crossbasis"}.}
   \item{model }{ a model object for which the reduction and prediction are desired. See Details below.}
   \item{coef, vcov, model.link }{ user-provided coefficients, (co)variance matrix and model link for the reduction and then prediction. See Details below.}
-  \item{type }{ type of reduction. Possible options are \code{"overall"} (default) for reduction to the overall cumulative association, \code{"lag"} for reduction to a lag-specific association, or \code{"var"} for reduction to a predictor-specific association. See Details below.}
+  \item{type }{ type of reduction. Possible options are \code{"overall"} (default) for reduction to the overall cumulative exposure-response association, \code{"lag"} for reduction to a lag-specific exposure-response association, or \code{"var"} for reduction to a predictor-specific lag-response association. See Details below.}
   \item{value }{ the single value of predictor or lag at which predictor-specific or lag-specific associations must be defined, respectively. See Details below.}
   \item{at }{ vector of values used for prediction in the dimension of predictor.}
   \item{from, to}{ range of predictor values used for prediction.}
   \item{lag }{ either an integer scalar or vector of length 2, defining the lag range used for prediction. Defalut to values used for estimation.}
   \item{by, bylag}{ increment of the sequences of predictor and lag values used for prediction.}
+  \item{cen }{ logical or a numeric scalar. It specifies the centering value, then used as a reference for predictions. See Details below.}
   \item{ci.level }{ confidence level for the computation of confidence intervals.}
   \item{object }{  an object of class \code{"crossreduce"}.}
   \item{\dots }{ additional arguments to be passed to \code{summary}.}
@@ -34,7 +35,11 @@ crossreduce(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
 \details{
 The dimension to which the fit is reduced is chosen by \code{type}, computing summaries for overall cumulative or lag-specific associations defining an exposure-response relationship in the predictor space, or predictor-specific associations defining a lag-response relationship in the lag space. The function re-expresses the original fit of the model, defined by the parameters of the bi-dimensional cross-basis functions, in summaries defined by the one-dimensional basis for the related space and a (usually smaller) set of modified parameters.
 
-Similarly to \code{\link{crosspred}}, the object \code{basis} must be the same containing the cross-basis matrix included in \code{model}, with its attributes and class. The optional arguments \code{at} and \code{from}/\code{to}/\code{by} provides the predictor values for predicted associations when the reduction is in the dimension of predictor. \code{lag} and \code{bylag} determine instead the lag values for predictor-specific associations. For specific associations, the value at which the reduction is computed is chosen by \code{value}. Exponentiated predictions and confidence intervals are also optionally returned. See \code{\link{crosspred}} for details.
+Similarly to \code{\link{crosspred}}, the object \code{basis} must be the same containing the cross-basis matrix included in \code{model}, with its attributes and class. The function computes predictions for specific values of predictor (for \code{type} equal to \code{"overall"} and \code{"lag"}) or lag (for for \code{type} equal to \code{"var"}). Values are set to default or chosen thorugh \code{at}/\code{from}/\code{to}/\code{by} and \code{lag}/\code{bylag}, respectively.
+
+Predictions are computed versus a reference value, with default values dependent on the function used in \code{basis}, or manually set through \code{cen}. Briefly, sensible default values are automatically defined for \code{\link{strata}}, \code{\link{thr}} and \code{\link{integer}} (corresponding to the reference region), and for \code{\link{lin}} (corresponding to 0). For other choices, such as \code{\link{ns}}, \code{\link{bs}}, \code{\link{poly}} or other existing or user-defined functions, the centering value is set by default to the mid-range. The inclusion of the intercept in \code{basis} term nullifies the centering.
+
+Exponentiated predictions are included if \code{model.link} is equal to \code{log} or \code{logit}. Confidence intervals computed using a normal approximation and a confidence level of \code{ci.level}. \code{model.link} is automatically selected from \code{model} for some classes, but needs to be provided for different classes. Matrices with incremental cumulative predicted associations along lags at each values used for prediction are included if \code{cumul=TRUE}.
 
 The function automatically works with model objects from regression function \code{\link{lm}} and \code{\link{glm}}, \code{\link[mgcv]{gam}} (package \pkg{mgcv}), \code{\link[survival]{coxph}} and \code{\link[survival]{clogit}} (package \pkg{survival}), \code{\link[nlme]{lme}} and \code{\link[nlme]{nlme}} (package \pkg{nlme}), \code{\link[lme4]{lmer}} and \code{\link[lme4]{glmer}} and \code{\link[lme4]{nlmer}} (package \pkg{lme4}), \code{\link[gee]{gee}} (package \pkg{gee}), \code{\link[geepack]{geeglm}} (package \pkg{geepack}). The function also works with any regression function for which \code{\link{coef}} and \code{\link{vcov}} methods are available. Otherwise, the user needs to input the coefficients and associated (co)variance matrix related to the parameters of the crossbasis as arguments \code{coef} and \code{vcov}. In this case, their dimensions and order must match the variables included in \code{basis}.
 }
@@ -44,6 +49,7 @@ A list object of class \code{"crossreduce"} with the following (optional) compon
   \item{coefficients, vcov }{ reduced parameters of the original fitted model for the chosen dimension.}
   \item{basis }{ basis matrix computed at \code{predvar} or for the sequence of lags defined by \code{lag}, depending on the chosen dimension.}
   \item{type, value }{ type of reduction and (optional) value, as arguments above.}
+  \item{cen }{ (optional) numeric scalar defining the centering value.}
   \item{predvar }{ vector of observations used for prediction, if the reduction is in the dimension of predictor.}
   \item{lag }{ integer vector defining the lag range.}
   \item{bylag }{ increment of the sequence of lag values.}
@@ -63,7 +69,9 @@ Gasparrini A., Armstrong, B., Kenward M. G. Reducing and meta-analyzing estimate
 \author{Antonio Gasparrini, \email{antonio.gasparrini@lshtm.ac.uk}}
 
 \note{
-All the predictions are generated using a reference value corresponding to the centering point for continuous functions or to the default values for the other options (see \code{\link{onebasis}} and \code{\link{crossbasis}}). Exponentiated predictions are included if \code{model.link} (specified automatically by \code{object} or selected by the user) is equal to \code{log} or \code{logit}.
+All the predictions are generated using a reference value, which if not directly specific by \code{cen} is given default values corresponding to the mid-range point for continuous functions. Before version 2.2.0 of \pkg{dlnm}, centering was produced in \code{\link{crossbasis}} (see the related help page), and for backward compatibility this information is kept (with a warning) and used in \code{crossreduce} unless \code{cen} is directly defined as an argument.
+
+Exponentiated predictions are included if \code{model.link} (specified automatically by \code{model} or selected by the user) is equal to \code{log} or \code{logit}.
 }
 
 \section{Warnings}{
@@ -87,8 +95,8 @@ cb4 <- crossbasis(chicagoNMMAPS$temp, lag=30, argvar=list(fun="thr",
 
 # # run the model and get the predictions
 library(splines)
-model4 <- glm(death ~  cb4 + ns(time, 7*14) + dow,
-  family=quasipoisson(), chicagoNMMAPS)
+model4 <- glm(death ~  cb4 + ns(time, 7*14) + dow, family=quasipoisson(),
+  chicagoNMMAPS)
 pred4 <- crosspred(cb4, model4, by=1)
 
 # reduce to overall cumulative association
@@ -112,14 +120,14 @@ lines(redall, ci="lines",col=4,lty=2)
 legend("top",c("Original","Reduced"),col=c(2,4),lty=1:2,ins=0.1)
 
 # reconstruct the fit in terms of uni-dimensional function
-b4 <- onebasis(0:30,knots=attributes(cb4)$arglag$knots,int=TRUE,cen=FALSE)
+b4 <- onebasis(0:30,knots=attributes(cb4)$arglag$knots,int=TRUE)
 pred4b <- crosspred(b4,coef=coef(redvar),vcov=vcov(redvar),model.link="log",by=1)
 
 # test
 plot(pred4, "slices", var=33, ylab="RR", ylim=c(0.9,1.2),
   main="Lag-response association at 33C")
 lines(redvar, ci="lines", col=4, lty=2)
-points(pred4b, col=1, pch=19, cex=0.6)
+points(pred4b, pch=19, cex=0.6)
 legend("top",c("Original","Reduced","Reconstructed"),col=c(2,4,1),lty=c(1:2,NA),
   pch=c(NA,NA,19),pt.cex=0.6,ins=0.1)
 }

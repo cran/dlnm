@@ -8,7 +8,7 @@ This function defines the position of knot or cut-off values at equally-spaced l
 }
 
 \usage{
-logknots(x, nk=NULL, fun="ns", df=1, degree=3, int=TRUE)
+logknots(x, nk=NULL, fun="ns", df=1, degree=3, intercept=TRUE)
 }
 
 \arguments{
@@ -17,7 +17,7 @@ logknots(x, nk=NULL, fun="ns", df=1, degree=3, int=TRUE)
   \item{fun }{ character scalar with the name of the function for which the knots or cut-offs must be created. See Details below.}
   \item{df }{ degree of freedom.}
   \item{degree }{ degree of the piecewise polynomial. Only for \code{fun="bs"}.}
-  \item{int }{ logical. If an intercept is included in the basis function.}
+  \item{intercept }{ logical. If an intercept is included in the basis function.}
 }
 
 \details{
@@ -25,9 +25,9 @@ This functions has been included for consistency with versions of \pkg{dlnm} ear
 
 The argument \code{x} is usually assumed to represent the maximum lag (if a scalar) or the lag range (if a vector of length 2). Otherwise is interpreted as a vector variable for which the range is computed internally.
 
-The number of knots is set with the argument \code{nk}, or otherwise determined by the choice of function and number of degrees of freedom through the arguments \code{fun} and \code{df}. Specifically, the number of knots is set to \code{df-1-int} for \code{"ns"}, \code{df-degree-int} for \code{"bs"}, or \code{df-int} for \code{"strata"}.
+The number of knots is set with the argument \code{nk}, or otherwise determined by the choice of function and number of degrees of freedom through the arguments \code{fun} and \code{df}. Specifically, the number of knots is set to \code{df-1-intercept} for \code{"ns"}, \code{df-degree-intercept} for \code{"bs"}, or \code{df-intercept} for \code{"strata"}.
 
-An intercept is included by default (\code{int=TRUE}), consistently with the default for the lag space.
+An intercept is included by default (\code{intercept=TRUE}), consistently with the default for the lag space.
 }
 
 \value{
@@ -54,17 +54,17 @@ logknots(20, fun="strata", df=4)
 
 ### with and without without intercept
 logknots(20, fun="ns", df=4)
-logknots(20, fun="ns", df=4, int=FALSE)
+logknots(20, fun="ns", df=4, intercept=FALSE)
 
 ### replicating an old example in time series analysis
 lagknots <- logknots(30, 3)
-cb <- crossbasis(chicagoNMMAPS$temp, lag=30, argvar=list(fun="bs",
-  df=5,degree=2,cen=21), arglag=list(knots=lagknots))
+cb <- crossbasis(chicagoNMMAPS$temp, lag=30, argvar=list(fun="bs",df=5,
+  degree=2), arglag=list(knots=lagknots))
 summary(cb)
 library(splines)
 model <- glm(death ~  cb + ns(time, 7*14) + dow, 
   family=quasipoisson(), chicagoNMMAPS)
-pred <- crosspred(cb, model, by=1)
+pred <- crosspred(cb, model, cen=21, by=1)
 plot(pred, xlab="Temperature", col="red", zlab="RR", shade=0.6,
   main="3D graph of temperature effect")
 }

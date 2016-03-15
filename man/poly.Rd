@@ -8,7 +8,7 @@ The function generates a basis matrix of polynomial transformations. It is meant
 }
 
 \usage{
-poly(x, degree=1, scale, int=FALSE)
+poly(x, degree=1, scale, intercept=FALSE)
 
 }
 
@@ -16,17 +16,17 @@ poly(x, degree=1, scale, int=FALSE)
   \item{x }{ the predictor variable. Missing values are allowed.}
   \item{degree }{ numerical scalar defining the degree of the polynomial.}
   \item{scale }{ scaling factor. Default to the maximum of the absolute value of \code{x}.}
-  \item{int }{ logical. If \code{TRUE}, an intercept is included in the basis matrix. See Details below.}
+  \item{intercept }{ logical. If \code{TRUE}, an intercept is included in the basis matrix. See Details below.}
 }
 
 \details{
 The predictor vector is scaled by default through the argument \code{scale} to avoid numerical problem with powers of very high/low values.
 
-If \code{int=TRUE}, an intercept is included in the model, namely an additional variable with a constant value of 1.
+If \code{intercept=TRUE}, an intercept is included in the model, namely an additional variable with a constant value of 1.
 }
 
 \value{
-A matrix object of class \code{"poly"}. It contains the attributes \code{degree}, \code{scale} and \code{int}, with values which can be different than the arguments provided due to internal reset.}
+A matrix object of class \code{"poly"}. It contains the attributes \code{degree}, \code{scale} and \code{intercept}, with values which can be different than the arguments provided due to internal reset.}
 
 \author{Antonio Gasparrini, \email{antonio.gasparrini@lshtm.ac.uk}}
 
@@ -43,7 +43,7 @@ See \code{\link{dlnm-package}} for an introduction to the package and for links 
 \examples{
 ### simple use (accessing non-exported function through ':::')
 dlnm:::poly(1:5, degree=3)
-dlnm:::poly(1:5, degree=3, int=TRUE)
+dlnm:::poly(1:5, degree=3, intercept=TRUE)
 
 ### use as an internal function in onebasis
 b <- onebasis(chicagoNMMAPS$pm10, "poly", degree=3)

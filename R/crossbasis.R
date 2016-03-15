@@ -1,21 +1,18 @@
 ###
-### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2014
+### R routines for the R package dlnm (c) Antonio Gasparrini 2012-2016
 #
 crossbasis <-
-  function(x, lag, argvar=list(), arglag=list(), group=NULL, ...) {         
+function(x, lag, argvar=list(), arglag=list(), group=NULL, ...) {         
 #
 ################################################################################
 # COHERENCE CHECKS
 #
-  # OLD USAGE
-  checkoldcrossbasis(argvar,arglag,list(...))
+  # CHECK OLD USAGE
+  checkcrossbasis(argvar,arglag,list(...))
 #
   #  lag MUST BE A POSITIVE INTEGER VECTOR 
   lag <- if(missing(lag)) c(0,NCOL(x)-1) else mklag(lag)
 #  
-  if(!is.list(argvar)) stop("'var' must be a list")
-  if(!is.list(arglag)) stop("'arglag' must be a list")
-#
 ############################################################################
 # CREATE THE BASIS FOR THE PREDICTOR SPACE
 #
@@ -30,20 +27,26 @@ crossbasis <-
 #
   # THE BASIS TRANSFORMATION CREATES DIFFERENT MATRICES DEPENDING THE DATA :
   #   IF TIME SERIES, EACH COLUMN CONTAINS THE UNLAGGED TRANSFORMATION
-  #   IF NOT, EACH COLUMN CONTAINS THE TRANFORMATION FOR ALL THE LAGGED 
-  basisvar <- do.call("onebasis",modifyList(argvar,list(x=x)))
+  #   IF NOT, EACH COLUMN CONTAINS THE TRANFORMATION FOR ALL THE LAGGED VALUES
+  basisvar <- do.call("onebasis",modifyList(argvar,list(x=as.numeric(x))))
 #
 ############################################################################
 # CREATE THE BASIS FOR THE LAG SPACE
 #
   # SET FUN="STRATA" AND DF=1 UNDER SPECIFIC CIRCUMSTANCES
   if(length(arglag)==0L || diff(lag)==0L) 
-    arglag <- list(fun="strata",df=1,int=TRUE)
+    arglag <- list(fun="strata",df=1,intercept=TRUE)
 #
   # IF NOT SPECIFIED AND AN ARGUMENT, INCLUDE AN INTERCEPT BY DEFAULT
-  if(is.null(arglag$int)) arglag$int <- TRUE
+  if((is.null(arglag$fun) || "intercept"%in%names(formals(arglag$fun))) && 
+      sum(pmatch(names(arglag),"intercept",nomatch=0))==0)
+    arglag$intercept <- TRUE
+  # FORCE UNCENTERED TRANSFORMATIONS
+  arglag$cen <- NULL
 #
-  basislag <- do.call("onebasis",modifyList(arglag,list(x=seqlag(lag),cen=FALSE))) 
+  # THE BASIS TRANSFORMATIONS ARE ONLY APPLIED TO THE LAG VECTOR
+  # DIMENSIONS ACCOUNTED FOR IN CROSS-BASIS COMPUTATIONS BELOW
+  basislag <- do.call("onebasis",modifyList(arglag,list(x=seqlag(lag)))) 
 #
 ############################################################################
 # CROSSBASIS COMPUTATION
@@ -57,7 +60,7 @@ crossbasis <-
   crossbasis <- matrix(0,nrow=dim[1],ncol=ncol(basisvar)*ncol(basislag))
   for(v in seq(length=ncol(basisvar))) {
     if(dim[2]==1L) {
-      mat <- as.matrix(Lag2(basisvar[, v],seqlag(lag),group=group))
+      mat <- as.matrix(Lag(basisvar[, v],seqlag(lag),group=group))
     } else mat <- matrix(basisvar[,v],ncol=diff(lag)+1)
     for(l in seq(length=ncol(basislag))) {
       crossbasis[,ncol(basisvar)*(l-1)+v] <- mat%*%(basislag[,l])
@@ -73,14 +76,18 @@ crossbasis <-
   dimnames(crossbasis) <- list(rownames(x),cn)
 #
   # REDEFINE ARGUMENTS FOR BASES, THEY MIGHT HAVE BEEN CHANGED BY onebasis
+  # FIRST VAR
   ind <- match(names(formals(attributes(basisvar)$fun)),
     names(attributes(basisvar)),nomatch=0)
-  argvar <- c(attributes(basisvar)[c("fun","cen")],attributes(basisvar)[ind])
+  argvar <- c(attributes(basisvar)["fun"],attributes(basisvar)[ind])
+  # THEN LAG
   ind <- match(names(formals(attributes(basislag)$fun)),
     names(attributes(basislag)),nomatch=0)
-  arglag <- c(attributes(basislag)[c("fun","cen")],attributes(basislag)[ind])
+  arglag <- c(attributes(basislag)["fun"],attributes(basislag)[ind])
+  # THEN ADD CENTERING FOR VAR, IF PROVIDED (OTHERWISE NULL)
+  argvar$cen <- attributes(basisvar)$cen
 #
-#
+  # ATTRIBUTES
   attributes(crossbasis) <- c(attributes(crossbasis),
     list(df=c(ncol(basisvar),ncol(basislag)),range=range(x,na.rm=T),lag=lag,
       argvar=argvar,arglag=arglag))
