@@ -24,7 +24,7 @@ function(basis, model=NULL, coef=NULL, vcov=NULL, model.link=NULL, at=NULL,
       stop(errormes)
     if(length(which(sterms==name))>1)
       warning(paste(name,"included in multiple smoothers, only the first one taken"))
-    if(!"cbs.smooth"%in%class(basis) && basis$dim>1L)
+    if(!"cb.smooth"%in%class(basis) && basis$dim>1L)
       stop("predictions not provided for multidimensional smoothers")
   } else name <- deparse(substitute(basis))
 #

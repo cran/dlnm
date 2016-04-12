@@ -80,11 +80,13 @@ function(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
 ##########################################################################
 # REDUCTION
 #
-  # CREATE TRANSFORMATION MATRIX AND BASIS
+  # CREATE (CENTERED) TRANSFORMATION MATRIX AND BASIS
+  # NB: ORDER OF THE TENSOR REVERSED SINCE VERSION 2.2.4
+  # NOW ORDER COMPATIBLE WITH crossbasis BUT REVERSE OF GASPARRINI BMCmrm 2013
   if(type=="overall") {
     lagbasis <- do.call("onebasis",c(list(x=seqlag(lag)),attr$arglag))
-    M <- (t(rep(1,diff(lag)+1)) %*% lagbasis) %x% 
-      diag(ncol(basis)/ncol(lagbasis))
+    M <- diag(ncol(basis)/ncol(lagbasis)) %x%
+      (t(rep(1,diff(lag)+1)) %*% lagbasis)  
     newbasis <- do.call("onebasis",c(list(x=at),attr$argvar))
     if(!is.null(cen)) {
       basiscen <- do.call("onebasis",c(list(x=cen),attr$argvar))
@@ -92,7 +94,7 @@ function(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
     }
   } else if(type=="lag") {
     lagbasis <- do.call("onebasis",c(list(x=value),attr$arglag))
-    M <- lagbasis %x% diag(ncol(basis)/ncol(lagbasis))
+    M <- diag(ncol(basis)/ncol(lagbasis)) %x% lagbasis
     newbasis <- do.call("onebasis",c(list(x=at),attr$argvar))
     if(!is.null(cen)) {
       basiscen <- do.call("onebasis",c(list(x=cen),attr$argvar))
@@ -104,9 +106,12 @@ function(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
       basiscen <- do.call("onebasis",c(list(x=cen),attr$argvar))
       varbasis <- scale(varbasis,center=basiscen,scale=FALSE)
     }
-    M <- diag(ncol(basis)/ncol(varbasis)) %x% varbasis
+    M <- varbasis %x% diag(ncol(basis)/ncol(varbasis))
     newbasis <- do.call("onebasis",c(list(x=seqlag(lag,bylag)),attr$arglag))
   }
+#
+  # NAMES
+  dimnames(newbasis) <- list(seq(nrow(newbasis)),paste0("b",seq(ncol(newbasis))))
 #
   # CREATE NEW SET OF COEF AND VCOV
   newcoef <- as.vector(M%*%coef)
@@ -118,7 +123,7 @@ function(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
 # PREDICTION
 #
   fit <- as.vector(newbasis%*%newcoef)
-  se <- sqrt(diag(newbasis%*%newvcov%*%t(newbasis)))
+  se <- sqrt(pmax(0,rowSums((newbasis%*%newvcov)*newbasis)))
   if(type=="var") {
     names(fit) <- names(se) <- outer("lag",seqlag(lag,bylag),paste,sep="")
   }else names(fit) <- names(se) <- at

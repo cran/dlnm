@@ -13,7 +13,7 @@ function(type, basis, at, predvar, predlag, cen) {
 #
   if(type=="cb") {
     # IF STANDARD CROSS-BASIS, CREATE MARGINAL BASIS AND CALL TENSOR
-    # NB: NOTE ORDER OF BASIS MATRICES IN TENSOR (LAG FIRST)
+    # NB: ORDER OF BASIS MATRICES IN TENSOR CHANGED SINCE VERSION 2.2.4
     # CENTERING APPLIED ONLY MARGINALLY TO VAR DIMENSION
     basisvar <- do.call("onebasis",c(list(x=varvec),attr(basis,"argvar")))
     basislag <- do.call("onebasis",c(list(x=lagvec),attr(basis,"arglag")))
@@ -21,7 +21,7 @@ function(type, basis, at, predvar, predlag, cen) {
       basiscen <- do.call("onebasis",c(list(x=cen),attr(basis,"argvar")))
       basisvar <- scale(basisvar,center=basiscen,scale=FALSE)
     }
-    Xpred <- tensor.prod.model.matrix(list(basislag,basisvar))
+    Xpred <- tensor.prod.model.matrix(list(basisvar,basislag))
   } else if(type=="one") {
     # IF ONEBASIS, SIMPLY CALL THE FUNCTION WITH PROPER ARGUMENTS
     ind <- match(c("fun",names(formals(attr(basis,"fun")))),

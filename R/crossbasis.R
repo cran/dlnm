@@ -57,13 +57,14 @@ function(x, lag, argvar=list(), arglag=list(), group=NULL, ...) {
   # COMPUTE CROSS-BASIS:
   #   FOR TIME SERIES DATA, COMPUTE THE MATRIX OF LAGGED OCCURRENCES FIRST
   #   IF x WAS ALREADY A MATRIX, JUST RECOMPUTE THE APPROPRIATE DIMENSIONS
+  #   NB: ORDER OF TRANSFORMATION IN THE TENSOR CHANGED SINCE VERSION 2.2.4
   crossbasis <- matrix(0,nrow=dim[1],ncol=ncol(basisvar)*ncol(basislag))
   for(v in seq(length=ncol(basisvar))) {
     if(dim[2]==1L) {
       mat <- as.matrix(Lag(basisvar[, v],seqlag(lag),group=group))
     } else mat <- matrix(basisvar[,v],ncol=diff(lag)+1)
     for(l in seq(length=ncol(basislag))) {
-      crossbasis[,ncol(basisvar)*(l-1)+v] <- mat%*%(basislag[,l])
+      crossbasis[,ncol(basislag)*(v-1)+l] <- mat%*%(basislag[,l])
     }
   }
 #
@@ -71,8 +72,10 @@ function(x, lag, argvar=list(), arglag=list(), group=NULL, ...) {
 # ATTRIBUTES AND NAMES
 #
   # NAMES
-  cn <- as.vector(outer(paste("v",seq(length=ncol(basisvar)),
-    sep=""),paste("l",seq(length=ncol(basislag)),sep=""),paste,sep="."))
+  #   NB: ORDER CHANGED SINCE VERSION 2.2.4
+
+  cn <- paste0("v",rep(seq(ncol(basisvar)),each=ncol(basislag)),".l",
+    rep(seq(ncol(basislag)),ncol(basisvar)))
   dimnames(crossbasis) <- list(rownames(x),cn)
 #
   # REDEFINE ARGUMENTS FOR BASES, THEY MIGHT HAVE BEEN CHANGED BY onebasis

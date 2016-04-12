@@ -15,8 +15,6 @@ function(fun,args,cen) {
   if(!is.null(args$cen) && !"cen"%in%names(formals(fun))) {
     warning("centering through 'cen' now applied at the prediction stage. See ?crosspred")  
     args$cen <- NULL
-    if((!is.null(args$int)&&args$int) || (fun%in%c("thr","strata","integer")))
-      cen <- NULL
   }
 #  
   # OLD ARGUMENT bound FOR SPLINE FUNCTIONS
