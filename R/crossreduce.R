@@ -46,7 +46,8 @@ function(basis, model=NULL, type="overall", value=NULL, coef=NULL, vcov=NULL,
 # SET COEF, VCOV CLASS AND LINK FOR EVERY TYPE OF MODELS
 #
   # WRITE CONDITIONS (DEPENDENT ON TYPE AND IF MATRIX/VECTOR)
-  cond <- paste(name,"[[:print:]]*v[0-9]{1,2}\\.l[0-9]{1,2}",sep="")
+  cond <- if(ncol(basis)==1L) name else 
+    paste(name,"[[:print:]]*v[0-9]{1,2}\\.l[0-9]{1,2}",sep="")
 #
   # IF MODEL PROVIDED, EXTRACT FROM HERE, OTHERWISE DIRECTLY FROM COEF AND VCOV
   if(!is.null(model)) {
