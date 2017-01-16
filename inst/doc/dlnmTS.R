@@ -1,9 +1,10 @@
 ### R code from vignette source 'dlnmTS.Rnw'
 
 ###################################################
-### code chunk number 1: dlnmTS.Rnw:51-52
+### code chunk number 1: dlnmTS.Rnw:53-55
 ###################################################
 options(continue="  ")
+set.seed(13041975)
 
 
 ###################################################
