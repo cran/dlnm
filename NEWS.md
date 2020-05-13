@@ -1,5 +1,25 @@
 -----------------------------------
 
+### Changes in dlnm 2.4.1 (13 May 2020)
+
+#### Minor changes
+
+  * Fixes for CRAN checks.
+
+-----------------------------------
+
+### Changes in dlnm 2.4.0 (01 May 2020)
+
+#### Minor changes
+
+  * Allowed incremental cumulative predictions for any lag interval.
+  
+  * Small fixes in exphist(), getcoef(), and getvcov().
+
+  * Documentation amended.
+
+-----------------------------------
+
 ### Changes in dlnm 2.3.9 (11 Mar 2019)
 
 #### Minor changes
@@ -8,7 +28,7 @@
   
   * Added colnames in object returned by exphist().
 
-  * Minor correction to documentation.
+  * Documentation amended.
 
 -----------------------------------
 
