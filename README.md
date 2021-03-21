@@ -1,8 +1,10 @@
-[![Travis-CI Build Status](https://travis-ci.org/fabian-s/dlnm.svg?branch=cran-ready)](https://travis-ci.org/fabian-s/dlnm)
-
 -----------------------------------
 
-## Distributed Lag Non-linear Models (DLNM)
+## dlnm: Distributed Lag Non-Linear Models
+
+[![CRAN Version](https://www.r-pkg.org/badges/version/dlnm)](https://cran.r-project.org/package=dlnm)
+[![Monthly Downloads](https://cranlogs.r-pkg.org/badges/dlnm)](https://cranlogs.r-pkg.org/badges/dlnm)
+[![Total Downloads](https://cranlogs.r-pkg.org/badges/grand-total/dlnm)](https://cranlogs.r-pkg.org/badges/grand-total/dlnm)
 
 The package `dlnm` contains functions to specify and interpret distributed lag linear (DLMs) and non-linear (DLNMs) models. The DLM/DLNM methodology is illustrated in detail in a series of articles referenced at the end of this document.
 
@@ -32,7 +34,7 @@ install.packages("dlnm")
 
 ### R code in published articles
 
-Several peer-reviewed articles and documents provide R code illustrating methodological developments of `dlnm` or replicating substantive results using this package. An updated version of the code can be found at the GitHub (https://github.com/gasparrini) or personal web page (http://www.ag-myresearch.com) of the package maintainer.
+Several peer-reviewed articles and documents provide R code illustrating methodological developments of `dlnm` or replicating substantive results using this package. An updated version of the code can be found at the GitHub (httpsgithub.com/gasparrini) or personal web page (http://www.ag-myresearch.com) of the package maintainer.
 
 ### References:
 
@@ -40,7 +42,7 @@ Gasparrini A. Distributed lag linear and non-linear models in R:
 the package dlnm. *Journal of Statistical Software*. 2011;
 **43**(8):1-20. [freely available [here](http://www.ag-myresearch.com/2011_gasparrini_jss.html)]
 
-Gasparrini A, Scheipl F, Armstrong B, Kenward MG. A penalized framework for distributed lag non-linear models. *Biometrics*. 2017;**73**(3):938-948. [freely available [here](http://www.ag-myresearch.com/2017_gasparrini_biomet.html)]
+Gasparrini A, Scheipl F, Armstrong B, Kenward MG. A penalized framework for distributed lag non-linear models. *Biometrics*. 2017;**73**(3):938-948. [freely available [here](http://www.ag-myresearch.com/2017_gasparrini_biomet.html)]://
 
 Gasparrini A. Modelling lagged associations in environmental time series data: a simulation study. *Epidemiology*. 2016; **27**(6):835-842. [freely available [here](http://www.ag-myresearch.com/2016_gasparrini_epidem.html)]
 
@@ -58,4 +60,4 @@ Methodology*. 2013; **13**(1):1. [freely available [here](http://www.ag-myresear
 
 Armstrong, B. Models for the relationship between ambient temperature and
 daily mortality. *Epidemiology*. 2006, **17**(6):624-31. [available
-[here](http://www.ncbi.nlm.nih.gov/pubmed/17028505)].
+[here](https://pubmed.ncbi.nlm.nih.gov/17028505/)].
