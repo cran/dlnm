@@ -1,7 +1,7 @@
 Package: dlnm
 Type: Package
-Version: 2.4.5
-Date: 2021-03-21
+Version: 2.4.6
+Date: 2021-06-15
 Title: Distributed Lag Non-Linear Models
 Description: Collection of functions for distributed lag linear and non-linear models.
 Author: Antonio Gasparrini [aut, cre],
@@ -21,6 +21,6 @@ URL: https://github.com/gasparrini/dlnm,
 License: GPL (>= 2)
 LazyData: yes
 NeedsCompilation: no
-Packaged: 2021-03-21 17:37:11 UTC; anton
+Packaged: 2021-06-15 06:54:34 UTC; anton
 Repository: CRAN
-Date/Publication: 2021-03-21 18:20:02 UTC
+Date/Publication: 2021-06-15 07:40:24 UTC
